@@ -443,27 +443,29 @@ function panelGlyphs(p){
 function isSingleDesignator(gl, solo){
   return !!solo && gl.length>0 && !gl.some(g=>ARROW_GLYPH_REV[g]||g===' '||g==='-'||g==='/');
 }
-function panelChain(p, h, norm, solo){
+/* Faktor für Ränder und Abstände je Schild (Feld „Abstände [%]“, 100 % = Normwert) */
+function spf(sign){ const v=Number(sign&&sign.spacing); return v>0 ? v/100 : 1; }
+function panelChain(p, h, norm, solo, f=1){
   const gl = panelGlyphs(p);
   const single = isSingleDesignator(gl, solo);
-  const m = P(norm, single?'sideMarginSingle':'sideMargin', h);
+  const m = Math.round(P(norm, single?'sideMarginSingle':'sideMargin', h)*f);
   const chain = [{kind:'margin',label:single?'Rand (H)':'Rand',w:m}];
   gl.forEach((g,i)=>{
     chain.push({kind:'char',label:g,w:charWidth(g,h)});
     if(i<gl.length-1){
       let sp = pairSpace(g,gl[i+1],h);
       if(p.arrowTight && gl.length===2 && (ARROW_GLYPH_REV[g]||ARROW_GLYPH_REV[gl[i+1]])) sp = Math.round(0.25*h); // ICAO App. 4, Instruction 2
-      chain.push({kind:'space',label:'↔',w:sp});
+      chain.push({kind:'space',label:'↔',w:Math.round(sp*f)});
     }
   });
   chain.push({kind:'margin',label:single?'Rand (H)':'Rand',w:m});
   return chain;
 }
-function panelWidth(panel, h, norm, solo){
+function panelWidth(panel, h, norm, solo, f=1){
   const t = PANEL_TYPES[panel.type];
   if(t.symbol==='noentry') return 3*h;                    // Abb. A4-3 / N-2G: Feld 3 H breit
   if(t.symbol==='vacated') return Math.round(4.8*h);      // Abb. A4-3 / N-2F: dargestellte Breite ≈ 4,8 H (nicht bemaßt)
-  return Math.round(panelChain(panel,h,norm,solo).reduce((a,c)=>a+c.w,0));
+  return Math.round(panelChain(panel,h,norm,solo,f).reduce((a,c)=>a+c.w,0));
 }
 /* Schildhöhe: Norm-Minimum (ICAO 1,5 H / EASA 2 H) oder 2 H erzwungen */
 function faceHeight(sign){
@@ -476,8 +478,8 @@ function signDims(sign){
   const h = sign.h, norm = sign.norm;
   const face = faceHeight(sign);
   const solo = sign.panels.length===1;
-  const widths = sign.panels.map(p=>panelWidth(p,h,norm,solo));
-  const gap = P(norm,'panelGap',h);
+  const widths = sign.panels.map(p=>panelWidth(p,h,norm,solo,spf(sign)));
+  const gap = Math.round(P(norm,'panelGap',h)*spf(sign));
   const total = widths.reduce((a,b)=>a+b,0) + gap*Math.max(0,sign.panels.length-1);
   return { face, widths, total, area: Math.round(face*total/1e6*100)/100 };
 }
@@ -490,7 +492,7 @@ function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 function renderSignSVG(sign, opts={}){
   const d = signDims(sign);
   const h = sign.h, norm = sign.norm;
-  const face = d.face, gap = P(norm,'panelGap',h);
+  const face = d.face, gap = Math.round(P(norm,'panelGap',h)*spf(sign));
   const pad = opts.pad ?? 40;
   const vmargin = (face - h)/2; // vertikale Lage der Beschriftung
   const W = d.total + 2*pad, H = face + 2*pad + (opts.dims?110:0);
@@ -571,7 +573,7 @@ function renderPanel(p, x, y, w, face, h, norm, sign){
     return s;
   }
   // Text + Pfeil über Maßkette
-  const chain = panelChain(p,h,norm, sign && sign.panels.length===1);
+  const chain = panelChain(p,h,norm, sign && sign.panels.length===1, spf(sign));
   let cx = x;
   const fs = h / CAP;
   const baseline = cy + h/2;
@@ -648,6 +650,7 @@ function renderSigns(){
         <div class="field" style="min-width:auto"><label>Schildhöhe</label>
           <select data-f="faceMode"><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
         ${sign.faceMode==='custom'?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
+        <div class="field" style="min-width:auto" title="Seitliche Ränder, Zeichen-, Gruppen- und Pfeilabstände gemeinsam skalieren (100 % = Normwert). Panelbreiten, Gesamtlänge und Maßketten passen sich an."><label>Ränder/Abstände [%]</label><div style="display:flex;gap:4px;align-items:center"><button class="btn small" data-spstep="-5" title="−5 %">−</button><input type="number" data-f="spacing" value="${Math.round(spf(sign)*100)}" min="30" max="200" step="5" style="width:70px;${spf(sign)!==1?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-spstep="5" title="+5 %">+</button>${spf(sign)!==1?'<button class="btn small" data-spstep="0" title="Normwert (100 %)">Norm</button>':''}</div></div>
         <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="A14 5.4.2.13 / CS N.780(c)(1): schwarze Kontur 10 mm (Code 1–2) bzw. 20 mm (Code 3–4) um die weiße Schrift"><input type="checkbox" data-fchk="outline" ${sign.outline?'checked':''}> Schwarze Kontur (${sign.codeNo==='1-2'?10:20} mm)</label>
         <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="App. 4 Nr. 11 / CS N.775(c)(19): Gebotszeichen nur auf einer Rollbahnseite → Mindestbreite 1,46 m (Code 1–2) / 1,94 m (Code 3–4)"><input type="checkbox" data-fchk="singleSided" ${sign.singleSided?'checked':''}> Nur einseitig aufgestellt</label>
       </div>
@@ -656,7 +659,7 @@ function renderSigns(){
       <div style="margin-top:8px"><button class="btn small" data-act="addpanel">+ Panel / Nachricht anhängen</button> <span class="note">Tipp: Panel in der Vorschau anklicken, um es zu bearbeiten.</span></div>
       ${sign.h!=rec?`<div class="hint">Die gewählte Schrifthöhe (${sign.h} mm) weicht von der Mindesthöhe nach ${NORM_INFO[sign.norm].height} (${NORM_INFO[sign.norm].short}) für Code ${sign.codeNo} ab (${rec} mm).</div>`:''}
       <div class="preview">${previewSVG(sign)}</div>
-      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span></div>
+      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${spf(sign)!==1?`<span>Ränder/Abstände <b>${Math.round(spf(sign)*100)} %</b></span>`:''}</div>
       <details class="chain"><summary>Maßkette als Text</summary>${chainHTML(sign)}</details>
       <div class="compliance">${complianceHTML(sign)}</div>
     `;
@@ -664,13 +667,14 @@ function renderSigns(){
     card.querySelectorAll('[data-f]').forEach(el=>{
       el.addEventListener('change', e=>{
         const f = el.dataset.f;
-        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else sign[f] = el.value;
+        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else sign[f] = el.value;
         if(f==='norm'){ sign.faceMode = sign.faceMode||'norm'; }
         if(f==='name'||f==='location'||f==='description'||f==='number'){ if(f==='number') sign.number=String(el.value).replace(/^\s*\\\s*/,'').trim(); renderOverview(); return; }
         if(f==='codeNo'){ /* Empfehlung anwenden */ sign.h = recommendedHeight(sign); }
         renderSigns(); renderOverview();
       });
     });
+    card.querySelectorAll('[data-spstep]').forEach(b=>b.addEventListener('click',()=>{ const st=Number(b.dataset.spstep); sign.spacing = st? Math.min(200,Math.max(30,Math.round(spf(sign)*100)+st)) : 100; renderSigns(); renderOverview(); }));
     card.querySelectorAll('[data-act]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const a = btn.dataset.act;
@@ -716,11 +720,11 @@ function updatePreview(card, sign){
 }
 function chainText(p, sign){
   const t = PANEL_TYPES[p.type];
-  if(t.symbol) return 'Symbolfeld '+panelWidth(p,sign.h,sign.norm,sign.panels.length===1)+' mm';
-  return panelChain(p,sign.h,sign.norm,sign.panels.length===1).map(c=>c.kind==='char'?`<b>${esc(ARROW_GLYPH_REV[c.label]?ARROWS[ARROW_GLYPH_REV[c.label]]:(c.label===' '?'␣':c.label))}</b> ${c.w}`:(c.kind==='margin'?`Rand ${c.w}`:`${c.w}`)).join(' · ');
+  if(t.symbol) return 'Symbolfeld '+panelWidth(p,sign.h,sign.norm,sign.panels.length===1,spf(sign))+' mm';
+  return panelChain(p,sign.h,sign.norm,sign.panels.length===1,spf(sign)).map(c=>c.kind==='char'?`<b>${esc(ARROW_GLYPH_REV[c.label]?ARROWS[ARROW_GLYPH_REV[c.label]]:(c.label===' '?'␣':c.label))}</b> ${c.w}`:(c.kind==='margin'?`Rand ${c.w}`:`${c.w}`)).join(' · ');
 }
 function chainHTML(sign){
-  return sign.panels.map((p,i)=>`<div><span class="pl">P${i+1}</span> ${chainText(p,sign)} <span class="pl">= ${panelWidth(p,sign.h,sign.norm,sign.panels.length===1)} mm</span></div>`).join('');
+  return sign.panels.map((p,i)=>`<div><span class="pl">P${i+1}</span> ${chainText(p,sign)} <span class="pl">= ${panelWidth(p,sign.h,sign.norm,sign.panels.length===1,spf(sign))} mm</span></div>`).join('');
 }
 function panelRowHTML(p, pi, sign){
   const t = PANEL_TYPES[p.type];
@@ -770,6 +774,7 @@ function complianceChecks(sign){
     {ok:d.face>=faceMin, label:`Schildhöhe ≥ Norm-Minimum ${N.short} (${N.face}): ${faceMin} mm bei h = ${sign.h} – ist ${d.face} mm`},
     {ok:singleSidedOk, label:`Einseitig aufgestelltes Gebotszeichen ≥ ${sign.codeNo==='1-2'?'1460':'1940'} mm breit (App. 4 Nr. 11; CS N.775(c)(19))`},
     {ok:!badDesig.length, label:`Rollbahnbezeichner ohne I, O, X (A14 5.4.3.37; CS N.785(c)(12))${badDesig.length?' – gefunden: '+badDesig.join(', '):''}`},
+    {ok:spf(sign)>=1, label:`Ränder und Zeichenabstände ≥ Normwert (Tab. A4-1 / N-3, Abb. A4-4 / N-3)${spf(sign)!==1?' – eingestellt '+Math.round(spf(sign)*100)+' %':''}`},
     {ok:sign.panels.length>=1, label:'Mindestens eine Nachricht'},
     {ok:nLoc<=1, label:'Höchstens ein Standort-Panel (Location)'},
     {ok:!(hasMand&&hasInfo), label:'Keine Kombination Information + Mandatory auf einem Schild (Standort ist zulässig)'},
@@ -918,12 +923,12 @@ function inscriptionSVG(p, x, y, fs){
 
 /* ---- Maßkette eines Schildes in Schild-mm ---- */
 function chainSegments(sign){
-  const d=signDims(sign), solo=sign.panels.length===1, gap=P(sign.norm,'panelGap',sign.h);
+  const d=signDims(sign), solo=sign.panels.length===1, gap=Math.round(P(sign.norm,'panelGap',sign.h)*spf(sign));
   let x=0; const segs=[], panels=[];
   sign.panels.forEach((p,i)=>{
     const x0=x, t=PANEL_TYPES[p.type];
     if(t.symbol){ segs.push({x1:x, x2:x+d.widths[i], v:d.widths[i], kind:'symbol'}); }
-    else { let xx=x; panelChain(p,sign.h,sign.norm,solo).forEach(c=>{ segs.push({x1:xx, x2:xx+c.w, v:c.w, kind:c.kind}); xx+=c.w; }); }
+    else { let xx=x; panelChain(p,sign.h,sign.norm,solo,spf(sign)).forEach(c=>{ segs.push({x1:xx, x2:xx+c.w, v:c.w, kind:c.kind}); xx+=c.w; }); }
     x = x0 + d.widths[i]; panels.push({x1:x0, x2:x, v:d.widths[i]});
     if(i<sign.panels.length-1 && gap){ segs.push({x1:x, x2:x+gap, v:gap, kind:'gap'}); x+=gap; }
   });
@@ -1058,7 +1063,7 @@ function sheetSVG(sign, idx, total){
   ['Panel','Typ','Inhalt','Breite [mm]','Maßkette [mm]'].forEach((t,i)=>{ s+=tx(cols[i],ty,t,3,{bold:true}); });
   const solo=sign.panels.length===1;
   sign.panels.forEach((p,pi)=>{ ty+=5.2; s+=tx(cols[0],ty,'P'+(pi+1),3)+tx(cols[1],ty,PANEL_TYPES[p.type].label,3)+inscriptionSVG(p,cols[2],ty,3)+tx(cols[3]+18,ty,String(d.widths[pi]),3,{anchor:'end'});
-    const ch = PANEL_TYPES[p.type].symbol ? String(d.widths[pi]) : panelChain(p,sign.h,sign.norm,solo).map(c=>fmtN(c.w)).join(' | ');
+    const ch = PANEL_TYPES[p.type].symbol ? String(d.widths[pi]) : panelChain(p,sign.h,sign.norm,solo,spf(sign)).map(c=>fmtN(c.w)).join(' | ');
     s+=tx(cols[4],ty,ch,2.6,{fill:'#374151'}); });
   // Compliance links neben dem Schriftfeld
   const c=complianceChecks(sign), bad=c.filter(x=>!x.ok);
@@ -1804,11 +1809,9 @@ $('#save-go').addEventListener('click', async()=>{
   catch(e){ openSaveDialog(e.message); }
 });
 
-// Startbeispiele
+// Start: immer genau ein Schild
 state.signs.push(newSign());
 state.signs[0].name='Rollhalteort 25'; state.signs[0].location='TWY A / RWY 25'; state.signs[0].panels=[{type:'location',text:'A',arrow:'none'},{type:'holding',text:'25-07',arrow:'none'}]; state.signs[0].h=400;
-state.signs.push(newSign());
-state.signs[1].name='Richtung B/C'; state.signs[1].location='TWY A, Kreuzung B/C'; state.signs[1].panels=[{type:'direction',text:'B',arrow:'left'},{type:'location',text:'A',arrow:'none'},{type:'direction',text:'C',arrow:'right'}];
 renderProjectCard(); renderSigns(); renderOverview(); renderParams();
 </script>
 </body>
