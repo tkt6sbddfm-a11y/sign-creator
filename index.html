@@ -1755,8 +1755,9 @@ async function uploadFile(tok, name, blob){
 async function uploadWithMeta(tok, name, blob, kind){
   const item = await uploadFile(tok, name, blob), pr=pj(), dId=await libDrive(tok);
   await gfetch(tok, `/drives/${dId}/items/${item.id}/listItem/fields`, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({
-    RefKunde: pr.customer||'', Bearbeiter: (msalAccount&&msalAccount.name) || pr.drawnBy || '', AnzahlSchilder: state.signs.length,
-    Projektdatum: new Date().toISOString(), Bauvorhaben: pr.title||'', PlanNr: pr.planNo||'', Dateiart: kind })});
+    RefKunde: pr.customer||'', Flughafen: pr.airport||'', Bauvorhaben: pr.title||'', Planstatus: pr.status||'', Zeichnungstitel: pr.drawingTitle||'',
+    PlanNr: pr.planNo||'', Bearbeiter: pr.drawnBy || (msalAccount&&msalAccount.name) || '', RevDatum: pr.rev||'', Blatt: pr.format||'',
+    AnzahlSchilder: state.signs.length, Projektdatum: new Date().toISOString(), Dateiart: kind })});
   return item;
 }
 function projectJsonName(){ return `${baseName()}_Projekt.json`; }
@@ -1780,11 +1781,11 @@ function openSaveDialog(msg){
   const pr=pj(), m=$('#save-modal'); if(!m) return;
   const configured = !!SP_SAVE.clientId;
   $('#save-body').innerHTML = `
-    <p style="margin-top:0">Projekt in der SharePoint-Bibliothek <a href="${SP_SAVE.listUrl}" target="_blank" rel="noopener"><b>Sign Creator Projekte</b></a> ablegen – mit Datum, Bearbeiter, Anzahl Schilder (${state.signs.length}) und Referenz/Kunde.${pendingSave?` Der Export <b>${esc(pendingSave.name)}</b> wird mit abgelegt.`:''}</p>
+    <p style="margin-top:0">Projekt in der SharePoint-Bibliothek <a href="${SP_SAVE.listUrl}" target="_blank" rel="noopener"><b>Sign Creator Projekte</b></a> ablegen – mit allen Projektangaben, Anzahl Schilder (${state.signs.length}) und Datum.${pendingSave?` Der Export <b>${esc(pendingSave.name)}</b> wird mit abgelegt.`:''}</p>
     <div class="row" style="margin-bottom:10px">
       <div class="field" style="min-width:240px"><label>Referenz / Kunde *</label><input type="text" id="save-ref" value="${esc(pr.customer||'')}" style="text-transform:none"></div>
       <div class="field" style="min-width:200px"><label>Bauvorhaben</label><input type="text" id="save-title" value="${esc(pr.title||'')}" style="text-transform:none"></div>
-      <div class="field" style="min-width:140px"><label>Bearbeiter</label><select id="save-by"><option value="">– bitte wählen –</option>${(DRAFTERS.includes(pr.drawnBy)||!pr.drawnBy?DRAFTERS:[...DRAFTERS,pr.drawnBy]).map(n=>`<option${n===pr.drawnBy?' selected':''}>${esc(n)}</option>`).join('')}</select></div>
+      <div class="field" style="min-width:140px"><label>Gez. von</label><select id="save-by"><option value="">– bitte wählen –</option>${(DRAFTERS.includes(pr.drawnBy)||!pr.drawnBy?DRAFTERS:[...DRAFTERS,pr.drawnBy]).map(n=>`<option${n===pr.drawnBy?' selected':''}>${esc(n)}</option>`).join('')}</select></div>
     </div>
     ${msg?`<div class="hint">${esc(msg)}</div>`:''}
     ${configured?'':`<div class="hint">Die automatische Ablage braucht noch die einmalige Microsoft-Anmeldung (App-Registrierung). Bis dahin wird die Projektdatei heruntergeladen – bitte in <a href="${SP_SAVE.listUrl}" target="_blank" rel="noopener">Sign Creator Projekte</a> hochladen und die Spalten ausfüllen.</div>`}`;
