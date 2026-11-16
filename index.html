@@ -129,7 +129,8 @@
   #project-card h3{font-size:18px!important;font-weight:700}
   #project-card label{color:#5c4a00}
   #project-card input,#project-card select{border-color:#e8d48f}
-  select,input[type=text],input[type=number]{border-radius:8px;border:1px solid #cfd0cc}
+  select,input[type=text],input[type=number],input[type=date]{border-radius:8px;border:1px solid #cfd0cc}
+  input[type=date]{padding:6px 9px;font-size:14px;font-family:inherit;background:#fff;cursor:pointer}
   select:focus,input:focus{outline:2px solid var(--y);outline-offset:0;border-color:var(--yd)}
   .btn{border-radius:16px;border:1px solid #cfd0cc;padding:7px 14px}
   .btn:hover{border-color:var(--yd);background:#fffbea}
@@ -865,7 +866,9 @@ const LOGO_JPG = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxI
 const COMPANY = 'Innovence Airport Systems GmbH';
 const SHEETS = { A4:{w:297,h:210, tbW:190, tbH:32}, A3:{w:420,h:297, tbW:230, tbH:38} };
 const DRAFTERS = ['B. Müller','M. Müller','B. Dembski'];
-const PROJECT_DEFAULTS = { customer:'', airport:'', title:'', status:'Ausführungsplan', drawingTitle:'Detailzeichnung RVZ', planNo:'', drawnBy:'', rev:'-', format:'A4', housing:true, housingSide:30, housingTB:25 };
+function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function dateDE(v){ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); return m? `${m[3]}.${m[2]}.${m[1]}` : (v||'-'); }
+const PROJECT_DEFAULTS = { customer:'', airport:'', title:'', status:'Ausführungsplan', drawingTitle:'Detailzeichnung RVZ', planNo:'', drawnBy:'', rev:'', format:'A4', housing:true, housingSide:30, housingTB:25 };
 function pj(){ if(!state.project) state.project={}; for(const k in PROJECT_DEFAULTS) if(!(k in state.project)) state.project[k]=PROJECT_DEFAULTS[k]; return state.project; }
 const fx = v => Math.round(v*100)/100;
 function fmtN(v){ const r=Math.round(v*10)/10; return Number.isInteger(r)? String(r) : String(r).replace('.',','); }
@@ -1019,7 +1022,7 @@ function titleBlock(S, x, y, sheetLabel, scaleTxt, planSuffix){
   for(let i=1;i<=4;i++) s+=ln(cx2,y+i*rr,cx2+c2,y+i*rr,0.13);
   s+=ln(cx2+c2*0.36,y,cx2+c2*0.36,y+hr,0.13);
   const today=new Date().toLocaleDateString('de-DE');
-  [['Gez. Dat.:',today],['Gez. von:',pr.drawnBy||'-'],['Rev. Dat.:',pr.rev||'-'],['Maßstab:',scaleTxt]].forEach(([a,b],i)=>{ s+=tx(cx2+0.8,y+i*rr+rr*0.72,a,sm)+tx(cx2+c2*0.36+0.8,y+i*rr+rr*0.72,b,sm); });
+  [['Gez. Dat.:',today],['Gez. von:',pr.drawnBy||'-'],['Rev. Dat.:',dateDE(pr.rev)],['Maßstab:',scaleTxt]].forEach(([a,b],i)=>{ s+=tx(cx2+0.8,y+i*rr+rr*0.72,a,sm)+tx(cx2+c2*0.36+0.8,y+i*rr+rr*0.72,b,sm); });
   const lh=hr-2, lw=lh*304/233;
   s+=`<image href="${LOGO_JPG}" x="${fx(cx2+(c2-lw)/2)}" y="${fx(y+hr+1)}" width="${fx(lw)}" height="${fx(lh)}" preserveAspectRatio="xMidYMid meet"/>`;
   // Spalte 3: Kunde/Referenz oben, Plan-Nr. unten
@@ -1162,18 +1165,20 @@ function printAll(){
 /* ---- Projektangaben (Schriftfeld, Ablage) ---- */
 function renderProjectCard(){
   const pr=pj(), el=$('#project-card'); if(!el) return;
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(pr.rev||'')) pr.rev=todayISO();
   const drafterSel=(k,l,v)=>{ const opts=DRAFTERS.includes(v)||!v?DRAFTERS:[...DRAFTERS,v]; return `<div class="field" style="min-width:130px"><label>${l}</label><select data-pj="${k}"><option value="">– bitte wählen –</option>${opts.map(n=>`<option${n===v?' selected':''}>${esc(n)}</option>`).join('')}</select></div>`; };
   const f=(k,l,w,ph='')=>`<div class="field" style="min-width:${w}px"><label>${l}</label><input type="text" data-pj="${k}" value="${esc(pr[k]||'')}" placeholder="${esc(ph)}" style="text-transform:none"></div>`;
   el.innerHTML = `<div class="row" style="align-items:flex-end">
     <h3 style="margin:0 8px 6px 0;font-size:15px">Projekt</h3>
     ${f('customer','Referenz / Kunde',170,'z. B. Fraport AG')}${f('airport','Flughafen / Ort',160,'Flughafen Frankfurt')}${f('title','Bauvorhaben',200,'Sanierung TWY L21 und L22')}
-    ${f('status','Planstatus',130,'Ausführungsplan')}${f('drawingTitle','Zeichnungstitel',150)}${f('planNo','Plan-Nr. (INN …)',120,'B-002856')}${drafterSel('drawnBy','Gez. von',pr.drawnBy)}${f('rev','Rev. Datum',90)}
+    ${f('status','Planstatus',130,'Ausführungsplan')}${f('drawingTitle','Zeichnungstitel',150)}${f('planNo','Plan-Nr. (INN …)',120,'B-002856')}${drafterSel('drawnBy','Gez. von',pr.drawnBy)}<div class="field" style="min-width:140px"><label>Rev. Datum</label><input type="date" data-pj="rev" value="${esc(pr.rev)}" style="text-transform:none"></div>
     <div class="field" style="min-width:80px"><label>Blatt</label><select data-pj="format"><option${pr.format==='A4'?' selected':''}>A4</option><option${pr.format==='A3'?' selected':''}>A3</option></select></div>
     <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px"><input type="checkbox" data-pjc="housing" ${pr.housing?'checked':''}> Gehäuserahmen</label>
     ${pr.housing?`<div class="field" style="min-width:70px"><label>seitlich [mm]</label><input type="number" data-pj="housingSide" value="${pr.housingSide}" style="width:70px"></div><div class="field" style="min-width:70px"><label>oben/unten</label><input type="number" data-pj="housingTB" value="${pr.housingTB}" style="width:70px"></div>`:''}
   </div>`;
   let t=null;
   el.querySelectorAll('[data-pj]').forEach(inp=>inp.addEventListener(inp.tagName==='SELECT'?'change':'input',()=>{ const k=inp.dataset.pj; pr[k] = inp.type==='number' ? Number(inp.value)||0 : inp.value; if(/^housing|format/.test(k)){ clearTimeout(t); t=setTimeout(()=>renderSigns(),250); } }));
+  el.querySelectorAll('input[type=date]').forEach(inp=>inp.addEventListener('click',()=>{ try{ inp.showPicker(); }catch(e){} }));
   el.querySelectorAll('[data-pjc]').forEach(cb=>cb.addEventListener('change',()=>{ pr[cb.dataset.pjc]=cb.checked; renderProjectCard(); renderSigns(); }));
 }
 /* Schild normalisieren (Großbuchstaben, Schildnummer aus „\442.3“) */
@@ -1761,7 +1766,7 @@ async function uploadWithMeta(tok, name, blob, kind){
   const item = await uploadFile(tok, name, blob), pr=pj(), dId=await libDrive(tok);
   await gfetch(tok, `/drives/${dId}/items/${item.id}/listItem/fields`, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({
     RefKunde: pr.customer||'', Flughafen: pr.airport||'', Bauvorhaben: pr.title||'', Planstatus: pr.status||'', Zeichnungstitel: pr.drawingTitle||'',
-    PlanNr: pr.planNo||'', Bearbeiter: pr.drawnBy || (msalAccount&&msalAccount.name) || '', RevDatum: pr.rev||'', Blatt: pr.format||'',
+    PlanNr: pr.planNo||'', Bearbeiter: pr.drawnBy || (msalAccount&&msalAccount.name) || '', RevDatum: dateDE(pr.rev), Blatt: pr.format||'',
     AnzahlSchilder: state.signs.length, Projektdatum: new Date().toISOString(), Dateiart: kind })});
   return item;
 }
