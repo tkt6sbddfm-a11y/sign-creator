@@ -88,6 +88,11 @@
   .ins{display:flex;justify-content:center;margin:-2px 0}
   .ins button{border:1px dashed #cbd5e1;background:#fff;border-radius:999px;font-size:11px;padding:1px 10px;color:var(--muted);cursor:pointer}
   .ins button:hover{border-color:var(--acc);color:var(--acc)}
+  .imp-table td{vertical-align:middle}
+  .imp-table .thumb{width:260px;background:#e8eaed;border-radius:6px;padding:4px}
+  .imp-table .thumb svg{width:100%;height:auto;display:block}
+  .imp-warn{color:#b45309;font-size:11px}
+  .imp-opts{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;padding:10px 16px;border-bottom:1px solid var(--line)}
   .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;display:none;z-index:50}
   .src a{color:var(--acc);text-decoration:none}.src li{margin-bottom:6px}
   .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
@@ -127,6 +132,8 @@
       <button class="btn primary" id="add-sign">+ Schild hinzufügen</button>
       <button class="btn" id="save-json">Projekt speichern (JSON)</button>
       <label class="btn" style="margin:0">Projekt laden <input type="file" id="load-json" accept=".json" style="display:none"></label>
+      <label class="btn" style="margin:0" title="Master-SignsDef (Blatt S_Def) oder eigene Tabelle mit Spalte „Inhalt“">Excel importieren <input type="file" id="load-xls" accept=".xls,.xlsx,.xlsm,.csv" style="display:none"></label>
+      <button class="btn" id="xls-template" title="Leere Importtabelle mit Beispielen und Syntax">Importvorlage</button>
       <span class="grow"></span>
       <button class="btn" id="pdf-all">Alle als eine PDF</button>
       <button class="btn" id="print-all">Alle drucken (Browser)</button>
@@ -227,6 +234,19 @@
     <div class="modal-foot"><button class="btn" id="tpl-blank">Leeres Schild</button><button class="btn primary" id="tpl-add" disabled>Schild hinzufügen</button></div>
   </div>
 </div>
+<div class="modal-bg" id="imp-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Excel-Import – Vorschau</h3><span class="note" id="imp-info"></span><span style="flex:1"></span><button class="btn small" id="imp-close">Schließen</button></div>
+    <div class="imp-opts">
+      <div class="field"><label>Norm (wenn nicht in der Datei)</label><select id="imp-norm"><option value="ICAO">ICAO Annex 14 Vol. I</option><option value="EASA">EASA CS-ADR-DSN</option></select></div>
+      <div class="field"><label>Code-Nummer (wenn nicht in der Datei)</label><select id="imp-code"><option value="auto">aus Schrifthöhe ableiten</option><option value="1-2">1 oder 2</option><option value="3-4">3 oder 4</option></select></div>
+      <div class="field"><label>Übernehmen als</label><select id="imp-mode"><option value="append">an bestehende Schilder anhängen</option><option value="replace">bestehende Schilder ersetzen</option></select></div>
+      <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px"><input type="checkbox" id="imp-all" checked> alle auswählen</label>
+    </div>
+    <div class="modal-main"><table class="imp-table" id="imp-table"></table></div>
+    <div class="modal-foot"><span class="note" style="flex:1" id="imp-legend">Typen, Pfeile und Farben werden aus der Tabelle erkannt; nach dem Import ist jedes Panel wie gewohnt editierbar.</span><button class="btn primary" id="imp-apply">Übernehmen</button></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -286,7 +306,7 @@ const PANEL_TYPES = {
   destination:{label:'Ziel (Destination) mit Pfeil',         cat:'info',      bg:'yellow', fg:'black', border:null,    arrow:true},
   runwayExit:{label:'Runway exit',                           cat:'runwayExit',bg:'yellow', fg:'black', border:null,    arrow:true},
   vacated:   {label:'Runway vacated',                        cat:'info',      bg:'yellow', fg:'black', border:null,    arrow:false, symbol:'vacated'},
-  intersection:{label:'Intersection take-off',               cat:'info',      bg:'yellow', fg:'black', border:null,    arrow:false},
+  intersection:{label:'Intersection take-off',               cat:'info',      bg:'yellow', fg:'black', border:null,    arrow:true},
   distance:  {label:'Distance remaining',                    cat:'info',      bg:'black',  fg:'white', border:null,    arrow:false},
 };
 const TEMPLATES = [
@@ -867,6 +887,303 @@ $('#copy-csv').addEventListener('click',async()=>{ try{ await navigator.clipboar
 $('#csv-download').addEventListener('click',()=>saveFile('Rollverkehrszeichen_uebersicht.csv','﻿'+overviewCSV()));
 $('#save-json').addEventListener('click',()=>saveFile('Rollverkehrszeichen_projekt.json', JSON.stringify(state,null,2)));
 $('#load-json').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const o=JSON.parse(r.result); if(o.signs){ state=o; state.fontWidths=state.fontWidths||deepCopy(FONT_WIDTHS); state.spacingCodes=state.spacingCodes||deepCopy(SPACING_CODES); state.params=state.params||{ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; ['ICAO','EASA'].forEach(n=>{ const d=makeDefaults(n); state.params[n]=state.params[n]||d; Object.keys(d.rows).forEach(k=>{ if(!state.params[n].rows[k]) state.params[n].rows[k]=d.rows[k]; }); }); state.signs.forEach(s=>{ if(!s.faceMode) s.faceMode = s.vpad==='H/4' ? 'norm' : (s.norm==='ICAO' && s.vpad==='H/2' ? '2H' : 'norm'); }); signCounter=Math.max(0,...state.signs.map(s=>s.id||0)); renderSigns(); renderOverview(); toast('Projekt geladen'); } }catch(err){ toast('Ungültige Datei'); } }; r.readAsText(f); e.target.value=''; });
+
+
+/* ================= Excel-Import ================= */
+/* Zwei Formate:
+   1) Master-SignsDef (Blatt „S_Def“): ein Zeichen je Zelle in C–V, Zellfarbe = Panelfarbe (gelb/schwarz/rot),
+      CHAR(158) bzw. CHAR(166) = Farbtrenner, „|“ = Trennstrich, Wingdings 231–238 (ç è é ê ë ì í î) = Pfeile,
+      B = Standort, W = Bemerkung, Y = Zeichenhöhe (2/3/4 bzw. 200/300/400), Z = Typ (I/M). Daten ab Zeile 9 bis „Sum.“.
+   2) Eigene Tabelle (erste Zeile = Überschriften): Spalte „Inhalt“ (oder „Schildertext“/„Panels“) mit Panels getrennt
+      durch „|“, optional Label, Standort, Beschreibung/Anmerkung, Norm, Code, Schrifthöhe.
+      Panel-Syntax: [Kürzel:]Text mit Pfeil vorne/hinten (← → ↑ ↓ ↖ ↗ ↙ ↘ oder <- -> ^ v).
+      Kürzel: L Standort · D Richtung · Z Ziel · X Runway exit · T Intersection take-off · V Runway vacated · R Distance remaining ·
+      H Rollhalteort · C CAT · NE NO ENTRY · M Vorschrift-Freitext. Ohne Kürzel wird der Typ erraten.            */
+const XLS_ARROW = {'ç':'left','è':'right','é':'up','ê':'down','ë':'upLeft','ì':'upRight','í':'downLeft','î':'downRight'};
+const XLS_SEP = new Set(['\u009e','ž','¦','ž','¦']);
+const UNI_ARROW = {'←':'left','→':'right','↑':'up','↓':'down','↖':'upLeft','↗':'upRight','↙':'downLeft','↘':'downRight'};
+const ASCII_ARROW = [['<-','left'],['->','right'],['^','up']];
+const TYPE_CODES = {L:'location',D:'direction',Z:'destination',X:'runwayExit',T:'intersection',V:'vacated',R:'distance',H:'holding',C:'cat',NE:'noentry',M:'mandatoryText'};
+
+function colorClass(hex){
+  if(!hex) return null;
+  const h = String(hex).replace(/^#/,'').slice(-6); if(!/^[0-9a-f]{6}$/i.test(h)) return null;
+  const r=parseInt(h.slice(0,2),16), g=parseInt(h.slice(2,4),16), b=parseInt(h.slice(4,6),16);
+  if(r<70&&g<70&&b<70) return 'black';
+  if(r>200&&g>170&&b<130) return 'yellow';
+  if(r>140&&g<100&&b<100) return 'red';
+  if(r>220&&g>220&&b>220) return null;   // weiß = keine Füllung
+  return null;
+}
+function normHeight(v){
+  const n = Number(String(v||'').replace(',','.')); if(!n) return null;
+  if(n<10) return {2:200,3:300,4:400}[Math.round(n)]||null;
+  if(n<100) return {20:200,30:300,40:400}[Math.round(n)]||null;
+  return [200,300,400].includes(Math.round(n)) ? Math.round(n) : null;
+}
+function normCode(v){
+  const t = String(v||'').trim(); if(!t) return null;
+  if(/1\s*[-–\/oder]*\s*2|^[12]$/.test(t)) return '1-2';
+  if(/3\s*[-–\/oder]*\s*4|^[34]$/.test(t)) return '3-4';
+  return null;
+}
+function codeFromHeight(h, mandatory){
+  if(mandatory) return h>=400 ? '3-4' : '1-2';
+  return h>=300 ? '3-4' : '1-2';
+}
+/* Panel-Typ aus Text/Pfeil/Farbe erraten */
+function guessType(text, arrow, color, mandatory){
+  const t = (text||'').trim(), T = t.toUpperCase();
+  if(/NO\s*ENTRY/i.test(t)) return 'noentry';
+  if(color==='black') return /^\d+$/.test(T) && !mandatory ? 'distance' : 'location';
+  if(color==='red' || mandatory){
+    if(/CAT/i.test(T)) return 'cat';
+    if(/^\d{1,2}[LRC]?(\s*-\s*\d{1,2}[LRC]?)?$/.test(T)) return 'holding';
+    return color==='red' ? 'mandatoryText' : (/^[A-Z]{1,2}\d{0,2}$/.test(T) ? 'location' : 'mandatoryText');
+  }
+  if(/^\d+\s*M$/i.test(t)) return 'intersection';
+  if(arrow){
+    if(/^[A-Z]{1,2}\d{0,2}$/.test(T) || T==='') return 'direction';
+    return 'destination';
+  }
+  if(color==='yellow') return 'destination';
+  if(/^[A-Z]{1,2}\d{0,2}$/.test(T)) return 'location';
+  return 'destination';
+}
+/* Pfeil am Anfang/Ende eines Textes abtrennen */
+function splitArrow(raw){
+  let t = String(raw||'').trim(), arrow='none';
+  const first=[...t][0], last=[...t].slice(-1)[0];
+  if(UNI_ARROW[first]){ arrow=UNI_ARROW[first]; t=[...t].slice(1).join('').trim(); }
+  else if(UNI_ARROW[last]){ arrow=UNI_ARROW[last]; t=[...t].slice(0,-1).join('').trim(); }
+  else {
+    for(const [a,dir] of ASCII_ARROW){ if(t.startsWith(a)){ arrow=dir; t=t.slice(a.length).trim(); break; } if(t.endsWith(a)){ arrow=dir; t=t.slice(0,-a.length).trim(); break; } }
+    if(arrow==='none' && /\sv$/i.test(t)){ arrow='down'; t=t.slice(0,-1).trim(); }
+  }
+  return {text:t, arrow};
+}
+function finishPanel(type, text, arrow){
+  const pt = PANEL_TYPES[type] || PANEL_TYPES.destination;
+  const p = {type: PANEL_TYPES[type]?type:'destination', text: pt.symbol ? '' : (text||''), arrow: pt.arrow ? (arrow||'none') : 'none'};
+  if(pt.arrow && p.arrow==='none' && (type==='direction'||type==='runwayExit')) p.arrow='right';
+  return p;
+}
+/* Eigene Panel-Syntax: "L:A | H:25-07" */
+function parsePanelText(str, mandatoryHint){
+  const warns=[];
+  const panels = String(str||'').split('|').map(x=>x.trim()).filter(Boolean).map(part=>{
+    let type=null, body=part;
+    const m = part.match(/^(NE|L|D|Z|X|T|V|R|H|C|M)\s*:\s*(.*)$/i);
+    if(m){ type=TYPE_CODES[m[1].toUpperCase()]; body=m[2]; }
+    else if(/^(NE|NO\s*ENTRY)$/i.test(part)) { type='noentry'; body=''; }
+    else if(/^V$/i.test(part)) { type='vacated'; body=''; }
+    else if(/^\[(.*)\]$/.test(part)) { type='location'; body=part.slice(1,-1); }
+    const {text, arrow} = splitArrow(body);
+    if(!type) type = guessType(text, arrow!=='none', null, mandatoryHint);
+    return finishPanel(type, text, arrow);
+  });
+  if(!panels.length) warns.push('keine Panels erkannt');
+  return {panels, warns};
+}
+
+/* Master-SignsDef: Zeichenzellen einer Zeile → Panels */
+function parseSDefRow(cells, typ){
+  const warns=[]; const mandatory = /^M/i.test(String(typ||''));
+  const segs=[]; let cur=null;
+  const flush=()=>{ if(cur && cur.glyphs.length) segs.push(cur); cur=null; };
+  cells.forEach(c=>{
+    if(c==null || c.v===undefined || c.v===null || String(c.v)==='') return;
+    let v = String(c.v);
+    if(typeof c.v==='number' && Number.isInteger(c.v)) v = String(c.v);
+    const col = colorClass(c.bg);
+    for(const ch of [...v]){
+      if(XLS_SEP.has(ch)){ flush(); continue; }
+      if(ch==='|'){ flush(); continue; }
+      if(cur && col && cur.color && col!==cur.color) flush();
+      if(!cur) cur={glyphs:[], color:col};
+      if(!cur.color && col) cur.color=col;
+      cur.glyphs.push(ch);
+    }
+  });
+  flush();
+  const panels = segs.map(sg=>{
+    let arrow='none'; const g=[...sg.glyphs];
+    if(XLS_ARROW[g[0]]){ arrow=XLS_ARROW[g.shift()]; }
+    else if(XLS_ARROW[g[g.length-1]]){ arrow=XLS_ARROW[g.pop()]; }
+    const unknown = g.filter(ch=>ch.charCodeAt(0)>=0xC0 && !XLS_ARROW[ch]);
+    if(unknown.length) warns.push('Sonderzeichen nicht zugeordnet: '+unknown.map(ch=>'CHAR('+ch.charCodeAt(0)+')').join(', '));
+    const text = g.filter(ch=>!unknown.includes(ch)).join('').replace(/\s+/g,' ').trim();
+    const type = guessType(text, arrow!=='none', sg.color, mandatory);
+    return finishPanel(type, text, arrow);
+  });
+  // ohne Farbinformation: in Hinweiszeichen kurzes Feld ohne Pfeil neben Pfeilfeldern = Standort
+  if(!segs.some(s=>s.color) && !mandatory && panels.length>1){
+    panels.forEach(p=>{ if(p.type==='destination' && p.arrow==='none' && /^[A-Z]{1,2}\d{0,2}$/i.test(p.text)) p.type='location'; });
+    warns.push('keine Zellfarben gelesen – Panel-Typen geschätzt');
+  }
+  return {panels, warns};
+}
+
+/* Arbeitsmappe (vereinheitlicht: {sheetName: [[{v,bg}]]}) → Schildliste */
+function importFromGrid(book){
+  const out=[]; const names=Object.keys(book);
+  const sdefName = names.find(n=>/^s_?def$/i.test(n.trim()));
+  if(sdefName){
+    const rows = book[sdefName];
+    for(let r=8; r<rows.length; r++){
+      const row = rows[r]||[];
+      const rowText = row.map(c=>c&&c.v!=null?String(c.v):'').join(' ');
+      if(/Sum\.|Gesamtsumme/.test(rowText)) break;
+      const chars = row.slice(2,22);
+      if(!chars.some(c=>c && c.v!=null && String(c.v).trim()!=='')) continue;
+      const typ = row[25] && row[25].v;
+      const {panels, warns} = parseSDefRow(chars, typ);
+      if(!panels.length) continue;
+      const h = normHeight(row[24] && row[24].v);
+      const loc = row[1] && row[1].v!=null ? String(row[1].v).trim() : '';
+      const remark = row[22] && row[22].v!=null ? String(row[22].v).trim() : '';
+      out.push({row:r+1, nr: row[0]&&row[0].v!=null?String(row[0].v):'', location:loc, description:remark, h, norm:null, code:null, mandatory:/^M/i.test(String(typ||'')), panels, warns, source:'S_Def'});
+    }
+    return {format:'Master-SignsDef (Blatt „'+sdefName+'“)', signs:out};
+  }
+  // eigene Tabelle
+  for(const n of names){
+    const rows = book[n]; if(!rows || !rows.length) continue;
+    let hr=-1, col={};
+    for(let r=0; r<Math.min(rows.length,15) && hr<0; r++){
+      const hdr=(rows[r]||[]).map(c=>c&&c.v!=null?String(c.v).trim().toLowerCase():'');
+      const idx=k=>hdr.findIndex(x=>k.test(x));
+      const ci = idx(/^(inhalt|schildertext|schildtext|panels?|beschriftung|sign inscription|inscription)/);
+      if(ci>=0){ hr=r; col={inhalt:ci, label:idx(/^(label|name|bezeichnung|schild)$/), standort:idx(/^(standort|position|location|ort)/), beschr:idx(/^(beschreibung|anmerkung|bemerkung|remark|notiz|kommentar)/), norm:idx(/^norm/), code:idx(/^code/), h:idx(/^(schrifthöhe|zeichenhöhe|schrifthoehe|character height|h)$/), typ:idx(/^(typ|art|type)$/)}; }
+    }
+    if(hr<0) continue;
+    const g=(row,i)=> i>=0 && row[i] && row[i].v!=null ? String(row[i].v).trim() : '';
+    for(let r=hr+1; r<rows.length; r++){
+      const row=rows[r]||[]; const txt=g(row,col.inhalt); if(!txt) continue;
+      const typ=g(row,col.typ);
+      const {panels, warns} = parsePanelText(txt, /^(m|mand|vorschrift|gebot)/i.test(typ));
+      const normTxt=g(row,col.norm).toUpperCase();
+      out.push({row:r+1, nr:'', label:g(row,col.label), location:g(row,col.standort), description:g(row,col.beschr), h:normHeight(g(row,col.h)), norm: /EASA/.test(normTxt)?'EASA':(/ICAO/.test(normTxt)?'ICAO':null), code:normCode(g(row,col.code)), mandatory: panels.some(p=>PANEL_TYPES[p.type].cat==='mandatory'), panels, warns, source:'Tabelle'});
+    }
+    return {format:'Tabelle (Blatt „'+n+'“, Spalte Inhalt)', signs:out};
+  }
+  return {format:'unbekannt', signs:[], error:'Weder ein Blatt „S_Def“ noch eine Überschrift „Inhalt“ / „Schildertext“ gefunden.'};
+}
+function importedToSign(it, defNorm, defCode){
+  const s = newSign();
+  s.panels = deepCopy(it.panels);
+  s.norm = it.norm || defNorm;
+  s.location = it.location || '';
+  s.description = it.description || '';
+  s.name = it.label || (it.location ? it.location : (it.nr ? 'Schild '+it.nr : 'Import Z. '+it.row));
+  const rec = ()=>recommendedHeight(s);
+  if(it.code) s.codeNo = it.code;
+  else if(defCode!=='auto') s.codeNo = defCode;
+  else if(it.h) s.codeNo = codeFromHeight(it.h, s.panels.some(p=>PANEL_TYPES[p.type].cat==='mandatory'));
+  s.h = it.h || rec();
+  return s;
+}
+
+/* ---- SheetJS laden und Datei in Raster umwandeln ---- */
+let xlsxLib = null;
+function loadXLSX(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  if(xlsxLib) return xlsxLib;
+  xlsxLib = new Promise((res,rej)=>{ const sc=document.createElement('script'); sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; sc.onload=()=>res(window.XLSX); sc.onerror=()=>{ xlsxLib=null; rej(new Error('Excel-Bibliothek konnte nicht geladen werden (Internet?)')); }; document.head.appendChild(sc); });
+  return xlsxLib;
+}
+function workbookToGrid(XLSX, wb){
+  const book={};
+  wb.SheetNames.forEach(n=>{
+    const ws=wb.Sheets[n]; if(!ws || !ws['!ref']) { book[n]=[]; return; }
+    const rg=XLSX.utils.decode_range(ws['!ref']); const rows=[];
+    for(let r=rg.s.r; r<=Math.min(rg.e.r, 2000); r++){
+      const row=[];
+      for(let c=0; c<=Math.min(rg.e.c, 80); c++){
+        const cell=ws[XLSX.utils.encode_cell({r,c})];
+        if(!cell){ row.push(null); continue; }
+        let bg=null; const st=cell.s;
+        if(st && st.patternType && st.patternType!=='none'){ bg = (st.fgColor && st.fgColor.rgb) || (st.bgColor && st.bgColor.rgb) || null; }
+        row.push({v: cell.v, bg});
+      }
+      rows[r]=row;
+    }
+    book[n]=rows;
+  });
+  return book;
+}
+let impResult = null;
+async function handleExcelFile(file){
+  try{
+    toast('Excel wird gelesen …');
+    const XLSX = await loadXLSX();
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array', cellStyles:true});
+    impResult = importFromGrid(workbookToGrid(XLSX, wb));
+    impResult.file = file.name;
+    openImport();
+  }catch(e){ toast('Import fehlgeschlagen: '+(e.message||e)); }
+}
+function renderImport(){
+  const r = impResult; if(!r) return;
+  const defNorm=$('#imp-norm').value, defCode=$('#imp-code').value;
+  $('#imp-info').textContent = `${r.file||''} · Format: ${r.format} · ${r.signs.length} Schilder erkannt`;
+  if(r.error || !r.signs.length){ $('#imp-table').innerHTML = `<tr><td class="note">${esc(r.error||'Keine Schilder gefunden.')}</td></tr>`; $('#imp-apply').disabled=true; return; }
+  $('#imp-apply').disabled=false;
+  $('#imp-table').innerHTML = `<thead><tr><th></th><th>Zeile</th><th>Standort / Anmerkung</th><th>Vorschau</th><th>Panels</th><th class="num">Schrifthöhe</th><th>Hinweise</th></tr></thead><tbody>`+
+    r.signs.map((it,i)=>{
+      const s=importedToSign(it, defNorm, defCode); signCounter--; const d=signDims(s); const c=complianceChecks(s).filter(x=>!x.ok).length;
+      return `<tr><td><input type="checkbox" data-imp="${i}" ${it.skip?'':'checked'}></td><td>${it.row}${it.nr?' · Nr. '+esc(it.nr):''}</td>
+        <td><b>${esc(it.location||it.label||'—')}</b><div class="note">${esc(it.description||'')}</div></td>
+        <td><div class="thumb">${renderSignSVG(s,{pad:20})}</div></td>
+        <td>${s.panels.map(p=>`<span class="badge ${PANEL_TYPES[p.type].cat==='mandatory'?'m':(PANEL_TYPES[p.type].bg==='black'?'l':'i')}">${esc(PANEL_TYPES[p.type].label.split(' (')[0])}</span> ${esc(p.text||'')}${p.arrow&&p.arrow!=='none'?' '+ARROWS[p.arrow]:''}`).join('<br>')}</td>
+        <td class="num">${s.h}${it.h?'':' <span class="imp-warn">(Empf.)</span>'}<div class="note">${d.total}×${d.face}</div></td>
+        <td>${it.warns.map(w=>`<div class="imp-warn">⚠ ${esc(w)}</div>`).join('')}${c?`<div class="imp-warn">Compliance: ${c} Hinweis(e)</div>`:''}</td></tr>`;
+    }).join('')+'</tbody>';
+  $('#imp-table').querySelectorAll('[data-imp]').forEach(cb=>cb.addEventListener('change',()=>{ r.signs[Number(cb.dataset.imp)].skip=!cb.checked; }));
+}
+function openImport(){ $('#imp-all').checked=true; renderImport(); $('#imp-modal').classList.add('open'); }
+function closeImport(){ $('#imp-modal').classList.remove('open'); }
+$('#load-xls').addEventListener('change', e=>{ const f=e.target.files[0]; if(f) handleExcelFile(f); e.target.value=''; });
+$('#imp-close').addEventListener('click', closeImport);
+$('#imp-modal').addEventListener('click', e=>{ if(e.target.id==='imp-modal') closeImport(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeImport(); });
+['imp-norm','imp-code'].forEach(id=>$('#'+id).addEventListener('change', renderImport));
+$('#imp-all').addEventListener('change', e=>{ if(!impResult) return; impResult.signs.forEach(s=>s.skip=!e.target.checked); renderImport(); });
+$('#imp-apply').addEventListener('click', ()=>{
+  if(!impResult) return;
+  const defNorm=$('#imp-norm').value, defCode=$('#imp-code').value;
+  const sel = impResult.signs.filter(s=>!s.skip);
+  if(!sel.length){ toast('Keine Zeile ausgewählt'); return; }
+  if($('#imp-mode').value==='replace'){ state.signs=[]; signCounter=0; }
+  sel.forEach(it=>{ const s=importedToSign(it, defNorm, defCode); state.signs.push(s); });
+  closeImport(); renderSigns(); renderOverview(); toast(sel.length+' Schilder importiert');
+});
+/* Importvorlage */
+$('#xls-template').addEventListener('click', async()=>{
+  const rows = [
+    ['Label','Standort','Inhalt','Norm','Code','Schrifthöhe','Anmerkung'],
+    ['Rollhalteort 25','TWY A / RWY 25','L:A | H:25-07','ICAO','3-4','400','Halteposition West'],
+    ['Kreuzung B/C','TWY A, Höhe B','←B | L:A | C→','ICAO','3-4','300',''],
+    ['Ausfahrt','RWY 07, km 1,2','X:←H','EASA','3-4','400',''],
+    ['Intersection','TWY D','T:←1220m','ICAO','3-4','400',''],
+    ['Vorfeld','TWY C Süd','APRON→','ICAO','','',''],
+    ['Kein Zutritt','Einfahrt Servicestraße','NE','ICAO','3-4','',''],
+    ['CAT II/III','TWY A, CAT-Halt','H:25 | C:CAT II/III','ICAO','3-4','400',''],
+    [],['Syntax','Panels mit „|“ trennen. Kürzel: L Standort · D Richtung · Z Ziel · X Runway exit · T Intersection take-off · V Runway vacated · R Distance remaining · H Rollhalteort · C CAT · NE NO ENTRY · M Vorschrift-Freitext. Pfeile ← → ↑ ↓ ↖ ↗ ↙ ↘ (oder <- ->) vor oder nach dem Text. Ohne Kürzel wird der Typ erraten; [A] = Standort.'],
+  ];
+  try{
+    const XLSX = await loadXLSX();
+    const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:18},{wch:26},{wch:28},{wch:7},{wch:6},{wch:12},{wch:30}];
+    XLSX.utils.book_append_sheet(wb, ws, 'Schilder');
+    const out = XLSX.write(wb, {type:'array', bookType:'xlsx'});
+    saveFile('SignCreator_Importvorlage.xlsx', new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  }catch(e){
+    const csv = rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');
+    saveFile('SignCreator_Importvorlage.csv', '﻿'+csv);
+  }
+});
 
 // Startbeispiele
 state.signs.push(newSign());
