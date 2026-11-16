@@ -861,7 +861,7 @@ const COMPANY = 'Innovence Airport Systems GmbH';
 const SHEETS = { A4:{w:297,h:210, tbW:190, tbH:32}, A3:{w:420,h:297, tbW:230, tbH:38} };
 const DRAFTERS = ['B. Müller','M. Müller','B. Dembski'];
 const PROJECT_DEFAULTS = { customer:'', airport:'', title:'', status:'Ausführungsplan', drawingTitle:'Detailzeichnung RVZ', planNo:'', drawnBy:'', rev:'-', format:'A4', housing:true, housingSide:30, housingTB:25 };
-function pj(){ state.project = Object.assign({}, PROJECT_DEFAULTS, state.project||{}); return state.project; }
+function pj(){ if(!state.project) state.project={}; for(const k in PROJECT_DEFAULTS) if(!(k in state.project)) state.project[k]=PROJECT_DEFAULTS[k]; return state.project; }
 const fx = v => Math.round(v*100)/100;
 function fmtN(v){ const r=Math.round(v*10)/10; return Number.isInteger(r)? String(r) : String(r).replace('.',','); }
 /* Text für PDF/SVG: nur Zeichen, die die PDF-Standardschrift kennt */
