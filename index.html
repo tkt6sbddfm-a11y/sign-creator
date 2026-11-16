@@ -790,7 +790,7 @@ function complianceHTML(sign){
     (bad.length?`<ul>${bad.map(x=>`<li>${esc(x.label)}</li>`).join('')}</ul>`:'')+
     `<details><summary>alle Prüfungen</summary><ul>${c.map(x=>`<li style="color:${x.ok?'#15803d':'#b91c1c'}">${x.ok?'✓':'✗'} ${esc(x.label)}</li>`).join('')}</ul></details></div>`;
 }
-function fileName(sign, ext){ return (sign.name||'schild').replace(/[^\w\-]+/g,'_')+'.'+ext; }
+function fileName(sign, ext){ return `${baseName()}_${fnPart(sign.number?sign.number+' '+(sign.name||''):(sign.name||'Schild'))}.${ext}`; }
 
 /* ================= Übersicht ================= */
 function renderOverview(){
@@ -1141,7 +1141,9 @@ async function sheetsToPDF(sheets){
   return doc.output('blob');
 }
 function stamp(){ const d=new Date(), z=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`; }
-function baseName(){ const pr=pj(); return ['RVZ', pr.customer, pr.planNo].filter(Boolean).join('_').replace(/[^\w\-]+/g,'_').slice(0,60) || 'RVZ'; }
+/* Dateiname: RVZ_<Referenz/Kunde>_<Bauvorhaben> <JJJJ> – unzulässige Zeichen und Leerzeichen innerhalb der Felder werden zu „_“ */
+function fnPart(v){ return String(v||'').trim().replace(/[\\\/:*?"<>|#%&{}~]+/g,'-').replace(/\s+/g,'_').replace(/_+/g,'_').replace(/^[-_.]+|[-_.]+$/g,'').slice(0,60); }
+function baseName(){ const pr=pj(); return ['RVZ', fnPart(pr.customer), fnPart(pr.title)].filter(Boolean).join('_') + ' ' + new Date().getFullYear(); }
 async function exportPDF(signs, name){
   if(!signs.length){ toast('Keine Schilder'); return; }
   toast('PDF wird erstellt …');
@@ -1234,15 +1236,17 @@ $('#tpl-modal').addEventListener('click', e=>{ if(e.target.id==='tpl-modal') clo
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeTpl(); });
 $('#tpl-add').addEventListener('click', addFromTemplate);
 $('#tpl-blank').addEventListener('click', ()=>{ const s=newSign(); s.norm=tpl.norm; s.codeNo=tpl.code; if(tpl.h!=='auto') s.h=Number(tpl.h); else s.h=recommendedHeight(s); state.signs.push(s); closeTpl(); renderSigns(); renderOverview(); });
-$('#pdf-all').addEventListener('click',()=>exportPDF(state.signs,`${baseName()}_${stamp()}.pdf`));
-$('#pdf-all-2').addEventListener('click',()=>exportPDF(state.signs,`${baseName()}_${stamp()}.pdf`));
-$('#svg-all').addEventListener('click',()=>exportSVG(state.signs,`${baseName()}_${stamp()}.svg`));
-$('#svg-all-2').addEventListener('click',()=>exportSVG(state.signs,`${baseName()}_${stamp()}.svg`));
+$('#pdf-all').addEventListener('click',()=>exportPDF(state.signs,`${baseName()}.pdf`));
+$('#pdf-all-2').addEventListener('click',()=>exportPDF(state.signs,`${baseName()}.pdf`));
+$('#svg-all').addEventListener('click',()=>exportSVG(state.signs,`${baseName()}.svg`));
+$('#svg-all-2').addEventListener('click',()=>exportSVG(state.signs,`${baseName()}.svg`));
 $('#print-all').addEventListener('click',printAll);
 $('#copy-csv').addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText(overviewCSV()); toast('CSV kopiert'); }catch(e){ toast('Zwischenablage nicht verfügbar'); } });
 $('#csv-download').addEventListener('click',()=>saveFile('Rollverkehrszeichen_uebersicht.csv','﻿'+overviewCSV()));
 $('#save-json').addEventListener('click',()=>{ saveFile(projectJsonName(), JSON.stringify(state,null,2)); projectSaveManual(); });
-$('#load-json').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const o=JSON.parse(r.result); if(o.signs){ state=o; state.fontWidths=state.fontWidths||deepCopy(FONT_WIDTHS); state.spacingCodes=state.spacingCodes||deepCopy(SPACING_CODES); state.params=state.params||{ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; ['ICAO','EASA'].forEach(n=>{ const d=makeDefaults(n); state.params[n]=state.params[n]||d; Object.keys(d.rows).forEach(k=>{ if(!state.params[n].rows[k]) state.params[n].rows[k]=d.rows[k]; }); }); state.project=Object.assign({},PROJECT_DEFAULTS,state.project||{}); state.signs.forEach(normalizeSign); renderProjectCard(); state.signs.forEach(s=>{ if(!s.faceMode) s.faceMode = s.vpad==='H/4' ? 'norm' : (s.norm==='ICAO' && s.vpad==='H/2' ? '2H' : 'norm'); }); signCounter=Math.max(0,...state.signs.map(s=>s.id||0)); renderSigns(); renderOverview(); toast('Projekt geladen'); } }catch(err){ toast('Ungültige Datei'); } }; r.readAsText(f); e.target.value=''; });
+function applyProject(o, fileName){ if(!o || !Array.isArray(o.signs)) throw new Error('keine Projektdatei'); state=o; state.code=state.code||deepCopy(DEFAULT_CODE); state.signs=state.signs.map(sg=>{ const d=newSign(); signCounter--; return Object.assign(d, sg, {panels:(sg.panels&&sg.panels.length?sg.panels:d.panels)}); }); state.fontWidths=state.fontWidths||deepCopy(FONT_WIDTHS); state.spacingCodes=state.spacingCodes||deepCopy(SPACING_CODES); state.params=state.params||{ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; ['ICAO','EASA'].forEach(n=>{ const d=makeDefaults(n); state.params[n]=state.params[n]||d; Object.keys(d.rows).forEach(k=>{ if(!state.params[n].rows[k]) state.params[n].rows[k]=d.rows[k]; }); }); state.project=Object.assign({},PROJECT_DEFAULTS,state.project||{}); state.signs.forEach(normalizeSign); renderProjectCard(); state.signs.forEach(s=>{ if(!s.faceMode) s.faceMode = s.vpad==='H/4' ? 'norm' : (s.norm==='ICAO' && s.vpad==='H/2' ? '2H' : 'norm'); }); signCounter=Math.max(0,...state.signs.map(s=>s.id||0)); openedFileName = fileName||''; renderSigns(); renderOverview(); toast('Projekt geladen'+(fileName?': '+fileName:'')); }
+let openedFileName='';
+$('#load-json').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ applyProject(JSON.parse(r.result), ''); }catch(err){ toast('Ungültige Datei'); } }; r.readAsText(f); e.target.value=''; });
 
 
 /* ================= Excel-Import ================= */
@@ -1739,7 +1743,9 @@ async function graphToken(interactive){
   const app = await msalInit(); if(!app) throw new Error('Ablage nicht eingerichtet');
   const scopes=['Sites.ReadWrite.All'];
   try{ if(!msalAccount) throw new Error('keine Anmeldung'); return (await app.acquireTokenSilent({scopes, account:msalAccount})).accessToken; }
-  catch(e){ if(!interactive) throw new Error('Anmeldung erforderlich'); const r=await app.acquireTokenPopup({scopes}); msalAccount=r.account; return r.accessToken; }
+  catch(e){
+    try{ const r=await app.ssoSilent({scopes, domainHint:'organizations'}); msalAccount=r.account; return r.accessToken; }catch(e2){}
+    if(!interactive) throw new Error('Anmeldung erforderlich'); const r=await app.acquireTokenPopup({scopes}); msalAccount=r.account; return r.accessToken; }
 }
 async function gfetch(tok, url, opt={}){
   const r = await fetch(url.startsWith('http')?url:'https://graph.microsoft.com/v1.0'+url, Object.assign({}, opt, {headers: Object.assign({Authorization:'Bearer '+tok}, opt.headers||{})}));
@@ -1770,7 +1776,7 @@ async function uploadWithMeta(tok, name, blob, kind){
     AnzahlSchilder: state.signs.length, Projektdatum: new Date().toISOString(), Dateiart: kind })});
   return item;
 }
-function projectJsonName(){ return `${baseName()}_Projekt.json`; }
+function projectJsonName(){ return openedFileName || `${baseName()}.json`; }
 async function saveProjectToSP(info, interactive){
   const tok = await graphToken(interactive);
   toast('Projekt wird in SharePoint gespeichert …');
@@ -1788,6 +1794,7 @@ async function startProjectSave(info){
   catch(e){ openSaveDialog(e.message); }
 }
 function openSaveDialog(msg){
+  $('#save-modal h3').textContent='Projekt speichern'; $('#save-go').dataset.mode='save';
   const pr=pj(), m=$('#save-modal'); if(!m) return;
   const configured = !!SP_SAVE.clientId;
   $('#save-body').innerHTML = `
@@ -1806,6 +1813,7 @@ function closeSaveDialog(){ const m=$('#save-modal'); if(m) m.classList.remove('
 $('#save-close').addEventListener('click', closeSaveDialog);
 $('#save-modal').addEventListener('click', e=>{ if(e.target.id==='save-modal') closeSaveDialog(); });
 $('#save-go').addEventListener('click', async()=>{
+  if($('#save-go').dataset.mode==='open'){ const pth=$('#save-go').dataset.path; if(!SP_SAVE.clientId){ closeSaveDialog(); return; } try{ await openFromSP(pth,true); closeSaveDialog(); }catch(e){ openDialog(pth,e.message); } return; }
   const pr=pj(), ref=$('#save-ref').value.trim();
   if(!ref){ $('#save-ref').focus(); toast('Bitte Referenz / Kunde angeben'); return; }
   pr.customer=ref; pr.title=$('#save-title').value.trim(); pr.drawnBy=$('#save-by').value.trim(); renderProjectCard();
@@ -1813,6 +1821,32 @@ $('#save-go').addEventListener('click', async()=>{
   try{ await saveProjectToSP(pendingSave,true); closeSaveDialog(); }
   catch(e){ openSaveDialog(e.message); }
 });
+
+/* ================= Projekt aus der Liste „Sign Creator Projekte“ öffnen (…/sign-creator/?open=<Dateipfad>) ================= */
+const OPEN_PARAM = new URLSearchParams(location.search).get('open');
+function libRelative(path){ const root=SP_SAVE.sitePath+'/'+SP_SAVE.library+'/'; let p=decodeURIComponent(path||''); if(p.startsWith('https://')) p=new URL(p).pathname, p=decodeURIComponent(p); return p.startsWith(root)? p.slice(root.length) : p.split('/').pop(); }
+async function openFromSP(path, interactive){
+  const rel=libRelative(path), tok=await graphToken(interactive), dId=await libDrive(tok);
+  toast('Projekt wird geladen …');
+  const r=await fetch(`https://graph.microsoft.com/v1.0/drives/${dId}/root:/${rel.split('/').map(encodeURIComponent).join('/')}:/content`,{headers:{Authorization:'Bearer '+tok}});
+  if(!r.ok) throw new Error('Datei nicht gefunden ('+r.status+')');
+  applyProject(await r.json(), rel.split('/').pop());
+  history.replaceState(null,'',location.pathname);
+}
+function openDialog(path,msg){
+  const rel=libRelative(path), url='https://'+SP_SAVE.host+SP_SAVE.sitePath+'/'+encodeURIComponent(SP_SAVE.library).replace(/%20/g,'%20')+'/'+rel.split('/').map(encodeURIComponent).join('/');
+  const configured=!!SP_SAVE.clientId;
+  pendingSave=null;
+  $('#save-modal h3').textContent='Projekt öffnen';
+  $('#save-body').innerHTML=`<p style="margin-top:0">Projekt <b>${esc(rel)}</b> aus <a href="${SP_SAVE.listUrl}" target="_blank" rel="noopener">Sign Creator Projekte</a> öffnen.</p>${msg?`<div class="hint">${esc(msg)}</div>`:''}
+    ${configured?'':`<div class="hint">Das direkte Öffnen braucht noch die einmalige Microsoft-Anmeldung (App-Registrierung). Bis dahin: Datei herunterladen und mit „Projekt laden“ öffnen.</div>
+    <p><a class="btn" href="${url}?download=1" target="_blank" rel="noopener">1. Datei herunterladen</a> &nbsp; <label class="btn primary">2. Projekt laden <input type="file" accept=".json" id="open-file" style="display:none"></label></p>`}`;
+  $('#save-go').textContent = configured ? 'Anmelden und öffnen' : 'Schließen';
+  $('#save-go').dataset.mode='open'; $('#save-go').dataset.path=path;
+  const of=$('#open-file'); if(of) of.addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>{ try{ applyProject(JSON.parse(rd.result), f.name); closeSaveDialog(); history.replaceState(null,'',location.pathname); }catch(err){ toast('Ungültige Datei'); } }; rd.readAsText(f); });
+  $('#save-modal').classList.add('open');
+}
+if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 // Start: immer genau ein Schild
 state.signs.push(newSign());
