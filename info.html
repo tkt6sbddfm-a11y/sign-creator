@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign Creator – Erläuterungen</title>
+<base target="_blank">
+<style>
+  :root{--ink:#242424;--muted:#616161;--line:#e0e0e0;--accent:#0f6cbd;}
+  html,body{margin:0;background:transparent;}
+  body{font:14px/1.5 "Segoe UI","Segoe UI Web (West European)",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;color:var(--ink);padding:4px 6px 16px;}
+  .links{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .links a{display:block;padding:8px 12px;border-radius:4px;text-decoration:none;font-weight:600;}
+  .links a.primary{background:var(--accent);color:#fff;}
+  .links a.secondary{border:1px solid var(--line);color:var(--accent);}
+  details{border-bottom:1px solid var(--line);}
+  details:first-of-type{border-top:1px solid var(--line);}
+  summary{cursor:pointer;list-style:none;padding:10px 4px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;}
+  summary::-webkit-details-marker{display:none;}
+  summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;flex:none;margin-left:2px;}
+  details[open] summary::before{transform:rotate(45deg);}
+  summary:hover{color:var(--accent);}
+  .body{padding:0 4px 12px 21px;color:var(--ink);}
+  .body p{margin:0 0 8px;} .body ul,.body ol{margin:0 0 8px;padding-left:18px;} .body li{margin-bottom:4px;}
+  a{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="links">
+  <a class="primary" href="https://tkt6sbddfm-a11y.github.io/sign-creator/">Sign Creator in neuem Tab öffnen</a>
+  <a class="secondary" href="https://innovencede.sharepoint.com/sites/IVTeamSharing/Sign%20Creator%20Projekte/Forms/AllItems.aspx">Gespeicherte Projekte</a>
+</div>
+
+<details>
+<summary>Über den Sign Creator</summary>
+<div class="body">
+<p>Mit dem Sign Creator werden Rollverkehrszeichen (Airfield Guidance Signs) nach <strong>ICAO Annex 14 Vol. I</strong> und <strong>EASA CS-ADR-DSN</strong> entworfen, bemaßt und auf Normkonformität geprüft. Schilder werden aus Panels zusammengesetzt (Rollhalteort, CAT I/II/III, NO ENTRY, Standort, Richtung, Ziel, Runway exit, Runway vacated, Intersection take-off, Distance remaining); Zeichenbreiten, Zeichenabstände, Rand und Schildhöhe werden aus der hinterlegten Normtabelle berechnet.</p>
+<p>Gespeicherte Projekte, PDF- und SVG-Zeichnungen liegen in der Bibliothek <a href="https://innovencede.sharepoint.com/sites/IVTeamSharing/Sign%20Creator%20Projekte/Forms/AllItems.aspx">Sign Creator Projekte</a> (Datum, Bearbeiter, Anzahl Schilder, Referenz/Kunde).</p>
+</div>
+</details>
+
+<details>
+<summary>Ablauf im Sign Creator</summary>
+<div class="body"><ol>
+<li><strong>Projektangaben</strong> für das Schriftfeld: Kunde, Flughafen, Bauvorhaben, Plan-Nr., Bearbeiter, Blatt A4/A3, Gehäuserahmen.</li>
+<li><strong>Schild hinzufügen</strong> → Vorlagen-Galerie: Norm (ICAO/EASA), Kategorie, Code-Nummer der Piste, Schrifthöhe (200/300/400 mm oder Mindestwert nach App. 4 Nr. 1 / Tab. N-2).</li>
+<li><strong>Norm je Schild</strong>: ICAO Annex 14 Vol. I (9. Ausg. 2022) oder EASA CS-ADR-DSN Issue 7; Schildhöhe Norm-Minimum, 2 H oder eigener Wert.</li>
+<li><strong>Panels bearbeiten</strong>: Typ, Beschriftung (nur Großbuchstaben), Pfeilrichtung (8 Richtungen); Panel in der Vorschau anklicken oder mit „+“ einfügen.</li>
+<li><strong>Schild-Nr., Label, Standort, Beschreibung</strong> je Schild.</li>
+<li><strong>Vorschau mit Maßkette</strong> und Compliance-Zeile mit 13 Prüfungen.</li>
+<li><strong>Import</strong>: Excel-Liste oder Bild (Screenshot/Foto) – Felder, Pfeile und Text werden erkannt.</li>
+<li><strong>Export</strong>: Zeichnungsblatt je Schild als PDF oder SVG, alle als eine PDF oder eine SVG-Datei; danach Ablage in „Sign Creator Projekte“.</li>
+</ol></div>
+</details>
+
+<details>
+<summary>Zeichnungsblatt und Bemaßung</summary>
+<div class="body"><ul>
+<li>Blatt A4/A3 quer, Maßstab automatisch, Innovence-Logo oben rechts, Schriftfeld unten rechts; Schild-Nr. vor dem Titel.</li>
+<li>Maßketten außen am Schild: oben Gehäuse | Rand / Zeichen / Abstände | Gehäuse, Panelbreiten und Gesamtlänge; links Schrift-, Schild- und Gehäusehöhe; gelber Rand oben/unten und seitlich bemaßt.</li>
+<li>Pfeile als Grafik, damit sie in PDF und SVG sicher gedruckt werden.</li>
+<li>Schrift: Open Taxiway Mandatory Sign (Open Runway Fonts, CC0), auf die Zeichenbreiten nach Tab. A4-1 skaliert.</li>
+</ul></div>
+</details>
+
+<details>
+<summary>Maßregeln je Norm</summary>
+<div class="body">
+<p><strong>Unterschied ICAO ↔ EASA:</strong> Schildhöhe min. – ICAO (App. 4 Nr. 10 / Tab. 5-5) 1,5 H = 300/450/600 mm (vertikaler Rand H/4); EASA (Tab. N-1 / CS N.775(c)(18)) 2 H = 400/600/800 mm (vertikaler Rand H/2). Alle übrigen Werte sind identisch.</p>
+<ul>
+<li><strong>Schrifthöhe</strong> nach Code-Nummer: Code 1–2 → Mandatory 300, Runway exit/vacated 300, übrige 200; Code 3–4 → 400/400/300. Installierte Höhe max. 700/900/1100 mm.</li>
+<li><strong>Zeichenbreiten</strong> A–Z, 0–9 nach Tab. A4-1 / N-3; <strong>Zeichenabstände</strong> Code 1–4 = 48/38/25/13 · 71/57/38/19 · 96/76/50/26 mm; Gruppen-/Pfeilabstand 140/210/280.</li>
+<li><strong>Seitlicher Rand</strong> H/2 je Seite; bei nur einem Bezeichner H.</li>
+<li><strong>Strichstärke</strong> 32/48/64 mm; Trenner 0,7 × Strichstärke; gelber Rand des Standortzeichens 0,5 × Strichstärke; optionale schwarze Kontur 10/20 mm.</li>
+<li><strong>Pfeil</strong> H × 0,7 H; <strong>NO ENTRY</strong> Feld 3 H, Ring Ø 1,35 H; <strong>Runway vacated</strong> Pattern A.</li>
+<li><strong>Rechenweg</strong>: Rand + Σ Zeichenbreiten + Σ Paarabstände + Rand – Doc-9157-Beispiel „APRON →“ (300 mm) = 2150 mm exakt.</li>
+</ul></div>
+</details>
+
+<details>
+<summary>Compliance-Prüfungen</summary>
+<div class="body"><ul>
+<li>Gesamtlänge ≤ 3000 mm (Doc 9157 Teil 6, 4.9.5)</li>
+<li>Schildbreite ≥ Schildhöhe (5.4.1.4 / N.775(c)(2))</li>
+<li>Zulässige Schrifthöhe und Mindestwert nach Code-Nummer</li>
+<li>Schildhöhe ≥ Norm-Minimum (ICAO 1,5 H / EASA 2 H)</li>
+<li>Einseitig aufgestelltes Gebotszeichen ≥ 1,46 m / 1,94 m</li>
+<li>Rollbahnbezeichner ohne I, O, X</li>
+<li>Mindestens eine Nachricht; höchstens ein Standort-Panel; keine leeren Panels</li>
+<li>Keine Kombination Information + Mandatory; Standort bei Vorschriftzeichen außen</li>
+<li>Pfeile links vom Standort nach links, rechts davon nach rechts (5.4.3.34)</li>
+</ul></div>
+</details>
+
+<details>
+<summary>Bereitstellung und Offline-Version</summary>
+<div class="body">
+<p>Bereitgestellt über GitHub Pages (<a href="https://tkt6sbddfm-a11y.github.io/sign-creator/">tkt6sbddfm-a11y.github.io/sign-creator</a>, Repository <a href="https://github.com/tkt6sbddfm-a11y/sign-creator">tkt6sbddfm-a11y/sign-creator</a>). Offline-Version als eine HTML-Datei: <a href="https://innovencede.sharepoint.com/sites/IVTeamSharing/Freigegebene%20Dokumente/Sign%20Creator/SignCreator.html">Dokumente › Sign Creator › SignCreator.html</a> – herunterladen und im Browser öffnen.</p>
+</div>
+</details>
+
+<details>
+<summary>Vergleich mit Wingframe</summary>
+<div class="body"><p>Wingframe (AAS International, Airfield Lighting Systems) arbeitet mit Vorlagen-Galerie, Normfilter, Hardware-Datenblatt, Klick-Editor, 46 Compliance-Prüfungen (Vollreport kostenpflichtig) und Übermittlung an den Hersteller statt freiem Export. Der Sign Creator übernimmt Galerie, Compliance, Klick-Bearbeitung und Label/Standort und ergänzt freien PDF/SVG/CSV-Export, Zeichnungsblätter mit Bemaßung und editierbare Normtabellen.</p></div>
+</details>
+
+<details>
+<summary>Quellen</summary>
+<div class="body"><ul>
+<li>ICAO Annex 14 Vol. I, 9. Ausgabe 2022, Kap. 5.4 und Appendix 4 (Tab. A4-1, Abb. A4-2 bis A4-4)</li>
+<li>EASA CS-ADR-DSN Issue 7 (ED Decision 2025/004/R), Kap. N, U, L</li>
+<li>ICAO Doc 9157 Aerodrome Design Manual Part 4 (5. Ausg. 2021), Kap. 12; Part 6</li>
+<li>Master-SignsDef-Halogen-180206.xls, Blatt „Zeichensatz“</li>
+<li>Open Runway Fonts (ryo-a), CC0</li>
+<li><a href="https://www.wingframe.com/">Wingframe</a> · <a href="https://aasinternational.nl/sign-configurator">AAS Sign Configurator</a> · <a href="https://www.airport-signs.work/">Airfield Sign Builder (FAA)</a></li>
+</ul></div>
+</details>
+</body>
+</html>
