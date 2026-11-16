@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rollverkehrszeichen-Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{--bg:#f3f4f6;--card:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;--acc:#1d4ed8;--acc2:#eff6ff;--warn:#b45309;--warnbg:#fffbeb;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+  header{background:#0f172a;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;font-weight:600}
+  header .sub{color:#94a3b8;font-size:12px}
+  nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+  nav button{background:transparent;border:1px solid #334155;color:#cbd5e1;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:13px}
+  nav button.active{background:#1e293b;color:#fff;border-color:#64748b}
+  main{padding:16px 20px;max-width:1400px;margin:0 auto}
+  .view{display:none}.view.active{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+  .sign-card{border-left:4px solid var(--acc)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .field{display:flex;flex-direction:column;gap:3px;min-width:140px}
+  .field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  select,input[type=text],input[type=number]{padding:7px 9px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;background:#fff;font-family:inherit}
+  input[type=text]{text-transform:uppercase}
+  button.btn{padding:7px 12px;border-radius:6px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:13px;font-family:inherit}
+  button.btn:hover{background:#f8fafc}
+  button.primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+  button.primary:hover{background:#1e40af}
+  button.danger{color:#b91c1c;border-color:#fecaca}
+  button.small{padding:4px 8px;font-size:12px}
+  .sign-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sign-head h3{margin:0;font-size:15px}
+  .sign-head .spacer{flex:1}
+  .panels{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  .panel-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:8px}
+  .panel-row .idx{font-weight:600;color:var(--muted);width:22px;padding-bottom:8px}
+  .preview{margin-top:12px;background:#e8eaed;border-radius:8px;padding:12px;overflow-x:auto}
+  .preview svg{display:block;max-width:100%;height:auto}
+  .dims{font-size:12px;color:var(--muted);margin-top:6px;display:flex;gap:16px;flex-wrap:wrap}
+  .dims b{color:var(--ink)}
+  .chain{font-size:11px;color:var(--muted);margin-top:6px;font-variant-numeric:tabular-nums;line-height:1.6}
+  .chain .pl{font-weight:600;color:var(--ink)}
+  .chain b{color:var(--ink)}
+  .hint{font-size:12px;color:var(--warn);background:var(--warnbg);border:1px solid #fde68a;border-radius:6px;padding:6px 8px;margin-top:8px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  th{background:#f8fafc;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:#475569}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tfoot td{font-weight:600;background:#f8fafc}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .toolbar .grow{flex:1}
+  .note{font-size:12px;color:var(--muted)}
+  .param-table input[type=number]{width:84px;padding:4px 6px}
+  .param-table input[type=text]{width:70px;padding:4px 6px;text-transform:none}
+  .badge{display:inline-block;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:600}
+  .badge.m{background:#fee2e2;color:#991b1b}.badge.i{background:#fef9c3;color:#854d0e}.badge.l{background:#111;color:#fde047}.badge.d{background:#111;color:#fff}
+  .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;z-index:40;align-items:center;justify-content:center;padding:16px}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:12px;width:min(1100px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:#f8fafc}
+  .modal-head h3{margin:0;font-size:16px}
+  .modal-body{display:flex;min-height:0;flex:1}
+  .modal-side{width:230px;border-right:1px solid var(--line);padding:12px;overflow:auto;background:#f8fafc}
+  .modal-side h4{margin:10px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .modal-side button{display:block;width:100%;text-align:left;background:none;border:0;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit}
+  .modal-side button.active{background:#dbeafe;color:#1e3a8a;font-weight:600}
+  .chip{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:12px;margin:2px}
+  .chip.active{background:#1d4ed8;color:#fff;border-color:#1d4ed8}
+  .modal-main{flex:1;overflow:auto;padding:14px 16px}
+  .tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+  .tpl{border:1px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;background:#fff;text-align:center}
+  .tpl:hover{border-color:var(--acc);box-shadow:0 0 0 3px #dbeafe}
+  .tpl.sel{border-color:var(--acc);background:#eff6ff}
+  .tpl .thumb{height:70px;display:flex;align-items:center;justify-content:center;background:#e8eaed;border-radius:6px;margin-bottom:6px;overflow:hidden}
+  .tpl .thumb svg{max-width:100%;max-height:100%;height:auto;width:auto}
+  .tpl .nm{font-size:12px;font-weight:600;line-height:1.3}
+  .tpl .tag{font-size:10px;color:var(--muted);margin-top:3px}
+  .modal-foot{display:flex;gap:8px;justify-content:flex-end;padding:10px 16px;border-top:1px solid var(--line)}
+  .comp{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-top:8px;font-size:12px}
+  .comp .ok{color:#15803d;font-weight:600}.comp .bad{color:#b91c1c;font-weight:600}
+  .comp ul{margin:0;padding-left:18px;color:#b91c1c}
+  .comp details{color:var(--muted)} .comp details ul{color:#15803d}
+  .preview svg g[data-pi]{cursor:pointer}
+  .preview svg g[data-pi]:hover rect:first-child{filter:brightness(1.08)}
+  .panel-row.sel{outline:2px solid var(--acc)}
+  .ins{display:flex;justify-content:center;margin:-2px 0}
+  .ins button{border:1px dashed #cbd5e1;background:#fff;border-radius:999px;font-size:11px;padding:1px 10px;color:var(--muted);cursor:pointer}
+  .ins button:hover{border-color:var(--acc);color:var(--acc)}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:8px;font-size:13px;display:none;z-index:50}
+  .src a{color:var(--acc);text-decoration:none}.src li{margin-bottom:6px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+  @media print{
+    header,nav,.toolbar,.no-print,.sign-card .row,.panels,.sign-head button,.hint{display:none!important}
+    body{background:#fff}
+    main{max-width:none;padding:0}
+    .view{display:none!important}
+    #print-area{display:block!important}
+    .print-page{page-break-after:always;padding:10mm}
+    .print-page:last-child{page-break-after:auto}
+    .print-page h2{font-size:16px;margin:0 0 6px}
+    .print-page svg{max-width:100%;height:auto}
+    .print-page table{margin-top:10px;font-size:12px}
+  }
+  #print-area{display:none}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Rollverkehrszeichen-Generator</h1>
+    <div class="sub">Airfield Guidance Signs · ICAO Annex 14 Vol. I (9. Ausg. 2022) / EASA CS-ADR-DSN Issue 7 (2025) · Maße je gewählter Norm</div>
+  </div>
+  <nav>
+    <button class="active" data-view="signs">Schilder</button>
+    <button data-view="overview">Gesamtübersicht</button>
+    <button data-view="params">Parameter / Norm</button>
+    <button data-view="sources">Quellen</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ===== Schilder ===== -->
+  <section id="view-signs" class="view active">
+    <div class="toolbar">
+      <button class="btn primary" id="add-sign">+ Schild hinzufügen</button>
+      <button class="btn" id="save-json">Projekt speichern (JSON)</button>
+      <label class="btn" style="margin:0">Projekt laden <input type="file" id="load-json" accept=".json" style="display:none"></label>
+      <span class="grow"></span>
+      <button class="btn" id="pdf-all">Alle als eine PDF</button>
+      <button class="btn" id="print-all">Alle drucken (Browser)</button>
+    </div>
+    <div id="sign-list"></div>
+    <div class="hint no-print">Die Maße werden je gewählter Norm aus dem Reiter „Parameter / Norm" berechnet. <b>ICAO</b> (Annex 14 Vol. I, 9. Ausg. 2022): Schildhöhe min. 1,5 H = 300/450/600 mm (vertikaler Rand H/4). <b>EASA</b> (CS-ADR-DSN Issue 7, Tab. N-1): Schildhöhe min. 2 H = 400/600/800 mm (vertikaler Rand H/2). Für beide gleich: Schrifthöhe nach Code (App. 4 Nr. 1 / Tab. N-2), Strichstärke 32/48/64, seitlicher Rand H/2 bzw. H bei Einzelbezeichner (Abb. A4-4 / N-3), Zeichenbreiten und -abstände (Tab. A4-1 / N-3), Trenner 0,7 × und gelber Rand 0,5 × Strichstärke, Pfeil H × 0,7 H, NO-ENTRY-Feld 3 H, Schildlänge ≤ 3 m. Belegstellen: Projekt-Dokument „RVZ-Normen-Sammlung".</div>
+  </section>
+
+  <!-- ===== Übersicht ===== -->
+  <section id="view-overview" class="view">
+    <div class="toolbar">
+      <span class="note">Alle Maße in mm. Gesamtlänge = Summe der Panelbreiten inkl. Ränder.</span>
+      <span class="grow"></span>
+      <button class="btn" id="copy-csv">Tabelle als CSV kopieren</button>
+      <button class="btn" id="csv-download">CSV herunterladen</button>
+      <button class="btn primary" id="pdf-all-2">Alle als eine PDF</button>
+    </div>
+    <div class="card"><div style="overflow-x:auto"><table id="overview-table"></table></div></div>
+  </section>
+
+  <!-- ===== Parameter ===== -->
+  <section id="view-params" class="view">
+    <div class="card">
+      <h3 style="margin-top:0">Normparameter je Schrifthöhe</h3>
+      <p class="note">Werte in mm bzw. als Faktor der Schrifthöhe. Änderungen wirken sofort auf alle Schilder. Später können die Werte aus Ihrer Excel-Tabelle hier eingetragen oder per JSON importiert werden.</p>
+      <div class="row" style="margin-bottom:10px">
+        <div class="field"><label>Norm bearbeiten</label>
+          <select id="param-norm"><option value="ICAO">ICAO Annex 14 Vol. I</option><option value="EASA">EASA CS-ADR-DSN</option></select></div>
+        <button class="btn" id="copy-norm">Werte von der anderen Norm übernehmen</button>
+        <button class="btn" id="reset-params">Auf Vorgaben zurücksetzen</button>
+      </div>
+      <div style="overflow-x:auto"><table class="param-table" id="param-table"></table></div>
+      <h3>Mindest-Schrifthöhe nach Code-Nummer (ICAO Annex 14 App. 4 Nr. 1 = EASA Tab. N-2; für beide Normen identisch)</h3>
+      <div style="overflow-x:auto"><table class="param-table" id="code-table"></table></div>
+      <h3>Zeichenabstände nach Zeichenpaar-Code [mm]</h3>
+      <p class="note">Der Abstand zwischen zwei Zeichen ergibt sich aus der paarweisen Code-Matrix (ICAO Annex 14 App. 4, Tab. „Character spacing"; Quelle: Master-SignsDef, Blatt „Zeichensatz"). Geprüft gegen ICAO Annex 14 Tab. A4-1 a)–c): Codes 1–4 stimmen; Buchstabe↔Zahl sowie -, ., / = Code 1 (Instruction 3, 4). Korrigiert gegenüber der Excel: Code 2 bei 200 mm = 38, Code 7 bei 200 mm = 100.</p>
+      <div style="overflow-x:auto"><table class="param-table" id="spacing-codes"></table></div>
+      <h3>Zeichenbreiten [mm] je Schrifthöhe</h3>
+      <p class="note">Quelle: Master-SignsDef, Blatt „Zeichensatz" (entspricht ICAO Annex 14 App. 4). Alle Breiten A–Z und 0–9 geprüft gegen ICAO Annex 14 Tab. A4-1 d)/e) – identisch (200-mm-Werte G/H/I/J/K/L nach ICAO korrigiert). Pfeile/Leerzeichen aus der Excel, 200-mm-Pfeile = halbe 400-mm-Breite. Strichstärke 32/48/64 nach CS ADR-DSN.N.785(b)(9).</p>
+      <div style="overflow-x:auto"><table class="param-table" id="char-widths"></table></div>
+    </div>
+  </section>
+
+  <!-- ===== Quellen ===== -->
+  <section id="view-sources" class="view">
+    <div class="card src">
+      <h3 style="margin-top:0">Normen und Regelwerke</h3>
+      <ul>
+        <li><a href="https://www.icao.int/" target="_blank" rel="noopener">ICAO Annex 14, Volume I – Aerodrome Design and Operations</a>, Kap. 5.4 (Signs) und Appendix 4 (Requirements concerning design of taxiing guidance signs)</li>
+        <li><a href="https://www.easa.europa.eu/" target="_blank" rel="noopener">EASA CS-ADR-DSN – Certification Specifications for Aerodrome Design</a>, Buch 1 Kap. N (Zeichen): Tab. N-2 Mindestzeichenhöhe, CS ADR-DSN.N.785(b)(9) Strichstärken, Abb. N-2A–D Zeichenformen; Kap. U Farben (Abb. U-3/U-4) – deutsche Fassung, geliefert als Auszug</li>
+        <li>ICAO Annex 14 Vol. I, Appendix 4, Tab. A4-1 (Ausgabe 3/11/22): Zeichenbreiten, Abstandscodes, Instructions 1–5 – geliefert als Bild</li>
+        <li>ICAO Annex 14 Vol. I, 9. Ausgabe 2022: Kap. 5.4 (Tab. 5-5 Schild-/Installationshöhe, Abb. 5-30/5-31), Appendix 4 Nr. 1–13 (Schrifthöhe, Strichstärke, Schildhöhe 1,5 H, Abb. A4-2 Zeichenformen/Pfeil, A4-3 NO ENTRY / Runway vacated, A4-4 Schildmaße) – PDF im Ordner „Sign Creator"</li>
+        <li>ICAO Annex 14 Vol. I, 7. Ausgabe 2016: Schildhöhe noch 2 H (400/600/800) – Vergleichswert</li>
+        <li>EASA CS-ADR-DSN Issue 7 (Annex to ED Decision 2025/004/R): Kap. N S. 222–245 (Tab. N-1 Schildhöhe 2 H, N-2, N-3, Abb. N-2A–H, N-3), Kap. U.935 Farben, Kap. L.605 Bodenmarkierungen</li>
+        <li>ICAO Doc 9157 Aerodrome Design Manual Part 4 (5. Ausg. 2021), Kap. 12 Signs: Gruppenabstand 140/210/280, Pfeilbreite = H, Rechenbeispiele Tab. 12-1/12-2; Part 6 Frangibility 4.9: Länge ≤ 3 m, ≤ 24,5 kg/m</li>
+        <li>Master-SignsDef-Halogen-180206.xls, Blatt „Zeichensatz": paarweise Abstandsmatrix und Zeichenbreiten (nur technische Werte übernommen)</li>
+        <li><a href="https://www.faa.gov/" target="_blank" rel="noopener">FAA AC 150/5340-18 – Standards for Airport Sign Systems</a> (nur zur Referenz; nicht im Generator umgesetzt)</li>
+      </ul>
+      <h3>Bestehende Generatoren / Konfiguratoren</h3>
+      <ul>
+        <li><a href="https://aasinternational.nl/sign-configurator" target="_blank" rel="noopener">AAS International – Sign Configurator (Wingframe)</a> – All About Signs, Niederlande</li>
+        <li><a href="https://aasinternational.nl/led-guidance-signs-2" target="_blank" rel="noopener">AAS International – LED Guidance Signs</a></li>
+        <li><a href="https://www.wingframe.com/" target="_blank" rel="noopener">Wingframe AB – Airfield Guidance Sign Design Software</a> (Hersteller der Software)</li>
+        <li><a href="https://www.wingframe.com/signs" target="_blank" rel="noopener">Wingframe – Schildreferenz (Signs)</a></li>
+        <li><a href="https://www.wingframe.com/signs/airport/airfield-guidance/mandatory-instruction" target="_blank" rel="noopener">Wingframe – Mandatory instruction signs</a></li>
+        <li><a href="https://www.wingframe.com/signs/airport/airfield-guidance/information/direction" target="_blank" rel="noopener">Wingframe – Direction signs</a></li>
+        <li><a href="https://www.airfieldlightingsystems.com/wingframe-sign-configurator/" target="_blank" rel="noopener">Airfield Lighting Systems (UK) – Wingframe Sign Configurator</a></li>
+        <li><a href="https://www.airport-signs.work/" target="_blank" rel="noopener">Airfield Sign Builder (airport-signs.work)</a> – kostenlos, FAA-Geometrie, SVG/PNG</li>
+        <li><a href="https://forum.flightgear.org/viewtopic.php?t=8596" target="_blank" rel="noopener">FGSignMaker (FlightGear)</a> – offener HTML-Generator für Simulator-Schilder</li>
+        <li><a href="https://www.transoftsolutions.com/aviation/software/airport-design-operations/aerostripe/" target="_blank" rel="noopener">Transoft AeroSTRIPE</a> – Bodenmarkierungen (ICAO/FAA), kein Schildgenerator</li>
+      </ul>
+      <h3>Hintergrund</h3>
+      <ul>
+        <li><a href="https://www.internationalairportreview.com/news/19025/all-about-signs-retrofit-for-taxiway-guidance-signs/" target="_blank" rel="noopener">International Airport Review – All About Signs Retrofit für Taxiway Guidance Signs</a></li>
+        <li><a href="https://www.airport-technology.com/contractors/lighting/all-about-signs/" target="_blank" rel="noopener">Airport Technology – All About Signs</a></li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<div id="print-area"></div>
+<div class="modal-bg" id="tpl-modal">
+  <div class="modal">
+    <div class="modal-head"><h3>Vorlage wählen</h3><span class="note">1. Norm → 2. Kategorie / Vorlage → 3. Schrifthöhe</span><span style="flex:1"></span><button class="btn small" id="tpl-close">Schließen</button></div>
+    <div class="modal-body">
+      <div class="modal-side">
+        <h4>Norm (Compliance)</h4>
+        <div id="tpl-norms"><span class="chip active" data-norm="ICAO">ICAO</span><span class="chip" data-norm="EASA">EASA</span></div>
+        <h4>Kategorie</h4>
+        <div id="tpl-cats"></div>
+        <h4>Code-Nummer</h4>
+        <div id="tpl-codes"><span class="chip" data-code="1-2">1 oder 2</span><span class="chip active" data-code="3-4">3 oder 4</span></div>
+        <h4>Schrifthöhe</h4>
+        <div id="tpl-heights"><span class="chip" data-h="auto">Empfehlung</span><span class="chip" data-h="200">200</span><span class="chip" data-h="300">300</span><span class="chip" data-h="400">400</span></div>
+      </div>
+      <div class="modal-main"><div class="tpl-grid" id="tpl-grid"></div></div>
+    </div>
+    <div class="modal-foot"><button class="btn" id="tpl-blank">Leeres Schild</button><button class="btn primary" id="tpl-add" disabled>Schild hinzufügen</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   Normparameter (editierbar), getrennt je Norm. Alle Werte in mm.
+   ICAO: Annex 14 Vol. I, 9. Ausgabe 2022, Kap. 5.4 (Tab. 5-5) + Appendix 4
+   EASA: CS-ADR-DSN Issue 7 (ED Decision 2025/004/R), Kap. N (Tab. N-1…N-3)
+   Unterschied: Schildhöhe (Face min) ICAO 1,5 H = 300/450/600,
+   EASA 2 H = 400/600/800 (= ICAO 7. Ausg. 2016). Übrige Werte identisch.
+   ============================================================ */
+const NORM_INFO = {
+  ICAO: {name:'ICAO Annex 14 Vol. I (9. Ausg. 2022)', short:'ICAO', face:'App. 4 Nr. 10 / Tab. 5-5', height:'App. 4 Nr. 1', vmargin:'H/4 (min)'},
+  EASA: {name:'EASA CS-ADR-DSN Issue 7 (2025)',        short:'EASA', face:'CS N.775(c)(18) / Tab. N-1', height:'Tab. N-2', vmargin:'H/2'},
+};
+function makeDefaults(norm){
+  const easa = norm==='EASA';
+  return {
+    heights: [200, 300, 400],
+    rows: {
+      faceHeight:  {label:'Schildhöhe min. (Face height) – '+(easa?'CS N.775(c)(18), Tab. N-1: 2 H':'App. 4 Nr. 10, Tab. 5-5: 1,5 H'), unit:'mm', v: easa?{200:400,300:600,400:800}:{200:300,300:450,400:600}},
+      installMax:  {label:'Installierte Höhe max. (Tab. '+(easa?'N-1':'5-5')+')', unit:'mm', v:{200:700, 300:900, 400:1100}},
+      stroke:      {label:'Strichstärke Schrift und Pfeil (32/48/64 = 0,16 H)', unit:'mm', v:{200:32,  300:48,  400:64}},
+      border:      {label:'Gelber Rand Standortzeichen (≈ 0,5 × Strichstärke)', unit:'mm', v:{200:16,  300:24,  400:32}},
+      delineator:  {label:'Schwarzer Trenner zwischen Richtungszeichen (≈ 0,7 × Strichstärke)', unit:'mm', v:{200:22,  300:34,  400:45}},
+      sideMargin:  {label:'Seitlicher Rand bei ≥ 2 Bezeichnern (H/2, Abb. '+(easa?'N-3':'A4-4')+')', unit:'mm', v:{200:100, 300:150, 400:200}},
+      sideMarginSingle:{label:'Seitlicher Rand bei nur einem Bezeichner (H, Abb. '+(easa?'N-3':'A4-4')+' B)', unit:'mm', v:{200:200, 300:300, 400:400}},
+      outline:     {label:'Schwarze Kontur weiße Schrift, optional (Code 1–2 / Code 3–4 → 10 / 20)', unit:'mm', v:{200:10, 300:20, 400:20}},
+      minWidthSingleSided:{label:'Mindestbreite einseitig aufgestelltes Gebotszeichen (1,46 m Code 1–2 / 1,94 m Code 3–4)', unit:'mm', v:{200:1460, 300:1940, 400:1940}},
+      panelGap:    {label:'Zusätzliche Fuge zwischen Panels',     unit:'mm', v:{200:0,   300:0,   400:0}},
+    }
+  };
+}
+const DEFAULT_PARAMS = makeDefaults('ICAO');
+const DEFAULT_CODE = { // ICAO App. 4 Nr. 1 = EASA Tab. N-2
+  '1-2': {mandatory:300, runwayExit:300, info:200},
+  '3-4': {mandatory:400, runwayExit:400, info:300},
+};
+/* Zeichenbreiten [mm] je Schrifthöhe 200/300/400 und paarweise Abstandscodes (ICAO Annex 14 App. 4 /
+   Master-SignsDef-Halogen). Pfeil-Glyphen: ç=links è=rechts é=oben ê=unten ë/ì/í/î=diagonal */
+const FONT_WIDTHS={"A":[170,255,340],"B":[137,205,274],"C":[137,205,274],"D":[137,205,274],"E":[124,186,248],"F":[124,186,248],"G":[137,205,274],"H":[137,205,274],"I":[32,48,64],"J":[127,190,254],"K":[140,210,280],"L":[124,186,248],"M":[157,236,314],"N":[137,205,274],"O":[143,214,286],"P":[137,205,274],"Q":[143,214,286],"R":[137,205,274],"S":[137,205,274],"T":[124,186,248],"U":[137,205,274],"V":[152,229,304],"W":[178,267,356],"X":[137,205,274],"Y":[171,257,342],"Z":[137,205,274],"0":[143,214,286],"1":[50,74,98],"2":[137,205,274],"3":[137,205,274],"4":[149,224,298],"5":[137,205,274],"6":[137,205,274],"7":[137,205,274],"8":[137,205,274],"9":[137,205,274],"-":[68,102,137],".":[32,48,64],"/":[137,205,274]," ":[140,210,280],"ç":[200,300,400],"è":[200,300,400],"é":[140,190,280],"ê":[140,190,280],"ë":[167,232,333],"ì":[167,232,333],"í":[167,232,333],"î":[167,232,333]};
+const SPACING_CODES={"1":[48,71,96],"2":[38,57,76],"3":[25,38,50],"4":[13,19,26],"5":[0,0,0],"6":[48,71,96],"7":[140,210,280],"8":[140,210,280],"9":[100,150,200]};
+const PAIR_CODES={"AA":4,"AB":2,"AC":2,"AD":2,"AE":2,"AF":2,"AG":2,"AH":2,"AI":2,"AJ":4,"AK":2,"AL":2,"AM":2,"AN":2,"AO":2,"AP":2,"AQ":2,"AR":2,"AS":2,"AT":4,"AU":2,"AV":4,"AW":4,"AX":2,"AY":4,"AZ":2,"A0":6,"A1":6,"A2":6,"A3":6,"A4":6,"A5":6,"A6":6,"A7":6,"A8":6,"A9":6,"A-":6,"A.":6,"A/":6,"A ":5,"Aç":7,"Aè":7,"Aé":7,"Aê":7,"Aë":7,"Aì":7,"Aí":7,"Aî":7,"BA":2,"BB":1,"BC":2,"BD":1,"BE":1,"BF":1,"BG":2,"BH":1,"BI":1,"BJ":2,"BK":1,"BL":1,"BM":1,"BN":1,"BO":2,"BP":1,"BQ":2,"BR":1,"BS":2,"BT":2,"BU":1,"BV":2,"BW":2,"BX":2,"BY":2,"BZ":2,"B0":6,"B1":6,"B2":6,"B3":6,"B4":6,"B5":6,"B6":6,"B7":6,"B8":6,"B9":6,"B-":6,"B.":6,"B/":6,"B ":5,"Bç":7,"Bè":7,"Bé":7,"Bê":7,"Bë":7,"Bì":7,"Bí":7,"Bî":7,"CA":3,"CB":2,"CC":2,"CD":2,"CE":2,"CF":2,"CG":2,"CH":2,"CI":2,"CJ":3,"CK":2,"CL":2,"CM":2,"CN":2,"CO":2,"CP":2,"CQ":2,"CR":2,"CS":2,"CT":3,"CU":2,"CV":3,"CW":3,"CX":2,"CY":3,"CZ":2,"C0":6,"C1":6,"C2":6,"C3":6,"C4":6,"C5":6,"C6":6,"C7":6,"C8":6,"C9":6,"C-":6,"C.":6,"C/":6,"C ":5,"Cç":7,"Cè":7,"Cé":7,"Cê":7,"Cë":7,"Cì":7,"Cí":7,"Cî":7,"DA":2,"DB":1,"DC":2,"DD":1,"DE":1,"DF":1,"DG":2,"DH":1,"DI":1,"DJ":2,"DK":1,"DL":1,"DM":1,"DN":1,"DO":2,"DP":1,"DQ":2,"DR":1,"DS":2,"DT":2,"DU":1,"DV":2,"DW":2,"DX":2,"DY":2,"DZ":2,"D0":6,"D1":6,"D2":6,"D3":6,"D4":6,"D5":6,"D6":6,"D7":6,"D8":6,"D9":6,"D-":6,"D.":6,"D/":6,"D ":5,"Dç":7,"Dè":7,"Dé":7,"Dê":7,"Dë":7,"Dì":7,"Dí":7,"Dî":7,"EA":3,"EB":2,"EC":2,"ED":2,"EE":2,"EF":2,"EG":2,"EH":2,"EI":2,"EJ":3,"EK":2,"EL":2,"EM":2,"EN":2,"EO":2,"EP":2,"EQ":2,"ER":2,"ES":2,"ET":3,"EU":2,"EV":3,"EW":3,"EX":2,"EY":3,"EZ":2,"E0":6,"E1":6,"E2":6,"E3":6,"E4":6,"E5":6,"E6":6,"E7":6,"E8":6,"E9":6,"E-":6,"E.":6,"E/":6,"E ":5,"Eç":7,"Eè":7,"Eé":7,"Eê":7,"Eë":7,"Eì":7,"Eí":7,"Eî":7,"FA":3,"FB":2,"FC":2,"FD":2,"FE":2,"FF":2,"FG":2,"FH":2,"FI":2,"FJ":3,"FK":2,"FL":2,"FM":2,"FN":2,"FO":2,"FP":2,"FQ":2,"FR":2,"FS":2,"FT":3,"FU":2,"FV":3,"FW":3,"FX":2,"FY":3,"FZ":2,"F0":6,"F1":6,"F2":6,"F3":6,"F4":6,"F5":6,"F6":6,"F7":6,"F8":6,"F9":6,"F-":6,"F.":6,"F/":6,"F ":5,"Fç":7,"Fè":7,"Fé":7,"Fê":7,"Fë":7,"Fì":7,"Fí":7,"Fî":7,"GA":2,"GB":1,"GC":2,"GD":1,"GE":1,"GF":1,"GG":2,"GH":1,"GI":1,"GJ":2,"GK":1,"GL":1,"GM":1,"GN":1,"GO":2,"GP":1,"GQ":2,"GR":1,"GS":2,"GT":2,"GU":1,"GV":2,"GW":2,"GX":2,"GY":2,"GZ":2,"G0":6,"G1":6,"G2":6,"G3":6,"G4":6,"G5":6,"G6":6,"G7":6,"G8":6,"G9":6,"G-":6,"G.":6,"G/":6,"G ":5,"Gç":7,"Gè":7,"Gé":7,"Gê":7,"Gë":7,"Gì":7,"Gí":7,"Gî":7,"HA":2,"HB":1,"HC":1,"HD":1,"HE":1,"HF":1,"HG":1,"HH":1,"HI":1,"HJ":2,"HK":1,"HL":1,"HM":1,"HN":1,"HO":1,"HP":1,"HQ":1,"HR":1,"HS":1,"HT":2,"HU":1,"HV":2,"HW":2,"HX":1,"HY":2,"HZ":1,"H0":6,"H1":6,"H2":6,"H3":6,"H4":6,"H5":6,"H6":6,"H7":6,"H8":6,"H9":6,"H-":6,"H.":6,"H/":6,"H ":5,"Hç":7,"Hè":7,"Hé":7,"Hê":7,"Hë":7,"Hì":7,"Hí":7,"Hî":7,"IA":2,"IB":1,"IC":1,"ID":1,"IE":1,"IF":1,"IG":1,"IH":1,"II":1,"IJ":2,"IK":1,"IL":1,"IM":1,"IN":1,"IO":1,"IP":1,"IQ":1,"IR":1,"IS":1,"IT":2,"IU":1,"IV":2,"IW":2,"IX":1,"IY":2,"IZ":1,"I0":6,"I1":6,"I2":6,"I3":6,"I4":6,"I5":6,"I6":6,"I7":6,"I8":6,"I9":6,"I-":6,"I.":6,"I/":6,"I ":5,"Iç":7,"Iè":7,"Ié":7,"Iê":7,"Ië":7,"Iì":7,"Ií":7,"Iî":7,"JA":2,"JB":1,"JC":1,"JD":1,"JE":1,"JF":1,"JG":1,"JH":1,"JI":1,"JJ":2,"JK":1,"JL":1,"JM":1,"JN":1,"JO":1,"JP":1,"JQ":1,"JR":1,"JS":1,"JT":2,"JU":1,"JV":2,"JW":2,"JX":1,"JY":2,"JZ":1,"J0":6,"J1":6,"J2":6,"J3":6,"J4":6,"J5":6,"J6":6,"J7":6,"J8":6,"J9":6,"J-":6,"J.":6,"J/":6,"J ":5,"Jç":7,"Jè":7,"Jé":7,"Jê":7,"Jë":7,"Jì":7,"Jí":7,"Jî":7,"KA":3,"KB":2,"KC":2,"KD":2,"KE":2,"KF":2,"KG":2,"KH":2,"KI":2,"KJ":3,"KK":2,"KL":2,"KM":2,"KN":2,"KO":2,"KP":2,"KQ":2,"KR":2,"KS":2,"KT":3,"KU":2,"KV":3,"KW":3,"KX":2,"KY":3,"KZ":2,"K0":6,"K1":6,"K2":6,"K3":6,"K4":6,"K5":6,"K6":6,"K7":6,"K8":6,"K9":6,"K-":6,"K.":6,"K/":6,"K ":5,"Kç":7,"Kè":7,"Ké":7,"Kê":7,"Kë":7,"Kì":7,"Kí":7,"Kî":7,"LA":4,"LB":2,"LC":2,"LD":2,"LE":2,"LF":2,"LG":2,"LH":2,"LI":2,"LJ":4,"LK":2,"LL":2,"LM":2,"LN":2,"LO":2,"LP":2,"LQ":2,"LR":2,"LS":2,"LT":4,"LU":2,"LV":4,"LW":4,"LX":2,"LY":4,"LZ":2,"L0":6,"L1":6,"L2":6,"L3":6,"L4":6,"L5":6,"L6":6,"L7":6,"L8":6,"L9":6,"L-":6,"L.":6,"L/":6,"L ":5,"Lç":7,"Lè":7,"Lé":7,"Lê":7,"Lë":7,"Lì":7,"Lí":7,"Lî":7,"MA":2,"MB":1,"MC":1,"MD":1,"ME":1,"MF":1,"MG":1,"MH":1,"MI":1,"MJ":2,"MK":1,"ML":1,"MM":1,"MN":1,"MO":1,"MP":1,"MQ":1,"MR":1,"MS":1,"MT":2,"MU":1,"MV":2,"MW":2,"MX":1,"MY":2,"MZ":1,"M0":6,"M1":6,"M2":6,"M3":6,"M4":6,"M5":6,"M6":6,"M7":6,"M8":6,"M9":6,"M-":6,"M.":6,"M/":6,"M ":5,"Mç":7,"Mè":7,"Mé":7,"Mê":7,"Më":7,"Mì":7,"Mí":7,"Mî":7,"NA":2,"NB":1,"NC":1,"ND":1,"NE":1,"NF":1,"NG":1,"NH":1,"NI":1,"NJ":2,"NK":1,"NL":1,"NM":1,"NN":1,"NO":1,"NP":1,"NQ":1,"NR":1,"NS":1,"NT":2,"NU":1,"NV":2,"NW":2,"NX":1,"NY":2,"NZ":1,"N0":6,"N1":6,"N2":6,"N3":6,"N4":6,"N5":6,"N6":6,"N7":6,"N8":6,"N9":6,"N-":6,"N.":6,"N/":6,"N ":5,"Nç":7,"Nè":7,"Né":7,"Nê":7,"Në":7,"Nì":7,"Ní":7,"Nî":7,"OA":2,"OB":1,"OC":2,"OD":1,"OE":1,"OF":1,"OG":2,"OH":1,"OI":1,"OJ":2,"OK":1,"OL":1,"OM":1,"ON":1,"OO":2,"OP":1,"OQ":2,"OR":1,"OS":2,"OT":2,"OU":1,"OV":2,"OW":2,"OX":2,"OY":2,"OZ":2,"O0":6,"O1":6,"O2":6,"O3":6,"O4":6,"O5":6,"O6":6,"O7":6,"O8":6,"O9":6,"O-":6,"O.":6,"O/":6,"O ":5,"Oç":7,"Oè":7,"Oé":7,"Oê":7,"Oë":7,"Oì":7,"Oí":7,"Oî":7,"PA":2,"PB":1,"PC":2,"PD":1,"PE":1,"PF":1,"PG":2,"PH":1,"PI":1,"PJ":2,"PK":1,"PL":1,"PM":1,"PN":1,"PO":2,"PP":1,"PQ":2,"PR":1,"PS":2,"PT":2,"PU":1,"PV":2,"PW":2,"PX":2,"PY":2,"PZ":2,"P0":6,"P1":6,"P2":6,"P3":6,"P4":6,"P5":6,"P6":6,"P7":6,"P8":6,"P9":6,"P-":6,"P.":6,"P/":6,"P ":5,"Pç":7,"Pè":7,"Pé":7,"Pê":7,"Pë":7,"Pì":7,"Pí":7,"Pî":7,"QA":2,"QB":1,"QC":2,"QD":1,"QE":1,"QF":1,"QG":2,"QH":1,"QI":1,"QJ":2,"QK":1,"QL":1,"QM":1,"QN":1,"QO":2,"QP":1,"QQ":2,"QR":1,"QS":2,"QT":2,"QU":1,"QV":2,"QW":2,"QX":2,"QY":2,"QZ":2,"Q0":6,"Q1":6,"Q2":6,"Q3":6,"Q4":6,"Q5":6,"Q6":6,"Q7":6,"Q8":6,"Q9":6,"Q-":6,"Q.":6,"Q/":6,"Q ":5,"Qç":7,"Qè":7,"Qé":7,"Qê":7,"Që":7,"Qì":7,"Qí":7,"Qî":7,"RA":2,"RB":1,"RC":2,"RD":1,"RE":1,"RF":1,"RG":2,"RH":1,"RI":1,"RJ":2,"RK":1,"RL":1,"RM":1,"RN":1,"RO":2,"RP":1,"RQ":2,"RR":1,"RS":2,"RT":2,"RU":1,"RV":2,"RW":2,"RX":2,"RY":2,"RZ":2,"R0":6,"R1":6,"R2":6,"R3":6,"R4":6,"R5":6,"R6":6,"R7":6,"R8":6,"R9":6,"R-":6,"R.":6,"R/":6,"R ":5,"Rç":7,"Rè":7,"Ré":7,"Rê":7,"Rë":7,"Rì":7,"Rí":7,"Rî":7,"SA":2,"SB":1,"SC":2,"SD":1,"SE":1,"SF":1,"SG":2,"SH":1,"SI":1,"SJ":2,"SK":1,"SL":1,"SM":1,"SN":1,"SO":2,"SP":1,"SQ":2,"SR":1,"SS":2,"ST":2,"SU":1,"SV":2,"SW":2,"SX":2,"SY":2,"SZ":2,"S0":6,"S1":6,"S2":6,"S3":6,"S4":6,"S5":6,"S6":6,"S7":6,"S8":6,"S9":6,"S-":6,"S.":6,"S/":6,"S ":5,"Sç":7,"Sè":7,"Sé":7,"Sê":7,"Së":7,"Sì":7,"Sí":7,"Sî":7,"TA":4,"TB":2,"TC":2,"TD":2,"TE":2,"TF":2,"TG":2,"TH":2,"TI":2,"TJ":4,"TK":2,"TL":2,"TM":2,"TN":2,"TO":2,"TP":2,"TQ":2,"TR":2,"TS":2,"TT":4,"TU":2,"TV":4,"TW":4,"TX":2,"TY":4,"TZ":2,"T0":6,"T1":6,"T2":6,"T3":6,"T4":6,"T5":6,"T6":6,"T7":6,"T8":6,"T9":6,"T-":6,"T.":6,"T/":6,"T ":5,"Tç":7,"Tè":7,"Té":7,"Tê":7,"Të":7,"Tì":7,"Tí":7,"Tî":7,"UA":2,"UB":1,"UC":1,"UD":1,"UE":1,"UF":1,"UG":1,"UH":1,"UI":1,"UJ":2,"UK":1,"UL":1,"UM":1,"UN":1,"UO":1,"UP":1,"UQ":1,"UR":1,"US":1,"UT":2,"UU":1,"UV":2,"UW":2,"UX":1,"UY":2,"UZ":1,"U0":6,"U1":6,"U2":6,"U3":6,"U4":6,"U5":6,"U6":6,"U7":6,"U8":6,"U9":6,"U-":6,"U.":6,"U/":6,"U ":5,"Uç":7,"Uè":7,"Ué":7,"Uê":7,"Uë":7,"Uì":7,"Uí":7,"Uî":7,"VA":4,"VB":2,"VC":2,"VD":2,"VE":2,"VF":2,"VG":2,"VH":2,"VI":2,"VJ":4,"VK":2,"VL":2,"VM":2,"VN":2,"VO":2,"VP":2,"VQ":2,"VR":2,"VS":2,"VT":4,"VU":2,"VV":4,"VW":4,"VX":2,"VY":4,"VZ":2,"V0":6,"V1":6,"V2":6,"V3":6,"V4":6,"V5":6,"V6":6,"V7":6,"V8":6,"V9":6,"V-":6,"V.":6,"V/":6,"V ":5,"Vç":7,"Vè":7,"Vé":7,"Vê":7,"Vë":7,"Vì":7,"Ví":7,"Vî":7,"WA":4,"WB":2,"WC":2,"WD":2,"WE":2,"WF":2,"WG":2,"WH":2,"WI":2,"WJ":4,"WK":2,"WL":2,"WM":2,"WN":2,"WO":2,"WP":2,"WQ":2,"WR":2,"WS":2,"WT":4,"WU":2,"WV":4,"WW":4,"WX":2,"WY":4,"WZ":2,"W0":6,"W1":6,"W2":6,"W3":6,"W4":6,"W5":6,"W6":6,"W7":6,"W8":6,"W9":6,"W-":6,"W.":6,"W/":6,"W ":5,"Wç":7,"Wè":7,"Wé":7,"Wê":7,"Wë":7,"Wì":7,"Wí":7,"Wî":7,"XA":3,"XB":2,"XC":2,"XD":2,"XE":2,"XF":2,"XG":2,"XH":2,"XI":2,"XJ":3,"XK":2,"XL":2,"XM":2,"XN":2,"XO":2,"XP":2,"XQ":2,"XR":2,"XS":2,"XT":3,"XU":2,"XV":3,"XW":3,"XX":2,"XY":3,"XZ":2,"X0":6,"X1":6,"X2":6,"X3":6,"X4":6,"X5":6,"X6":6,"X7":6,"X8":6,"X9":6,"X-":6,"X.":6,"X/":6,"X ":5,"Xç":7,"Xè":7,"Xé":7,"Xê":7,"Xë":7,"Xì":7,"Xí":7,"Xî":7,"YA":4,"YB":2,"YC":2,"YD":2,"YE":2,"YF":2,"YG":2,"YH":2,"YI":2,"YJ":4,"YK":2,"YL":2,"YM":2,"YN":2,"YO":2,"YP":2,"YQ":2,"YR":2,"YS":2,"YT":4,"YU":2,"YV":4,"YW":4,"YX":2,"YY":4,"YZ":2,"Y0":6,"Y1":6,"Y2":6,"Y3":6,"Y4":6,"Y5":6,"Y6":6,"Y7":6,"Y8":6,"Y9":6,"Y-":6,"Y.":6,"Y/":6,"Y ":5,"Yç":7,"Yè":7,"Yé":7,"Yê":7,"Yë":7,"Yì":7,"Yí":7,"Yî":7,"ZA":3,"ZB":2,"ZC":2,"ZD":2,"ZE":2,"ZF":2,"ZG":2,"ZH":2,"ZI":2,"ZJ":3,"ZK":2,"ZL":2,"ZM":2,"ZN":2,"ZO":2,"ZP":2,"ZQ":2,"ZR":2,"ZS":2,"ZT":3,"ZU":2,"ZV":3,"ZW":3,"ZX":2,"ZY":3,"ZZ":2,"Z0":6,"Z1":6,"Z2":6,"Z3":6,"Z4":6,"Z5":6,"Z6":6,"Z7":6,"Z8":6,"Z9":6,"Z-":6,"Z.":6,"Z/":6,"Z ":5,"Zç":7,"Zè":7,"Zé":7,"Zê":7,"Zë":7,"Zì":7,"Zí":7,"Zî":7,"0A":6,"0B":6,"0C":6,"0D":6,"0E":6,"0F":6,"0G":6,"0H":6,"0I":6,"0J":6,"0K":6,"0L":6,"0M":6,"0N":6,"0O":6,"0P":6,"0Q":6,"0R":6,"0S":6,"0T":6,"0U":6,"0V":6,"0W":6,"0X":6,"0Y":6,"0Z":6,"00":2,"01":1,"02":2,"03":2,"04":2,"05":1,"06":2,"07":2,"08":2,"09":2,"0-":6,"0.":6,"0/":6,"0 ":5,"0ç":7,"0è":7,"0é":7,"0ê":7,"0ë":7,"0ì":7,"0í":7,"0î":7,"1A":6,"1B":6,"1C":6,"1D":6,"1E":6,"1F":6,"1G":6,"1H":6,"1I":6,"1J":6,"1K":6,"1L":6,"1M":6,"1N":6,"1O":6,"1P":6,"1Q":6,"1R":6,"1S":6,"1T":6,"1U":6,"1V":6,"1W":6,"1X":6,"1Y":6,"1Z":6,"10":1,"11":1,"12":1,"13":1,"14":2,"15":1,"16":1,"17":2,"18":1,"19":1,"1-":6,"1.":6,"1/":6,"1 ":5,"1ç":7,"1è":7,"1é":7,"1ê":7,"1ë":7,"1ì":7,"1í":7,"1î":7,"2A":6,"2B":6,"2C":6,"2D":6,"2E":6,"2F":6,"2G":6,"2H":6,"2I":6,"2J":6,"2K":6,"2L":6,"2M":6,"2N":6,"2O":6,"2P":6,"2Q":6,"2R":6,"2S":6,"2T":6,"2U":6,"2V":6,"2W":6,"2X":6,"2Y":6,"2Z":6,"20":2,"21":1,"22":2,"23":2,"24":2,"25":1,"26":2,"27":2,"28":2,"29":2,"2-":6,"2.":6,"2/":6,"2 ":5,"2ç":7,"2è":7,"2é":7,"2ê":7,"2ë":7,"2ì":7,"2í":7,"2î":7,"3A":6,"3B":6,"3C":6,"3D":6,"3E":6,"3F":6,"3G":6,"3H":6,"3I":6,"3J":6,"3K":6,"3L":6,"3M":6,"3N":6,"3O":6,"3P":6,"3Q":6,"3R":6,"3S":6,"3T":6,"3U":6,"3V":6,"3W":6,"3X":6,"3Y":6,"3Z":6,"30":2,"31":1,"32":2,"33":2,"34":2,"35":1,"36":2,"37":2,"38":2,"39":2,"3-":6,"3.":6,"3/":6,"3 ":5,"3ç":7,"3è":7,"3é":7,"3ê":7,"3ë":7,"3ì":7,"3í":7,"3î":7,"4A":6,"4B":6,"4C":6,"4D":6,"4E":6,"4F":6,"4G":6,"4H":6,"4I":6,"4J":6,"4K":6,"4L":6,"4M":6,"4N":6,"4O":6,"4P":6,"4Q":6,"4R":6,"4S":6,"4T":6,"4U":6,"4V":6,"4W":6,"4X":6,"4Y":6,"4Z":6,"40":2,"41":2,"42":2,"43":2,"44":4,"45":2,"46":2,"47":4,"48":2,"49":2,"4-":6,"4.":6,"4/":6,"4 ":5,"4ç":7,"4è":7,"4é":7,"4ê":7,"4ë":7,"4ì":7,"4í":7,"4î":7,"5A":6,"5B":6,"5C":6,"5D":6,"5E":6,"5F":6,"5G":6,"5H":6,"5I":6,"5J":6,"5K":6,"5L":6,"5M":6,"5N":6,"5O":6,"5P":6,"5Q":6,"5R":6,"5S":6,"5T":6,"5U":6,"5V":6,"5W":6,"5X":6,"5Y":6,"5Z":6,"50":2,"51":1,"52":2,"53":2,"54":2,"55":1,"56":2,"57":2,"58":2,"59":2,"5-":6,"5.":6,"5/":6,"5 ":5,"5ç":7,"5è":7,"5é":7,"5ê":7,"5ë":7,"5ì":7,"5í":7,"5î":7,"6A":6,"6B":6,"6C":6,"6D":6,"6E":6,"6F":6,"6G":6,"6H":6,"6I":6,"6J":6,"6K":6,"6L":6,"6M":6,"6N":6,"6O":6,"6P":6,"6Q":6,"6R":6,"6S":6,"6T":6,"6U":6,"6V":6,"6W":6,"6X":6,"6Y":6,"6Z":6,"60":2,"61":1,"62":2,"63":2,"64":2,"65":1,"66":2,"67":2,"68":2,"69":2,"6-":6,"6.":6,"6/":6,"6 ":5,"6ç":7,"6è":7,"6é":7,"6ê":7,"6ë":7,"6ì":7,"6í":7,"6î":7,"7A":6,"7B":6,"7C":6,"7D":6,"7E":6,"7F":6,"7G":6,"7H":6,"7I":6,"7J":6,"7K":6,"7L":6,"7M":6,"7N":6,"7O":6,"7P":6,"7Q":6,"7R":6,"7S":6,"7T":6,"7U":6,"7V":6,"7W":6,"7X":6,"7Y":6,"7Z":6,"70":2,"71":2,"72":2,"73":2,"74":4,"75":2,"76":2,"77":4,"78":2,"79":2,"7-":6,"7.":6,"7/":6,"7 ":5,"7ç":7,"7è":7,"7é":7,"7ê":7,"7ë":7,"7ì":7,"7í":7,"7î":7,"8A":6,"8B":6,"8C":6,"8D":6,"8E":6,"8F":6,"8G":6,"8H":6,"8I":6,"8J":6,"8K":6,"8L":6,"8M":6,"8N":6,"8O":6,"8P":6,"8Q":6,"8R":6,"8S":6,"8T":6,"8U":6,"8V":6,"8W":6,"8X":6,"8Y":6,"8Z":6,"80":2,"81":1,"82":2,"83":2,"84":2,"85":1,"86":2,"87":2,"88":2,"89":2,"8-":6,"8.":6,"8/":6,"8 ":5,"8ç":7,"8è":7,"8é":7,"8ê":7,"8ë":7,"8ì":7,"8í":7,"8î":7,"9A":6,"9B":6,"9C":6,"9D":6,"9E":6,"9F":6,"9G":6,"9H":6,"9I":6,"9J":6,"9K":6,"9L":6,"9M":6,"9N":6,"9O":6,"9P":6,"9Q":6,"9R":6,"9S":6,"9T":6,"9U":6,"9V":6,"9W":6,"9X":6,"9Y":6,"9Z":6,"90":2,"91":1,"92":2,"93":2,"94":2,"95":1,"96":2,"97":2,"98":2,"99":2,"9-":6,"9.":6,"9/":6,"9 ":5,"9ç":7,"9è":7,"9é":7,"9ê":7,"9ë":7,"9ì":7,"9í":7,"9î":7,"-A":6,"-B":6,"-C":6,"-D":6,"-E":6,"-F":6,"-G":6,"-H":6,"-I":6,"-J":6,"-K":6,"-L":6,"-M":6,"-N":6,"-O":6,"-P":6,"-Q":6,"-R":6,"-S":6,"-T":6,"-U":6,"-V":6,"-W":6,"-X":6,"-Y":6,"-Z":6,"-0":6,"-1":6,"-2":6,"-3":6,"-4":6,"-5":6,"-6":6,"-7":6,"-8":6,"-9":6,"--":6,"-.":6,"-/":6,"- ":5,".A":6,".B":6,".C":6,".D":6,".E":6,".F":6,".G":6,".H":6,".I":6,".J":6,".K":6,".L":6,".M":6,".N":6,".O":6,".P":6,".Q":6,".R":6,".S":6,".T":6,".U":6,".V":6,".W":6,".X":6,".Y":6,".Z":6,".0":6,".1":6,".2":6,".3":6,".4":6,".5":6,".6":6,".7":6,".8":6,".9":6,".-":6,"..":6,"./":6,". ":5,".ç":7,".è":7,".é":7,".ê":7,".ë":7,".ì":7,".í":7,".î":7,"/A":6,"/B":6,"/C":6,"/D":6,"/E":6,"/F":6,"/G":6,"/H":6,"/I":6,"/J":6,"/K":6,"/L":6,"/M":6,"/N":6,"/O":6,"/P":6,"/Q":6,"/R":6,"/S":6,"/T":6,"/U":6,"/V":6,"/W":6,"/X":6,"/Y":6,"/Z":6,"/0":6,"/1":6,"/2":6,"/3":6,"/4":6,"/5":6,"/6":6,"/7":6,"/8":6,"/9":6,"/-":6,"/.":6,"//":6,"/ ":5,"/ç":7,"/è":7,"/é":7,"/ê":7,"/ë":7,"/ì":7,"/í":7,"/î":7," A":5," B":5," C":5," D":5," E":5," F":5," G":5," H":5," I":5," J":5," K":5," L":5," M":5," N":5," O":5," P":5," Q":5," R":5," S":5," T":5," U":5," V":5," W":5," X":5," Y":5," Z":5," 0":5," 1":5," 2":5," 3":5," 4":5," 5":5," 6":5," 7":5," 8":5," 9":5," -":5," .":5," /":5,"  ":5," ç":5," è":5," é":5," ê":5," ë":5," ì":5," í":5," î":5,"çA":7,"çB":7,"çC":7,"çD":7,"çE":7,"çF":7,"çG":7,"çH":7,"çI":7,"çJ":7,"çK":7,"çL":7,"çM":7,"çN":7,"çO":7,"çP":7,"çQ":7,"çR":7,"çS":7,"çT":7,"çU":7,"çV":7,"çW":7,"çX":7,"çY":7,"çZ":7,"ç0":7,"ç1":7,"ç2":7,"ç3":7,"ç4":7,"ç5":7,"ç6":7,"ç7":7,"ç8":7,"ç9":7,"ç/":1,"ç ":5,"çç":5,"çè":5,"çé":5,"çê":5,"çë":5,"çì":5,"çí":5,"çî":5,"èA":7,"èB":7,"èC":7,"èD":7,"èE":7,"èF":7,"èG":7,"èH":7,"èI":7,"èJ":7,"èK":7,"èL":7,"èM":7,"èN":7,"èO":7,"èP":7,"èQ":7,"èR":7,"èS":7,"èT":7,"èU":7,"èV":7,"èW":7,"èX":7,"èY":7,"èZ":7,"è0":7,"è1":7,"è2":7,"è3":7,"è4":7,"è5":7,"è6":7,"è7":7,"è8":7,"è9":7,"è/":1,"è ":5,"èç":5,"èè":5,"èé":5,"èê":5,"èë":5,"èì":5,"èí":5,"èî":5,"éA":7,"éB":7,"éC":7,"éD":7,"éE":7,"éF":7,"éG":7,"éH":7,"éI":7,"éJ":7,"éK":7,"éL":7,"éM":7,"éN":7,"éO":7,"éP":7,"éQ":7,"éR":7,"éS":7,"éT":7,"éU":7,"éV":7,"éW":7,"éX":7,"éY":7,"éZ":7,"é0":7,"é1":7,"é2":7,"é3":7,"é4":7,"é5":7,"é6":7,"é7":7,"é8":7,"é9":7,"é/":1,"é ":5,"éç":5,"éè":5,"éé":5,"éê":5,"éë":5,"éì":5,"éí":5,"éî":5,"êA":7,"êB":7,"êC":7,"êD":7,"êE":7,"êF":7,"êG":7,"êH":7,"êI":7,"êJ":7,"êK":7,"êL":7,"êM":7,"êN":7,"êO":7,"êP":7,"êQ":7,"êR":7,"êS":7,"êT":7,"êU":7,"êV":7,"êW":7,"êX":7,"êY":7,"êZ":7,"ê0":7,"ê1":7,"ê2":7,"ê3":7,"ê4":7,"ê5":7,"ê6":7,"ê7":7,"ê8":7,"ê9":7,"ê/":1,"ê ":5,"êç":5,"êè":5,"êé":5,"êê":5,"êë":5,"êì":5,"êí":5,"êî":5,"ëA":7,"ëB":7,"ëC":7,"ëD":7,"ëE":7,"ëF":7,"ëG":7,"ëH":7,"ëI":7,"ëJ":7,"ëK":7,"ëL":7,"ëM":7,"ëN":7,"ëO":7,"ëP":7,"ëQ":7,"ëR":7,"ëS":7,"ëT":7,"ëU":7,"ëV":7,"ëW":7,"ëX":7,"ëY":7,"ëZ":7,"ë0":7,"ë1":7,"ë2":7,"ë3":7,"ë4":7,"ë5":7,"ë6":7,"ë7":7,"ë8":7,"ë9":7,"ë/":1,"ë ":5,"ëç":5,"ëè":5,"ëé":5,"ëê":5,"ëë":5,"ëì":5,"ëí":5,"ëî":5,"ìA":7,"ìB":7,"ìC":7,"ìD":7,"ìE":7,"ìF":7,"ìG":7,"ìH":7,"ìI":7,"ìJ":7,"ìK":7,"ìL":7,"ìM":7,"ìN":7,"ìO":7,"ìP":7,"ìQ":7,"ìR":7,"ìS":7,"ìT":7,"ìU":7,"ìV":7,"ìW":7,"ìX":7,"ìY":7,"ìZ":7,"ì0":7,"ì1":7,"ì2":7,"ì3":7,"ì4":7,"ì5":7,"ì6":7,"ì7":7,"ì8":7,"ì9":7,"ì/":1,"ì ":5,"ìç":5,"ìè":5,"ìé":5,"ìê":5,"ìë":5,"ìì":5,"ìí":5,"ìî":5,"íA":7,"íB":7,"íC":7,"íD":7,"íE":7,"íF":7,"íG":7,"íH":7,"íI":7,"íJ":7,"íK":7,"íL":7,"íM":7,"íN":7,"íO":7,"íP":7,"íQ":7,"íR":7,"íS":7,"íT":7,"íU":7,"íV":7,"íW":7,"íX":7,"íY":7,"íZ":7,"í0":7,"í1":7,"í2":7,"í3":7,"í4":7,"í5":7,"í6":7,"í7":7,"í8":7,"í9":7,"í/":1,"í ":5,"íç":5,"íè":5,"íé":5,"íê":5,"íë":5,"íì":5,"íí":5,"íî":5,"îA":7,"îB":7,"îC":7,"îD":7,"îE":7,"îF":7,"îG":7,"îH":7,"îI":7,"îJ":7,"îK":7,"îL":7,"îM":7,"îN":7,"îO":7,"îP":7,"îQ":7,"îR":7,"îS":7,"îT":7,"îU":7,"îV":7,"îW":7,"îX":7,"îY":7,"îZ":7,"î0":7,"î1":7,"î2":7,"î3":7,"î4":7,"î5":7,"î6":7,"î7":7,"î8":7,"î9":7,"î/":1,"î ":5,"îç":5,"îè":5,"îé":5,"îê":5,"îë":5,"îì":5,"îí":5,"îî":5};
+const GLYPHS={"A":{"w":840,"d":"M354 0L331 69L320 74L320 103L286 183L246 309L234 326L234 337L223 343L217 389L206 400L206 417L189 469L171 497L171 514L149 566L137 611L126 617L126 640L97 709L80 771L69 789L51 851L34 891L23 897L23 931L11 949L0 994L166 994L166 977L200 897L211 851L223 846L223 823L240 771L251 754L251 743L263 731L571 731L589 754L623 857L623 886L634 891L669 994L834 994L834 977L817 943L817 914L806 909L789 846L771 811L771 794L749 749L737 697L720 663L720 634L709 629L703 600L691 583L669 514L669 497L651 469L634 417L634 400L623 383L623 360L611 354L577 240L566 223L537 126L520 91L520 63L509 57L491 0ZM417 297L429 297L440 314L463 383L463 400L474 417L497 497L520 549L520 566L514 571L326 571L320 566L320 549L331 531L343 486L377 406L394 343Z"},"B":{"w":686,"d":"M0 0L0 994L457 994L463 983L491 983L549 960L577 943L640 874L663 823L669 789L680 783L680 686L669 680L669 663L646 600L617 560L577 526L543 509L537 497L497 491L486 480L520 469L577 434L629 377L651 331L657 291L663 286L663 183L651 143L629 109L629 97L577 46L520 17L486 11L480 0ZM171 577L177 571L303 571L309 566L411 566L451 577L474 589L480 600L491 600L520 629L537 669L537 720L514 766L486 794L469 794L463 806L434 817L411 817L406 823L383 823L377 817L177 817L171 811ZM514 246L514 263L520 269L514 320L497 349L451 389L434 389L411 400L177 400L171 394L171 177L177 171L377 171L383 166L406 166L463 189L469 200L497 217Z"},"C":{"w":646,"d":"M286 0L280 11L263 11L229 29L217 29L183 51L137 97L126 97L120 120L63 200L34 286L23 291L23 326L6 383L6 434L0 440L6 611L11 617L11 646L23 674L23 714L34 720L34 731L57 777L57 794L109 874L160 931L234 977L269 983L274 994L434 994L440 983L486 971L520 954L583 897L606 857L617 851L617 840L634 811L634 794L617 777L606 777L509 726L491 726L486 749L457 800L440 817L423 823L417 834L371 851L303 851L297 846L280 846L223 800L223 789L217 789L200 766L177 714L177 697L166 669L166 640L160 634L160 594L154 589L154 423L160 417L160 377L166 371L171 326L189 274L206 240L223 229L223 217L246 200L257 183L303 160L371 160L429 189L434 200L446 200L457 211L486 263L497 263L566 229L640 200L640 189L617 143L606 137L583 97L520 46L451 17L406 11L400 0Z"},"D":{"w":703,"d":"M0 0L0 994L389 994L394 983L429 983L440 971L451 971L497 949L566 897L611 829L629 817L629 800L651 760L674 697L680 651L686 646L686 617L691 611L691 577L697 571L697 429L691 423L691 389L686 383L686 354L680 349L669 286L640 229L629 183L611 171L589 131L531 69L520 69L491 46L440 29L429 17L377 11L371 0ZM171 171L314 171L320 177L366 183L377 189L383 200L406 206L451 246L480 286L480 297L503 331L514 383L526 406L526 434L531 440L531 577L526 583L520 634L503 686L491 697L491 709L474 737L423 794L411 794L406 806L354 829L171 829L166 823L166 177Z"},"E":{"w":634,"d":"M0 0L0 994L629 994L629 823L177 823L171 817L171 577L177 571L469 571L469 400L177 400L171 394L171 189L177 183L606 183L606 0Z"},"F":{"w":634,"d":"M629 0L0 0L0 994L171 994L171 577L177 571L469 571L469 400L177 400L171 394L171 189L177 183L629 183Z"},"G":{"w":669,"d":"M291 0L286 11L269 11L223 34L211 34L131 97L126 114L114 120L109 137L63 200L29 303L17 309L17 349L6 389L6 434L0 440L6 606L17 640L17 680L29 686L51 760L97 846L114 863L114 874L120 874L131 891L200 949L246 971L274 977L280 989L411 989L417 977L446 971L514 931L560 891L600 829L611 823L651 714L651 686L663 651L663 497L326 497L326 651L520 651L526 657L526 680L514 686L514 726L503 754L469 800L423 834L389 846L366 846L360 851L326 851L320 846L280 840L240 817L211 777L200 771L183 737L166 680L166 646L160 640L160 491L166 486L171 400L177 394L177 366L183 360L189 314L200 297L200 280L211 274L211 251L240 206L280 171L320 154L389 154L429 171L474 211L503 257L514 257L583 223L611 217L634 200L657 200L657 189L629 131L611 114L611 97L600 97L554 57L526 46L514 34L497 34L463 17L406 11L400 0Z"},"H":{"w":680,"d":"M0 0L0 989L160 989L160 549L166 543L509 543L514 549L514 989L674 989L674 0L514 0L514 389L509 394L166 394L160 389L160 0Z"},"I":{"w":154,"d":"M0 0L0 989L149 989L149 0Z"},"J":{"w":651,"d":"M646 0L480 0L480 691L457 754L406 811L394 811L389 823L337 846L251 846L234 840L177 806L143 760L120 760L69 794L51 794L40 811L11 829L0 829L0 840L23 857L51 897L97 931L183 971L251 983L257 994L366 994L371 983L394 983L457 960L486 943L497 943L503 931L560 897L611 829L617 806L629 794L629 777L640 754L640 726L646 720Z"},"K":{"w":646,"d":"M0 0L0 994L149 994L149 663L171 640L200 594L217 583L217 571L251 531L257 531L269 549L286 600L314 646L314 663L326 669L331 697L343 709L377 777L377 794L411 851L411 869L417 869L429 886L429 897L474 983L474 994L623 994L623 971L611 954L611 937L600 931L589 897L543 811L543 794L514 749L514 731L509 731L497 714L497 697L486 686L457 629L451 600L417 543L411 509L400 503L371 446L371 434L354 406L354 389L389 343L411 326L411 314L474 234L486 211L503 200L503 189L514 183L520 166L577 97L589 74L611 57L611 46L640 11L640 0L474 0L463 23L423 74L411 80L389 120L366 143L331 194L314 200L309 223L246 297L234 320L217 331L217 343L194 366L177 394L166 400L154 423L149 417L149 0Z"},"L":{"w":623,"d":"M0 0L0 994L617 994L617 834L166 834L160 829L160 0Z"},"M":{"w":800,"d":"M0 0L0 994L166 994L166 423L171 417L194 469L200 503L211 509L217 537L274 669L280 697L297 726L297 749L309 754L309 766L354 869L360 897L377 926L383 954L394 977L406 977L411 949L429 920L434 891L446 874L469 806L480 794L480 777L486 766L497 760L497 731L526 674L531 646L577 543L583 514L594 509L600 474L629 411L634 417L634 994L794 994L794 0L634 0L629 23L606 63L606 74L594 80L594 97L560 166L560 177L543 200L537 229L514 269L509 291L497 297L497 314L469 371L469 383L440 434L440 446L411 497L411 509L400 520L394 514L394 497L383 491L377 469L349 417L349 400L314 343L314 331L297 303L297 280L286 274L263 229L257 200L229 154L229 143L200 86L200 69L189 63L166 0Z"},"N":{"w":674,"d":"M0 0L0 994L166 994L166 389L171 383L177 400L200 429L223 474L223 486L234 491L286 594L320 646L320 663L331 669L343 697L371 737L394 783L394 794L406 800L417 834L429 840L451 886L451 897L463 903L509 994L669 994L669 0L509 0L509 611L503 617L457 531L446 520L440 497L423 480L417 451L411 451L394 429L377 389L320 291L320 280L309 274L274 211L274 200L257 183L240 143L229 131L223 103L211 97L183 40L171 29L166 0Z"},"O":{"w":680,"d":"M309 0L303 11L280 11L211 34L149 74L114 103L114 114L91 131L63 189L51 200L23 274L11 343L6 349L6 383L0 389L0 560L6 566L6 617L11 623L17 674L40 749L80 829L91 840L91 851L103 857L131 897L183 937L189 949L200 949L234 971L280 983L286 994L389 994L394 983L411 983L474 954L486 954L491 943L520 926L583 869L583 857L623 800L623 789L651 726L663 657L669 651L669 623L674 617L674 429L669 423L669 377L651 320L651 297L629 229L617 211L617 200L583 149L583 137L571 131L554 103L497 51L469 34L400 11L371 11L366 0ZM320 171L366 171L400 183L411 200L429 200L457 229L469 257L480 269L486 314L497 320L497 343L509 377L509 429L514 434L514 611L509 617L509 669L497 709L486 714L486 737L474 760L440 794L423 794L417 806L394 817L349 823L343 829L320 829L280 817L257 806L251 794L240 794L206 760L189 726L189 691L177 686L177 663L171 657L166 486L160 480L171 331L177 326L177 309L189 303L189 274L206 240L246 200L257 200L263 189Z"},"P":{"w":680,"d":"M446 0L0 0L0 989L166 989L166 657L171 651L171 571L177 566L429 566L434 560L463 560L503 549L589 497L640 429L646 406L663 394L663 349L669 343L669 303L674 297L674 246L663 211L663 183L651 177L611 97L566 57L520 29L509 29L474 11L451 11ZM171 171L177 166L411 166L446 177L463 189L463 200L480 200L503 229L514 263L514 309L497 349L469 377L440 394L177 394L171 389Z"},"Q":{"w":686,"d":"M286 0L280 11L223 23L171 57L160 57L97 126L74 166L63 171L17 297L11 366L6 371L6 417L0 423L0 509L6 514L6 577L11 583L17 646L46 743L63 777L63 794L74 800L80 817L126 874L131 891L137 891L160 920L171 920L189 937L229 960L240 960L257 971L297 977L303 989L389 989L394 977L411 977L446 960L474 954L520 1011L537 1011L560 994L600 949L600 931L571 897L566 880L606 829L617 800L629 794L646 737L657 731L657 703L674 646L674 606L680 600L680 446L674 440L669 354L657 320L657 280L646 274L629 211L600 154L560 103L560 91L531 74L509 51L446 17L417 11L411 0ZM309 166L383 166L417 183L429 200L440 200L457 217L457 229L474 240L509 343L514 446L520 451L520 606L514 611L514 640L509 646L509 674L497 714L480 749L463 760L457 743L451 743L417 703L417 691L411 691L383 657L360 657L297 726L297 737L331 777L337 794L360 811L349 823L303 817L274 806L269 794L251 794L206 743L177 663L171 549L166 543L166 400L171 394L171 349L177 343L177 314L189 274L217 223L240 200L251 200L251 194L274 177Z"},"R":{"w":680,"d":"M0 0L0 989L171 989L171 571L177 566L360 566L371 577L371 606L383 611L417 714L417 731L469 880L469 909L480 914L497 966L497 989L669 989L669 954L657 949L651 920L640 903L577 703L566 686L566 657L554 651L520 549L526 537L554 520L566 520L571 509L594 497L640 434L657 389L669 383L669 337L674 331L674 229L669 223L669 189L657 183L634 131L611 97L571 63L566 51L509 23L457 11L451 0ZM171 171L177 166L417 166L457 183L469 200L480 200L509 234L520 269L514 320L497 354L474 377L446 394L177 394L171 389Z"},"S":{"w":663,"d":"M269 0L263 11L211 17L183 34L160 40L131 57L131 63L91 97L91 109L57 166L57 183L46 211L46 251L34 257L34 314L46 320L46 343L74 400L80 400L131 457L171 480L183 497L200 497L229 514L291 537L343 543L394 560L486 623L509 651L531 703L531 771L526 789L514 794L514 806L474 846L406 874L377 874L371 880L274 874L269 869L251 869L229 851L217 851L166 800L137 743L131 697L114 697L114 703L91 720L0 766L0 794L11 806L34 851L34 863L57 880L63 897L131 949L143 949L206 977L251 983L257 994L429 994L434 983L457 983L531 954L600 897L611 874L629 863L629 846L640 829L651 794L651 771L657 766L657 651L646 623L646 600L634 583L629 549L623 549L577 497L566 497L531 474L491 463L434 434L343 411L337 400L291 400L234 371L183 314L183 297L171 280L171 223L189 183L229 149L234 137L269 120L309 114L314 109L377 109L417 126L429 143L440 143L451 154L486 217L520 217L571 200L617 200L617 194L629 189L629 177L617 171L611 143L589 109L589 97L583 97L554 63L491 23L457 11L434 11L429 0Z"},"T":{"w":634,"d":"M0 0L0 143L229 143L234 149L234 994L394 994L394 149L400 143L629 143L629 0Z"},"U":{"w":669,"d":"M0 0L0 737L34 834L46 840L57 863L80 886L80 897L103 909L131 937L143 937L189 966L240 983L263 983L269 994L383 994L389 983L411 983L469 966L526 931L554 903L571 897L617 829L629 823L629 811L663 731L663 0L520 0L520 703L509 743L497 760L457 794L446 811L394 840L377 840L349 851L303 851L234 829L229 817L217 817L200 794L177 777L143 714L143 697L137 691L137 46L143 40L143 0Z"},"V":{"w":754,"d":"M0 0L6 63L17 69L23 103L34 120L51 171L51 189L86 280L86 297L109 354L109 383L120 389L131 440L143 457L149 497L160 514L171 566L206 657L206 697L211 697L223 714L251 800L251 817L291 926L291 943L303 966L303 994L474 994L491 926L503 920L503 886L520 840L537 760L549 737L549 720L560 697L594 560L606 554L606 514L617 497L617 474L640 411L640 394L657 349L674 269L686 246L691 211L703 206L703 171L726 103L726 86L737 63L737 46L749 23L749 0L589 0L571 51L571 69L560 91L560 109L549 131L549 149L537 171L537 189L526 211L526 229L514 251L514 269L503 274L503 309L491 331L469 429L451 469L451 486L440 509L417 606L406 611L406 646L394 657L383 640L371 594L337 514L337 497L309 434L303 389L297 389L286 371L269 309L257 291L240 229L229 211L206 143L206 120L194 114L160 11L149 11L143 0Z"},"W":{"w":851,"d":"M0 0L0 29L6 34L6 120L17 126L17 166L23 171L29 257L34 263L34 297L40 303L40 349L46 354L46 389L51 394L51 434L57 440L57 480L63 486L80 663L86 669L86 703L91 709L91 754L97 760L103 840L109 846L109 931L120 937L120 994L280 994L297 903L309 897L309 846L326 794L337 720L349 697L349 674L371 594L383 520L394 497L394 474L406 469L406 423L417 400L417 377L429 360L434 366L434 383L440 389L440 406L486 571L486 594L503 640L503 674L514 680L514 697L537 771L537 794L549 817L589 994L743 994L749 920L754 914L754 863L760 857L760 806L766 800L766 754L771 749L771 703L777 697L777 640L783 634L783 589L789 583L789 531L794 526L794 474L806 469L806 366L811 360L811 309L817 303L817 257L823 251L823 206L829 200L829 143L834 137L834 86L840 80L846 0L691 0L686 97L680 103L680 149L674 154L674 206L669 211L669 263L663 269L663 314L657 320L657 371L651 377L651 429L646 434L646 480L640 486L640 537L629 554L606 480L606 440L594 434L594 417L566 320L566 297L554 274L554 257L531 183L531 160L503 63L503 23L491 17L491 0L371 0L371 23L366 29L354 91L343 114L331 177L320 200L320 223L309 229L309 269L303 274L257 474L246 497L246 520L229 566L217 543L217 497L211 491L211 457L206 451L206 366L194 360L194 320L189 314L189 274L183 269L183 229L177 223L177 183L171 177L154 0Z"},"X":{"w":634,"d":"M0 0L0 17L11 23L46 91L46 103L57 114L91 183L97 217L109 223L183 371L194 417L206 423L240 491L240 509L223 537L223 549L211 560L206 583L194 589L194 606L154 686L143 697L143 709L109 783L97 789L97 806L57 886L46 897L46 914L23 949L23 960L11 977L11 994L154 994L154 983L183 926L194 920L194 903L240 817L240 806L251 794L251 783L286 714L297 709L297 691L314 663L326 669L394 811L394 829L406 834L480 994L629 994L629 977L606 943L606 931L594 914L594 897L583 891L520 766L520 754L509 743L509 731L491 703L491 686L480 680L394 503L394 491L440 406L440 394L451 383L480 314L491 309L491 291L531 211L543 200L560 149L571 137L577 114L594 103L594 80L629 17L629 0L486 0L406 166L394 171L394 194L320 337L309 331L297 309L297 291L286 286L286 274L269 251L251 200L240 189L194 97L194 80L183 74L183 63L154 11L154 0Z"},"Y":{"w":794,"d":"M0 0L0 11L29 57L29 74L40 80L46 97L69 126L103 189L103 200L114 206L131 240L131 251L137 251L154 274L160 297L177 314L217 394L229 406L229 423L246 434L274 486L274 497L286 503L320 566L320 989L469 989L469 566L497 514L514 497L514 486L526 480L526 463L571 394L617 309L629 303L629 286L640 274L674 206L686 200L697 166L714 137L726 131L726 120L789 11L789 0L629 0L583 91L571 97L571 109L537 171L526 177L526 194L463 297L463 309L451 320L440 349L429 354L429 371L394 423L377 406L377 394L349 354L326 309L326 291L309 280L286 229L274 217L229 131L229 114L211 103L160 0Z"},"Z":{"w":709,"d":"M40 0L40 171L474 171L480 177L469 194L457 200L451 217L434 229L434 240L371 320L360 343L337 360L337 371L326 389L314 394L309 411L263 474L240 491L234 514L154 623L137 634L137 646L109 686L97 691L63 749L40 766L40 777L11 817L0 823L0 989L703 989L703 823L229 823L223 811L240 800L240 789L291 714L314 691L320 674L337 663L337 651L423 531L434 526L440 509L526 389L537 383L537 371L623 251L634 246L651 211L669 200L669 189L691 171L691 0Z"},"1":{"w":251,"d":"M103 0L86 29L57 57L46 57L17 74L0 74L0 200L80 200L80 183L86 177L91 183L91 989L246 989L246 0Z"},"2":{"w":646,"d":"M200 23L154 46L126 69L114 69L114 74L86 97L29 177L17 183L0 251L103 274L109 280L137 280L154 246L154 234L206 177L246 154L263 154L291 143L320 143L326 149L360 149L394 166L406 166L411 177L423 177L440 200L469 223L486 251L497 286L497 309L474 354L440 389L423 400L411 400L400 417L383 423L354 446L314 463L274 491L251 497L246 509L211 526L206 537L177 554L126 600L114 600L114 617L51 697L29 766L17 771L17 823L6 846L6 874L0 880L0 994L640 994L640 840L171 840L166 834L171 829L177 783L194 754L200 731L211 726L251 674L326 617L354 600L371 600L383 583L411 571L526 497L537 497L537 491L583 451L594 429L611 417L611 394L629 354L634 303L640 297L634 223L623 183L611 166L611 143L594 131L577 109L577 97L514 46L451 17L417 11L411 0L269 0L263 11Z"},"3":{"w":669,"d":"M269 0L263 11L246 11L183 40L131 80L97 120L80 154L69 160L69 177L57 189L57 200L74 200L166 240L183 240L211 194L251 160L309 137L354 137L417 160L451 200L463 206L463 223L469 223L480 240L480 269L486 274L480 314L474 326L463 331L463 343L434 371L389 389L337 389L337 520L411 531L457 560L463 571L491 594L509 640L509 686L491 743L429 811L394 829L337 846L280 840L217 811L206 794L177 777L166 760L166 749L154 743L137 709L109 709L86 720L0 737L0 754L29 817L69 874L69 886L143 943L200 971L217 971L246 983L274 983L280 994L366 994L371 983L406 977L423 966L463 954L566 880L617 806L646 743L651 703L663 697L663 611L651 606L651 583L634 531L611 497L571 457L611 366L617 320L623 314L623 251L617 246L611 189L600 171L594 143L571 114L566 97L497 40L463 23L417 11L411 0Z"},"4":{"w":743,"d":"M491 0L491 11L434 86L417 97L417 109L394 126L394 137L343 200L309 251L297 257L291 274L269 297L223 366L200 383L200 394L189 400L183 417L131 486L114 497L114 509L97 520L97 531L74 554L23 629L0 646L0 731L486 731L497 743L497 994L629 994L629 737L634 731L737 731L737 600L634 600L629 594L629 0ZM177 606L183 600L189 606L183 611ZM491 240L497 246L497 594L491 600L211 600L206 594L286 491L297 486L309 463L354 406L366 400L377 377L394 366L400 349Z"},"5":{"w":674,"d":"M611 0L57 0L57 126L51 131L51 274L46 280L40 503L91 514L154 543L171 543L223 486L280 457L377 457L429 474L446 497L457 497L491 537L509 583L520 674L503 726L457 777L434 794L417 794L406 811L314 846L274 846L269 851L177 846L126 829L86 806L74 806L69 817L57 823L57 834L17 897L17 909L0 931L0 943L91 977L143 983L149 994L331 994L337 983L360 983L440 954L474 937L526 897L537 897L623 794L623 783L640 749L651 743L651 720L663 697L669 594L663 589L663 560L651 537L651 509L640 503L617 457L571 400L560 400L554 389L537 383L520 366L491 354L480 343L389 314L297 309L291 314L263 314L211 331L194 326L206 183L217 154L566 154L571 160L611 160Z"},"6":{"w":686,"d":"M400 0L389 0L383 11L274 103L211 183L189 200L189 211L171 229L109 331L97 337L97 354L69 400L63 429L34 491L29 531L11 577L11 600L0 606L0 737L11 743L23 794L46 840L91 897L126 926L183 960L246 983L263 983L269 994L417 994L423 983L446 983L497 966L526 949L583 903L594 903L594 891L623 863L651 806L663 794L663 777L674 749L674 709L680 703L674 623L640 537L594 480L497 423L446 411L440 400L246 400L240 411L229 406L286 309L297 303L297 291L337 240L411 160L469 114L463 86L400 11ZM160 634L206 583L257 554L274 554L303 543L417 549L474 577L486 594L497 600L497 617L503 617L514 634L520 720L514 726L509 771L497 777L497 789L480 811L440 834L383 840L377 846L331 846L326 840L257 834L211 811L200 794L166 766L149 714L149 663Z"},"7":{"w":686,"d":"M0 0L0 160L480 160L486 166L463 194L451 200L451 211L434 229L411 274L400 280L394 309L360 371L349 411L309 497L309 514L297 520L297 549L280 589L263 674L251 697L251 726L246 731L240 789L234 794L229 886L223 891L223 994L377 994L383 823L389 817L389 789L400 783L400 726L417 674L423 629L440 594L440 571L457 537L463 509L474 497L474 480L486 463L486 451L497 446L497 429L537 349L571 291L594 274L594 263L611 240L680 177L674 0Z"},"8":{"w":669,"d":"M251 0L246 11L200 23L154 46L91 97L69 137L57 143L57 166L40 200L40 240L34 246L46 354L57 371L57 394L120 451L69 497L57 497L57 514L40 531L17 571L0 629L0 726L6 731L6 760L17 783L23 817L57 874L57 891L69 891L114 937L154 966L189 977L194 989L280 1000L286 1006L360 1006L394 994L451 989L457 977L480 971L531 943L589 891L623 846L640 806L651 800L651 766L663 731L663 646L651 617L651 589L640 583L634 560L589 497L537 451L554 440L577 411L600 371L611 331L611 309L617 303L623 223L606 166L583 126L560 103L554 86L537 80L497 46L451 23L400 11L394 0ZM200 560L274 526L343 520L349 526L383 526L434 549L457 566L491 611L509 669L509 737L491 777L474 800L411 840L354 846L349 851L274 846L217 823L194 794L171 777L154 743L154 634L166 606ZM269 143L314 137L320 131L371 137L434 171L451 189L451 200L463 206L474 229L474 286L446 337L411 366L366 389L280 389L257 377L251 366L234 360L206 326L183 269L189 223L211 183L240 160L251 160L251 154Z"},"9":{"w":663,"d":"M394 0L263 0L257 11L234 11L183 29L143 51L80 97L63 126L46 137L46 149L23 183L0 251L0 360L11 400L46 463L109 520L126 526L143 543L246 577L274 577L280 583L383 583L423 571L434 577L400 640L371 680L354 691L354 703L343 709L269 789L246 794L246 806L234 817L177 851L177 863L194 891L217 914L257 977L274 977L343 920L366 891L377 891L400 857L423 840L463 794L531 697L543 691L549 669L594 594L629 486L640 480L640 440L646 434L651 366L657 360L657 246L646 223L640 177L629 171L583 97L554 80L543 63L531 63L474 29L400 11ZM160 206L211 160L269 137L337 131L343 137L394 143L457 177L474 200L486 206L509 246L509 263L514 269L514 331L503 366L486 389L451 417L389 440L297 446L240 429L206 411L194 394L177 389L143 337L143 309L131 303L131 274L143 269L143 240Z"},"0":{"w":697,"d":"M331 0L326 6L251 11L246 23L166 63L166 69L120 109L114 126L91 149L74 183L63 189L57 217L29 280L29 297L11 349L11 371L6 377L6 417L0 423L0 594L6 600L6 646L11 651L17 703L34 743L34 760L46 777L51 806L63 817L63 834L74 840L91 874L109 891L109 903L189 971L229 989L234 1000L286 1006L314 1017L400 1017L446 1000L474 1000L480 989L497 983L560 937L611 863L646 783L657 777L657 743L674 691L674 663L686 623L691 417L686 411L686 360L680 354L669 274L657 251L657 223L646 217L646 206L606 131L560 74L543 69L520 46L469 23L463 11L429 11L423 6L389 6L383 0ZM331 143L371 143L423 160L463 194L463 211L474 211L486 223L509 263L520 309L531 326L537 371L543 377L543 417L549 423L549 594L543 600L543 623L537 629L537 651L531 657L531 680L520 714L474 794L463 800L429 840L377 863L314 863L274 846L263 829L211 783L183 731L166 680L166 640L154 634L154 606L149 600L149 457L154 451L154 411L166 406L166 354L183 297L223 217L234 211L240 194L251 183L263 183L280 160Z"}};
+FONT_WIDTHS['m']=FONT_WIDTHS['m']||[170,255,340];
+const H_IDX = {200:0, 300:1, 400:2};
+const ARROW_GLYPH = {left:'ç', right:'è', up:'é', down:'ê', upLeft:'ë', upRight:'ì', downLeft:'í', downRight:'î'};
+const DEFAULT_CHARW = {};
+const COLORS = { red:'#C8102E', yellow:'#FFCC00', black:'#0B0B0B', white:'#FFFFFF' };
+
+const PANEL_TYPES = {
+  holding:   {label:'Rollhalteort (Runway-holding position)', cat:'mandatory', bg:'red',    fg:'white', border:'white', arrow:false},
+  cat:       {label:'CAT I/II/III Rollhalteort',             cat:'mandatory', bg:'red',    fg:'white', border:'white', arrow:false},
+  noentry:   {label:'NO ENTRY (Einfahrt verboten)',          cat:'mandatory', bg:'red',    fg:'white', border:'white', arrow:false, symbol:'noentry'},
+  mandatoryText:{label:'Vorschrift – Freitext',               cat:'mandatory', bg:'red',    fg:'white', border:'white', arrow:false},
+  location:  {label:'Standort (Location)',                   cat:'info',      bg:'black',  fg:'yellow',border:'yellow',arrow:false},
+  direction: {label:'Richtung (Direction) mit Pfeil',        cat:'info',      bg:'yellow', fg:'black', border:null,    arrow:true},
+  destination:{label:'Ziel (Destination) mit Pfeil',         cat:'info',      bg:'yellow', fg:'black', border:null,    arrow:true},
+  runwayExit:{label:'Runway exit',                           cat:'runwayExit',bg:'yellow', fg:'black', border:null,    arrow:true},
+  vacated:   {label:'Runway vacated',                        cat:'info',      bg:'yellow', fg:'black', border:null,    arrow:false, symbol:'vacated'},
+  intersection:{label:'Intersection take-off',               cat:'info',      bg:'yellow', fg:'black', border:null,    arrow:false},
+  distance:  {label:'Distance remaining',                    cat:'info',      bg:'black',  fg:'white', border:null,    arrow:false},
+};
+const TEMPLATES = [
+  // Vorschriftzeichen
+  {cat:'mandatory', name:'Single runway designator', panels:[{type:'holding',text:'18',arrow:'none'}]},
+  {cat:'mandatory', name:'Category I hold position', panels:[{type:'cat',text:'17 CAT I',arrow:'none'}]},
+  {cat:'mandatory', name:'Location + Runway hold position', panels:[{type:'location',text:'W',arrow:'none'},{type:'holding',text:'24-06',arrow:'none'}]},
+  {cat:'mandatory', name:'Category II/III hold position', panels:[{type:'cat',text:'CAT II/III',arrow:'none'}]},
+  {cat:'mandatory', name:'Runway hold + CAT II/III', panels:[{type:'holding',text:'25',arrow:'none'},{type:'cat',text:'CAT II/III',arrow:'none'}]},
+  {cat:'mandatory', name:'NO ENTRY', panels:[{type:'noentry',text:'',arrow:'none'}]},
+  // Hinweiszeichen
+  {cat:'info', name:'Location / Direction', panels:[{type:'location',text:'D',arrow:'none'},{type:'direction',text:'E',arrow:'right'}]},
+  {cat:'info', name:'Direction / Location / Direction', panels:[{type:'direction',text:'E',arrow:'left'},{type:'location',text:'F',arrow:'none'},{type:'direction',text:'G',arrow:'right'}]},
+  {cat:'info', name:'Direction array (Kreuzung)', panels:[{type:'direction',text:'B',arrow:'upLeft'},{type:'direction',text:'A',arrow:'up'},{type:'location',text:'C',arrow:'none'},{type:'direction',text:'D',arrow:'upRight'},{type:'direction',text:'E',arrow:'right'}]},
+  {cat:'info', name:'Runway exit', panels:[{type:'runwayExit',text:'H',arrow:'left'}]},
+  {cat:'info', name:'Outbound destination (Pisten)', panels:[{type:'destination',text:'08-29',arrow:'upRight'}]},
+  {cat:'info', name:'Destination (APRON / FUEL …)', panels:[{type:'destination',text:'APRON',arrow:'right'}]},
+  {cat:'info', name:'Intersection take-off', panels:[{type:'intersection',text:'2500m',arrow:'left'}]},
+  {cat:'info', name:'Runway vacated / Location', panels:[{type:'vacated',text:'',arrow:'none'},{type:'location',text:'B',arrow:'none'}]},
+  {cat:'info', name:'Distance remaining', panels:[{type:'distance',text:'4',arrow:'none'}]},
+  // Standortzeichen
+  {cat:'location', name:'Location', panels:[{type:'location',text:'A',arrow:'none'}]},
+  // Sonstige
+  {cat:'other', name:'Gate / Stand indication', panels:[{type:'destination',text:'A12',arrow:'none'}]},
+  {cat:'other', name:'VOR checkpoint (Text)', panels:[{type:'destination',text:'VOR 116.3',arrow:'none'}]},
+];
+const TEMPLATE_CATS = {all:'Alle', mandatory:'Vorschriftzeichen (Mandatory)', info:'Hinweiszeichen (Information)', location:'Standortzeichen (Location)', other:'Sonstige'};
+const ARROWS = {none:'—', up:'↑', upRight:'↗', right:'→', downRight:'↘', down:'↓', downLeft:'↙', left:'←', upLeft:'↖'};
+const ARROW_GLYPH_REV = {'ç':'left','è':'right','é':'up','ê':'down','ë':'upLeft','ì':'upRight','í':'downLeft','î':'downRight'};
+const ARROW_ANGLE = {up:0, upRight:45, right:90, downRight:135, down:180, downLeft:225, left:270, upLeft:315};
+
+/* ================= State ================= */
+let state = {
+  params: { ICAO: makeDefaults('ICAO'), EASA: makeDefaults('EASA') },
+  code: deepCopy(DEFAULT_CODE),
+  fontWidths: deepCopy(FONT_WIDTHS),
+  spacingCodes: deepCopy(SPACING_CODES),
+  signs: []
+};
+function deepCopy(o){ return JSON.parse(JSON.stringify(o)); }
+let signCounter = 0;
+function newSign(){
+  signCounter++;
+  return { id: signCounter, name:'Schild '+signCounter, location:'', description:'', norm:'ICAO', codeNo:'3-4', h:300, faceMode:'norm', outline:false, singleSided:false,
+           panels:[ {type:'location', text:'A', arrow:'none'}, {type:'direction', text:'B', arrow:'right'} ] };
+}
+
+/* ================= Geometrie ================= */
+function P(norm, key, h){ return Number(state.params[norm].rows[key].v[h]); }
+function charWidth(ch, h){
+  const w = state.fontWidths[ch];
+  if(w) return Number(w[H_IDX[h]])||0;
+  return Math.round(0.68*h); // unbekanntes Zeichen: Näherung
+}
+function pairSpace(a, b, h){
+  const code = PAIR_CODES[a+b];
+  const row = state.spacingCodes[code||6] || state.spacingCodes[6];
+  return Number(row[H_IDX[h]])||0;
+}
+/* Glyphfolge eines Panels: Text + ggf. Pfeil als Glyph */
+function panelGlyphs(p){
+  const t = PANEL_TYPES[p.type];
+  let txt = [...(p.text||'').toUpperCase()];
+  if(p.type==='intersection') txt = txt.map((c,i)=> (c==='M' && i===txt.length-1) ? 'm' : c);
+  if(!(t.arrow && p.arrow!=='none')) return txt;
+  const g = ARROW_GLYPH[p.arrow];
+  const leftSide = (p.arrow==='left'||p.arrow==='upLeft'||p.arrow==='downLeft');
+  return leftSide ? [g,...txt] : [...txt,g];
+}
+/* Maßkette: [{kind:'margin'|'char'|'space', label, w}] */
+/* Schild mit nur einem Bezeichner (Abb. A4-4 / N-3 B: „10“; Doc 9157 Part 4, 12.2.6 „signs containing only one
+   designator“): seitlicher Rand H statt H/2. Gilt, wenn das Schild aus einem Panel besteht, dessen Inschrift eine
+   einzige Zeichengruppe ohne Pfeil, Leerzeichen, Bindestrich oder Schrägstrich ist. */
+function isSingleDesignator(gl, solo){
+  return !!solo && gl.length>0 && !gl.some(g=>ARROW_GLYPH_REV[g]||g===' '||g==='-'||g==='/');
+}
+function panelChain(p, h, norm, solo){
+  const gl = panelGlyphs(p);
+  const single = isSingleDesignator(gl, solo);
+  const m = P(norm, single?'sideMarginSingle':'sideMargin', h);
+  const chain = [{kind:'margin',label:single?'Rand (H)':'Rand',w:m}];
+  gl.forEach((g,i)=>{
+    chain.push({kind:'char',label:g,w:charWidth(g,h)});
+    if(i<gl.length-1){
+      let sp = pairSpace(g,gl[i+1],h);
+      if(p.arrowTight && gl.length===2 && (ARROW_GLYPH_REV[g]||ARROW_GLYPH_REV[gl[i+1]])) sp = Math.round(0.25*h); // ICAO App. 4, Instruction 2
+      chain.push({kind:'space',label:'↔',w:sp});
+    }
+  });
+  chain.push({kind:'margin',label:single?'Rand (H)':'Rand',w:m});
+  return chain;
+}
+function panelWidth(panel, h, norm, solo){
+  const t = PANEL_TYPES[panel.type];
+  if(t.symbol==='noentry') return 3*h;                    // Abb. A4-3 / N-2G: Feld 3 H breit
+  if(t.symbol==='vacated') return Math.round(4.8*h);      // Abb. A4-3 / N-2F: dargestellte Breite ≈ 4,8 H (nicht bemaßt)
+  return Math.round(panelChain(panel,h,norm,solo).reduce((a,c)=>a+c.w,0));
+}
+/* Schildhöhe: Norm-Minimum (ICAO 1,5 H / EASA 2 H) oder 2 H erzwungen */
+function faceHeight(sign){
+  const f = P(sign.norm,'faceHeight',sign.h);
+  if(sign.faceMode==='2H') return Math.max(f, 2*sign.h);
+  if(sign.faceMode==='custom' && Number(sign.faceCustom)>0) return Number(sign.faceCustom);
+  return f;
+}
+function signDims(sign){
+  const h = sign.h, norm = sign.norm;
+  const face = faceHeight(sign);
+  const solo = sign.panels.length===1;
+  const widths = sign.panels.map(p=>panelWidth(p,h,norm,solo));
+  const gap = P(norm,'panelGap',h);
+  const total = widths.reduce((a,b)=>a+b,0) + gap*Math.max(0,sign.panels.length-1);
+  return { face, widths, total, area: Math.round(face*total/1e6*100)/100 };
+}
+
+/* ================= SVG-Rendering ================= */
+const FONT = 'Arial, Helvetica, "Liberation Sans", sans-serif';
+const CAP = 0.716; // Cap-Height von Arial relativ zur Schriftgröße
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function renderSignSVG(sign, opts={}){
+  const d = signDims(sign);
+  const h = sign.h, norm = sign.norm;
+  const face = d.face, gap = P(norm,'panelGap',h);
+  const pad = opts.pad ?? 40;
+  const vmargin = (face - h)/2; // vertikale Lage der Beschriftung
+  const W = d.total + 2*pad, H = face + 2*pad + (opts.dims?110:0);
+  let out = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family='${FONT}'>`;
+  if(opts.bg) out += `<rect width="${W}" height="${H}" fill="#fff"/>`;
+  let x = pad;
+  sign.panels.forEach((p,i)=>{
+    out += `<g data-pi="${i}">`+renderPanel(p, x, pad, d.widths[i], face, h, norm, sign)+'</g>';
+    x += d.widths[i] + gap;
+  });
+  // Schwarzer vertikaler Trenner zwischen benachbarten gelben Hinweiszeichen (A14 5.4.3.34 d / App. 4 Nr. 12a; CS N.775(c)(20)(i))
+  if(!gap){
+    const dl = P(norm,'delineator',h); let bx = pad;
+    sign.panels.forEach((p,i)=>{
+      bx += d.widths[i];
+      const q = sign.panels[i+1];
+      if(q && PANEL_TYPES[p.type].bg==='yellow' && PANEL_TYPES[q.type].bg==='yellow') out += `<rect x="${bx-dl/2}" y="${pad}" width="${dl}" height="${face}" fill="${COLORS.black}"/>`;
+    });
+  }
+  if(opts.dims){
+    const y = pad + face + 30;
+    out += `<g stroke="#334155" stroke-width="2" fill="none"><line x1="${pad}" y1="${y}" x2="${pad+d.total}" y2="${y}"/><line x1="${pad}" y1="${y-10}" x2="${pad}" y2="${y+10}"/><line x1="${pad+d.total}" y1="${y-10}" x2="${pad+d.total}" y2="${y+10}"/></g>`;
+    out += `<text x="${pad+d.total/2}" y="${y+40}" text-anchor="middle" font-size="34" fill="#334155">${d.total} mm</text>`;
+    const xs = pad+d.total+20;
+    out += `<g stroke="#334155" stroke-width="2" fill="none"><line x1="${xs}" y1="${pad}" x2="${xs}" y2="${pad+face}"/><line x1="${xs-10}" y1="${pad}" x2="${xs+10}" y2="${pad}"/><line x1="${xs-10}" y1="${pad+face}" x2="${xs+10}" y2="${pad+face}"/></g>`;
+    out += `<text x="${xs+14}" y="${pad+face/2+12}" font-size="34" fill="#334155">${face} mm</text>`;
+    let px = pad;
+    sign.panels.forEach((p,i)=>{ out += `<text x="${px+d.widths[i]/2}" y="${y+78}" text-anchor="middle" font-size="26" fill="#64748b">P${i+1}: ${d.widths[i]} mm</text>`; px += d.widths[i]+gap; });
+  }
+  out += '</svg>';
+  return out;
+}
+
+function renderPanel(p, x, y, w, face, h, norm, sign){
+  const t = PANEL_TYPES[p.type];
+  const bg = COLORS[t.bg], fg = COLORS[t.fg];
+  let s = `<rect x="${x}" y="${y}" width="${w}" height="${face}" fill="${bg}"/>`;
+  // Gelber Rand nur beim allein stehenden Standortzeichen (A14 5.4.3.26; CS N.785(c)(2))
+  if(t.border && t.bg==='black' && sign && sign.panels.length===1){
+    const b = P(norm,'border',h);
+    s += `<rect x="${x+b/2}" y="${y+b/2}" width="${w-b}" height="${face-b}" fill="none" stroke="${COLORS[t.border]}" stroke-width="${b}"/>`;
+  }
+  const cy = y + face/2;
+  const st = P(norm,'stroke',h);
+  // Optionale schwarze Kontur um weiße Schrift auf Gebotszeichen (A14 5.4.2.13; CS N.780(c)(1))
+  const ol = (sign && sign.outline && t.cat==='mandatory') ? (sign.codeNo==='1-2'?10:20) : 0;
+  const olAttr = ol ? ` stroke="${COLORS.black}" stroke-width="${2*ol}" paint-order="stroke" stroke-linejoin="round"` : '';
+  if(t.symbol==='noentry'){
+    // Abb. A4-3 / N-2G (aus Raster vermessen): Ring Außen-Ø ≈ 1,35 H, Ringstärke ≈ Strichstärke, Balken ≈ 0,57 H × Strichstärke
+    const R = 0.675*h, cx = x+w/2;
+    s += `<circle cx="${cx}" cy="${cy}" r="${R-st/2}" fill="none" stroke="${COLORS.white}" stroke-width="${st}"/>`;
+    s += `<rect x="${cx-0.285*h}" y="${cy-st/2}" width="${0.57*h}" height="${st}" fill="${COLORS.white}"/>`;
+    if(ol){ s += `<circle cx="${cx}" cy="${cy}" r="${R+ol/2}" fill="none" stroke="${COLORS.black}" stroke-width="${ol}"/><circle cx="${cx}" cy="${cy}" r="${R-st-ol/2}" fill="none" stroke="${COLORS.black}" stroke-width="${ol}"/>`; }
+    return s;
+  }
+  if(t.symbol==='vacated'){
+    // Abb. A4-3 / N-2F (aus Raster vermessen): Pattern A – 4 Balken ≈ 0,12 H, Lücken ≈ 0,11 H, Gesamthöhe ≈ 0,82 H zentriert;
+    // obere zwei durchgehend, untere zwei gestrichelt (Strich ≈ Lücke ≈ 0,72 H), über die volle Panelbreite
+    const bw = 0.12*h, gp = 0.11*h, top = cy - (4*bw+3*gp)/2;
+    for(let i=0;i<4;i++){
+      const yy = top + i*(bw+gp) + bw/2;
+      const dash = i>=2 ? ` stroke-dasharray="${0.72*h} ${0.72*h}" stroke-dashoffset="${0.36*h}"` : '';
+      s += `<line x1="${x}" y1="${yy}" x2="${x+w}" y2="${yy}" stroke="${fg}" stroke-width="${bw}"${dash}/>`;
+    }
+    return s;
+  }
+  // Text + Pfeil über Maßkette
+  const chain = panelChain(p,h,norm, sign && sign.panels.length===1);
+  let cx = x;
+  const fs = h / CAP;
+  const baseline = cy + h/2;
+  chain.forEach(c=>{
+    if(c.kind==='char'){
+      const g = c.label;
+      if(ARROW_GLYPH_REV[g]){
+        const aw = c.w, ang = ARROW_ANGLE[ARROW_GLYPH_REV[g]]||0, L = h, hw = 0.35*h, hl = 0.43*h;
+        // Pfeil nach Abb. A4-2 / N-2H (Raster vermessen): Länge H, Breite 0,7 H, Kopf ≈ 0,43 H lang, offener Winkel (Chevron),
+        // Schaft und Schenkel in Strichstärke (App. 4 Nr. 2; CS N.775(c)(11)). Maße bleiben bei Drehung gleich (Note 2).
+        const ang2 = Math.atan2(hl, hw);            // Schenkelwinkel zur Horizontalen
+        const k = st/2/Math.sin(ang2);              // Versatz der Schenkel-Mittellinie unter der Spitze
+        const ex = hw - (st/2)*Math.cos(ang2), ey = -L/2 + hl - (st/2)*Math.sin(ang2);
+        const arrowShape = (col, extra)=>`<rect x="${-st/2-extra}" y="${-L/2+k-extra}" width="${st+2*extra}" height="${L-k+2*extra}" fill="${col}"/>`+
+             `<polyline points="${-ex},${ey} 0,${-L/2+k} ${ex},${ey}" fill="none" stroke="${col}" stroke-width="${st+2*extra}" stroke-linejoin="miter" stroke-miterlimit="10" stroke-linecap="${extra?'square':'butt'}"/>`;
+        s += `<g transform="translate(${cx+aw/2} ${cy}) rotate(${ang})">`+(ol?arrowShape(COLORS.black,ol):'')+arrowShape(fg,0)+`</g>`;
+      } else if(GLYPHS[g]){
+        const G = GLYPHS[g], sy = h/1000, sx = c.w/G.w;
+        s += `<path d="${G.d}" fill="${fg}" fill-rule="evenodd"${ol?` stroke="${COLORS.black}" stroke-width="${2*ol/Math.min(sx,sy)}" paint-order="stroke" stroke-linejoin="round"`:''} transform="translate(${cx} ${cy-h/2}) scale(${sx} ${sy})"/>`;
+      } else if(g==='m'){
+        s += `<text x="${cx}" y="${baseline}" font-size="${0.75*h/0.52}" font-weight="bold" fill="${fg}" textLength="${c.w}" lengthAdjust="spacingAndGlyphs">m</text>`;
+      } else if(g==='-'){
+        s += `<rect x="${cx}" y="${cy-st/2}" width="${c.w}" height="${st}" fill="${fg}"${olAttr}/>`;   // Bindestrich: Strichstärke hoch, auf Mittellinie (Abb. N-2H)
+      } else if(g==='.'){
+        s += `<circle cx="${cx+c.w/2}" cy="${baseline-c.w/2}" r="${c.w/2}" fill="${fg}"${olAttr}/>`;   // Punkt: rund, Ø ≈ Strichstärke (Abb. N-2H)
+      } else if(g==='/'){
+        s += `<polygon points="${cx+c.w-st},${cy-h/2} ${cx+c.w},${cy-h/2} ${cx+st},${baseline} ${cx},${baseline}" fill="${fg}"/>`;
+      } else if(g!==' '){
+        s += `<text x="${cx}" y="${baseline}" font-size="${fs}" font-weight="bold" fill="${fg}" textLength="${c.w}" lengthAdjust="spacingAndGlyphs">${esc(g)}</text>`;
+      }
+    }
+    cx += c.w;
+  });
+  return s;
+}
+
+/* ================= UI: Schilder ================= */
+const $ = s=>document.querySelector(s);
+const signList = $('#sign-list');
+
+function renderSigns(){
+  signList.innerHTML = '';
+  if(!state.signs.length){
+    signList.innerHTML = '<div class="card"><p class="note">Noch keine Schilder. Klicken Sie auf „+ Schild hinzufügen".</p></div>';
+  }
+  state.signs.forEach((sign,si)=>{
+    const d = signDims(sign);
+    const card = document.createElement('div');
+    card.className = 'card sign-card';
+    const rec = recommendedHeight(sign);
+    card.innerHTML = `
+      <div class="sign-head">
+        <h3>#${si+1}</h3>
+        <input type="text" value="${esc(sign.name)}" data-f="name" placeholder="Label" style="text-transform:none;font-weight:600;min-width:150px">
+        <input type="text" value="${esc(sign.location||'')}" data-f="location" placeholder="Standort / Position (z. B. TWY A / RWY 25)" style="text-transform:none;min-width:220px">
+        <input type="text" value="${esc(sign.description||'')}" data-f="description" placeholder="Beschreibung" style="text-transform:none;min-width:160px">
+        <span class="spacer"></span>
+        <button class="btn small" data-act="dup">Duplizieren</button>
+        <button class="btn small" data-act="up" ${si===0?'disabled':''}>▲</button>
+        <button class="btn small" data-act="down" ${si===state.signs.length-1?'disabled':''}>▼</button>
+        <button class="btn small" data-act="svg">SVG</button>
+        <button class="btn small" data-act="pdf">Einzel-PDF</button>
+        <button class="btn small danger" data-act="del">Löschen</button>
+      </div>
+      <div class="row">
+        <div class="field"><label>1. Norm</label>
+          <select data-f="norm"><option value="ICAO"${sign.norm==='ICAO'?' selected':''}>ICAO Annex 14 Vol. I</option><option value="EASA"${sign.norm==='EASA'?' selected':''}>EASA CS-ADR-DSN</option></select></div>
+        <div class="field"><label>Code-Nummer (Piste)</label>
+          <select data-f="codeNo"><option value="1-2"${sign.codeNo==='1-2'?' selected':''}>1 oder 2</option><option value="3-4"${sign.codeNo==='3-4'?' selected':''}>3 oder 4</option></select></div>
+        <div class="field"><label>3. Schrifthöhe</label>
+          <select data-f="h">${state.params[sign.norm].heights.map(h=>`<option value="${h}"${sign.h==h?' selected':''}>${h} mm</option>`).join('')}</select></div>
+        <div class="field" style="min-width:auto"><label>Empfehlung</label><div style="padding:7px 0;font-size:13px">${rec} mm</div></div>
+        <div class="field" style="min-width:auto"><label>Schildhöhe</label>
+          <select data-f="faceMode"><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
+        ${sign.faceMode==='custom'?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
+        <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="A14 5.4.2.13 / CS N.780(c)(1): schwarze Kontur 10 mm (Code 1–2) bzw. 20 mm (Code 3–4) um die weiße Schrift"><input type="checkbox" data-fchk="outline" ${sign.outline?'checked':''}> Schwarze Kontur (${sign.codeNo==='1-2'?10:20} mm)</label>
+        <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="App. 4 Nr. 11 / CS N.775(c)(19): Gebotszeichen nur auf einer Rollbahnseite → Mindestbreite 1,46 m (Code 1–2) / 1,94 m (Code 3–4)"><input type="checkbox" data-fchk="singleSided" ${sign.singleSided?'checked':''}> Nur einseitig aufgestellt</label>
+      </div>
+      <div class="note" style="margin-top:4px">${NORM_INFO[sign.norm].name}: Schrifthöhe ${NORM_INFO[sign.norm].height} · Schildhöhe ${NORM_INFO[sign.norm].face} (vertikaler Rand ${NORM_INFO[sign.norm].vmargin}) · seitlicher Rand H/2, bei Einzelbezeichner H · Strichstärke ${P(sign.norm,'stroke',sign.h)} mm · installiert max. ${P(sign.norm,'installMax',sign.h)} mm</div>
+      <div class="panels">${sign.panels.map((p,pi)=>`<div class="ins"><button data-ins="${pi}" title="Panel davor einfügen">+</button></div>`+panelRowHTML(p,pi,sign)).join('')}</div>
+      <div style="margin-top:8px"><button class="btn small" data-act="addpanel">+ Panel / Nachricht anhängen</button> <span class="note">Tipp: Panel in der Vorschau anklicken, um es zu bearbeiten.</span></div>
+      ${sign.h!=rec?`<div class="hint">Die gewählte Schrifthöhe (${sign.h} mm) weicht von der Mindesthöhe nach ${NORM_INFO[sign.norm].height} (${NORM_INFO[sign.norm].short}) für Code ${sign.codeNo} ab (${rec} mm).</div>`:''}
+      <div class="preview">${renderSignSVG(sign)}</div>
+      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span></div>
+      <div class="chain">${chainHTML(sign)}</div>
+      <div class="compliance">${complianceHTML(sign)}</div>
+    `;
+    // Events
+    card.querySelectorAll('[data-f]').forEach(el=>{
+      el.addEventListener('change', e=>{
+        const f = el.dataset.f;
+        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else sign[f] = el.value;
+        if(f==='norm'){ sign.faceMode = sign.faceMode||'norm'; }
+        if(f==='name'||f==='location'||f==='description'){ renderOverview(); return; }
+        if(f==='codeNo'){ /* Empfehlung anwenden */ sign.h = recommendedHeight(sign); }
+        renderSigns(); renderOverview();
+      });
+    });
+    card.querySelectorAll('[data-act]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const a = btn.dataset.act;
+        if(a==='del'){ state.signs.splice(si,1); }
+        if(a==='dup'){ const c = deepCopy(sign); signCounter++; c.id=signCounter; c.name=sign.name+' (Kopie)'; state.signs.splice(si+1,0,c); }
+        if(a==='up'){ [state.signs[si-1],state.signs[si]]=[state.signs[si],state.signs[si-1]]; }
+        if(a==='down'){ [state.signs[si+1],state.signs[si]]=[state.signs[si],state.signs[si+1]]; }
+        if(a==='addpanel'){ sign.panels.push({type:'direction', text:'', arrow:'right'}); }
+        if(a==='svg'){ saveFile(fileName(sign,'svg'), renderSignSVG(sign,{dims:true,bg:true,pad:60})); return; }
+        if(a==='pdf'){ makePDF([sign], fileName(sign,'pdf')); return; }
+        renderSigns(); renderOverview();
+      });
+    });
+    card.querySelectorAll('[data-pf]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        const pi = Number(el.dataset.pi), f = el.dataset.pf, p = sign.panels[pi];
+        p[f] = el.value;
+        if(f==='type'){ const t=PANEL_TYPES[p.type]; if(!t.arrow) p.arrow='none'; else if(p.arrow==='none') p.arrow='right';
+          if(p.type==='noentry'||p.type==='vacated') p.text=''; if(p.type==='cat'&&!p.text) p.text='25-CAT II'; }
+        if(el.tagName==='SELECT' || f==='text' && ([...el.value].length===1) !== !!card.querySelector(`[data-pchk][data-pi="${pi}"]`)){ renderSigns(); const nx=signList.querySelectorAll('.sign-card')[si]?.querySelector(`[data-pf="text"][data-pi="${pi}"]`); if(nx){nx.focus(); nx.setSelectionRange(nx.value.length,nx.value.length);} } else { updatePreview(card, sign); }
+        renderOverview();
+      });
+    });
+    card.querySelectorAll('[data-pchk]').forEach(el=>el.addEventListener('change',()=>{ sign.panels[Number(el.dataset.pi)][el.dataset.pchk]=el.checked; renderSigns(); renderOverview(); }));
+    card.querySelectorAll('[data-fchk]').forEach(el=>el.addEventListener('change',()=>{ sign[el.dataset.fchk]=el.checked; renderSigns(); renderOverview(); }));
+    card.querySelectorAll('[data-ins]').forEach(b=>b.addEventListener('click',()=>{ const i=Number(b.dataset.ins); const prev=sign.panels[i-1]||sign.panels[i]; sign.panels.splice(i,0,{type:prev&&PANEL_TYPES[prev.type].cat==='mandatory'?'holding':'direction', text:'', arrow:prev&&PANEL_TYPES[prev.type].cat==='mandatory'?'none':'right'}); renderSigns(); renderOverview(); }));
+    card.querySelector('.preview').addEventListener('click', e=>{
+      const g = e.target.closest('g[data-pi]'); if(!g) return;
+      const pi = g.dataset.pi; card.querySelectorAll('.panel-row').forEach(r=>r.classList.remove('sel'));
+      const row = card.querySelectorAll('.panel-row')[Number(pi)]; if(row){ row.classList.add('sel'); row.scrollIntoView({block:'nearest',behavior:'smooth'}); const inp=row.querySelector('[data-pf="text"]')||row.querySelector('select'); if(inp){ inp.focus(); if(inp.select) inp.select(); } }
+    });
+    card.querySelectorAll('[data-pdel]').forEach(b=>b.addEventListener('click',()=>{ sign.panels.splice(Number(b.dataset.pdel),1); renderSigns(); renderOverview(); }));
+    signList.appendChild(card);
+  });
+}
+function updatePreview(card, sign){
+  card.querySelector('.preview').innerHTML = renderSignSVG(sign);
+  const d = signDims(sign);
+  card.querySelector('.dims').innerHTML = `<span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span>`;
+  card.querySelector('.chain').innerHTML = chainHTML(sign);
+  card.querySelector('.compliance').innerHTML = complianceHTML(sign);
+}
+function chainText(p, sign){
+  const t = PANEL_TYPES[p.type];
+  if(t.symbol) return 'Symbolfeld '+panelWidth(p,sign.h,sign.norm,sign.panels.length===1)+' mm';
+  return panelChain(p,sign.h,sign.norm,sign.panels.length===1).map(c=>c.kind==='char'?`<b>${esc(ARROW_GLYPH_REV[c.label]?ARROWS[ARROW_GLYPH_REV[c.label]]:(c.label===' '?'␣':c.label))}</b> ${c.w}`:(c.kind==='margin'?`Rand ${c.w}`:`${c.w}`)).join(' · ');
+}
+function chainHTML(sign){
+  return sign.panels.map((p,i)=>`<div><span class="pl">P${i+1}</span> ${chainText(p,sign)} <span class="pl">= ${panelWidth(p,sign.h,sign.norm,sign.panels.length===1)} mm</span></div>`).join('');
+}
+function panelRowHTML(p, pi, sign){
+  const t = PANEL_TYPES[p.type];
+  const noText = t.symbol==='noentry'||t.symbol==='vacated';
+  const group = (cat)=>Object.entries(PANEL_TYPES).filter(([k,v])=>v.cat===cat).map(([k,v])=>`<option value="${k}"${p.type===k?' selected':''}>${v.label}</option>`).join('');
+  return `<div class="panel-row">
+    <span class="idx">P${pi+1}</span>
+    <div class="field" style="min-width:260px"><label>2. Typ</label>
+      <select data-pf="type" data-pi="${pi}">
+        <optgroup label="Vorschriftzeichen (Mandatory instruction)">${group('mandatory')}</optgroup>
+        <optgroup label="Hinweiszeichen (Information)">${group('info')}${group('runwayExit')}</optgroup>
+      </select></div>
+    <div class="field"><label>Beschriftung</label><input type="text" data-pf="text" data-pi="${pi}" value="${esc(p.text)}" ${noText?'disabled placeholder="Symbol"':''} maxlength="24"></div>
+    ${t.arrow?`<div class="field" style="min-width:90px"><label>Pfeil</label><select data-pf="arrow" data-pi="${pi}">${Object.entries(ARROWS).map(([k,v])=>`<option value="${k}"${p.arrow===k?' selected':''}>${v}</option>`).join('')}</select></div>`:''}
+    ${t.arrow && p.arrow!=='none' && [...(p.text||'')].length===1 ? `<label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px"><input type="checkbox" data-pchk="arrowTight" data-pi="${pi}" ${p.arrowTight?'checked':''}> Pfeilabstand 0,25 h</label>`:''}
+    <span class="badge ${t.cat==='mandatory'?'m':(t.bg==='black'?(t.fg==='yellow'?'l':'d'):'i')}" style="margin-bottom:9px">${t.cat==='mandatory'?'Mandatory':'Information'}</span>
+    <button class="btn small danger" data-pdel="${pi}" style="margin-bottom:4px" ${sign.panels.length<=1?'disabled':''}>✕</button>
+  </div>`;
+}
+function recommendedHeight(sign){
+  const row = state.code[sign.codeNo];
+  const cats = sign.panels.map(p=>PANEL_TYPES[p.type].cat);
+  if(cats.includes('mandatory')) return row.mandatory;
+  if(cats.includes('runwayExit')) return row.runwayExit;
+  return row.info;
+}
+/* Compliance-Prüfungen (angelehnt an Wingframe / ICAO Annex 14) */
+function complianceChecks(sign){
+  const d = signDims(sign), rec = recommendedHeight(sign);
+  const cats = sign.panels.map(p=>PANEL_TYPES[p.type].cat);
+  const nLoc = sign.panels.filter(p=>p.type==='location').length;
+  const hasMand = cats.includes('mandatory'), hasInfo = sign.panels.some(p=>p.type!=='location' && (PANEL_TYPES[p.type].cat==='info'||PANEL_TYPES[p.type].cat==='runwayExit'));
+  const arrows = sign.panels.filter(p=>PANEL_TYPES[p.type].arrow && p.arrow!=='none');
+  const locIdx = sign.panels.findIndex(p=>p.type==='location');
+  let arrowSide = true;
+  if(locIdx>=0) sign.panels.forEach((p,i)=>{ if(PANEL_TYPES[p.type].arrow && p.arrow!=='none'){ const l=/left/i.test(p.arrow)||p.arrow==='left'; const r=/right/i.test(p.arrow)||p.arrow==='right'; if(i<locIdx && r && !l) arrowSide=false; if(i>locIdx && l && !r) arrowSide=false; } });
+  const emptyText = sign.panels.some(p=>!PANEL_TYPES[p.type].symbol && !(p.text||'').trim() && !(PANEL_TYPES[p.type].arrow && p.arrow!=='none'));
+  const N = NORM_INFO[sign.norm], faceMin = P(sign.norm,'faceHeight',sign.h);
+  const badDesig = sign.panels.filter(p=>(p.type==='location'||p.type==='direction'||p.type==='runwayExit') && /^[IOX]$/.test((p.text||'').trim().toUpperCase())).map(p=>p.text.trim().toUpperCase());
+  const minW = P(sign.norm,'minWidthSingleSided',sign.h);
+  const singleSidedOk = !(sign.singleSided && hasMand) || d.total >= (sign.codeNo==='1-2'?1460:1940);
+  return [
+    {ok:d.total<=3000, label:`Gesamtlänge ≤ 3000 mm (Doc 9157 Teil 6, 4.9.5) – ist ${d.total} mm`},
+    {ok:d.total>=d.face, label:'Schildbreite ≥ Schildhöhe – längere Seite horizontal (A14 5.4.1.4; CS N.775(c)(2))'},
+    {ok:[200,300,400].includes(Number(sign.h)), label:`Zulässige Schrifthöhe (${N.short}: ${N.height}) – ${sign.h} mm`},
+    {ok:sign.h>=rec, label:`Schrifthöhe ≥ Mindestwert nach ${N.height} für Code ${sign.codeNo}: ${rec} mm`},
+    {ok:d.face>=faceMin, label:`Schildhöhe ≥ Norm-Minimum ${N.short} (${N.face}): ${faceMin} mm bei h = ${sign.h} – ist ${d.face} mm`},
+    {ok:singleSidedOk, label:`Einseitig aufgestelltes Gebotszeichen ≥ ${sign.codeNo==='1-2'?'1460':'1940'} mm breit (App. 4 Nr. 11; CS N.775(c)(19))`},
+    {ok:!badDesig.length, label:`Rollbahnbezeichner ohne I, O, X (A14 5.4.3.37; CS N.785(c)(12))${badDesig.length?' – gefunden: '+badDesig.join(', '):''}`},
+    {ok:sign.panels.length>=1, label:'Mindestens eine Nachricht'},
+    {ok:nLoc<=1, label:'Höchstens ein Standort-Panel (Location)'},
+    {ok:!(hasMand&&hasInfo), label:'Keine Kombination Information + Mandatory auf einem Schild (Standort ist zulässig)'},
+    {ok:!(hasMand && nLoc===1 && sign.panels.length>1 && locIdx!==0 && locIdx!==sign.panels.length-1), label:'Standort bei Vorschriftzeichen außen angeordnet'},
+    {ok:arrowSide, label:'Pfeile links vom Standort zeigen nach links, rechts davon nach rechts (5.4.3)'},
+    {ok:!emptyText, label:'Keine leeren Panels'},
+  ];
+}
+function complianceHTML(sign){
+  const c = complianceChecks(sign), bad = c.filter(x=>!x.ok), n = c.length;
+  return `<div class="comp"><span class="${bad.length?'bad':'ok'}">${bad.length?'⚠':'✓'} Compliance ${n-bad.length}/${n} bestanden (${sign.norm})</span>`+
+    (bad.length?`<ul>${bad.map(x=>`<li>${esc(x.label)}</li>`).join('')}</ul>`:'')+
+    `<details><summary>alle Prüfungen</summary><ul>${c.map(x=>`<li style="color:${x.ok?'#15803d':'#b91c1c'}">${x.ok?'✓':'✗'} ${esc(x.label)}</li>`).join('')}</ul></details></div>`;
+}
+function fileName(sign, ext){ return (sign.name||'schild').replace(/[^\w\-]+/g,'_')+'.'+ext; }
+
+/* ================= Übersicht ================= */
+function renderOverview(){
+  const tbl = $('#overview-table');
+  let sumLen=0, sumArea=0;
+  const rows = state.signs.map((s,i)=>{
+    const d = signDims(s); sumLen+=d.total; sumArea+=d.area;
+    const types = s.panels.map(p=>PANEL_TYPES[p.type].label.split(' (')[0]).join(' | ');
+    const texts = s.panels.map(p=>(p.text||'')+(p.arrow&&p.arrow!=='none'?' '+ARROWS[p.arrow]:'')).join(' | ');
+    const c = complianceChecks(s), bad = c.filter(x=>!x.ok).length;
+    return `<tr><td>${i+1}</td><td>${esc(s.name)}<div class="note">${esc(s.description||'')}</div></td><td>${esc(s.location||'')}</td><td>${s.norm}</td><td>${s.codeNo}</td><td>${esc(types)}</td><td>${esc(texts)}</td>
+      <td class="num">${s.h}</td><td class="num">${d.face}</td><td class="num">${d.widths.join(' + ')}</td><td class="num"><b>${d.total}</b></td><td class="num">${d.area.toFixed(2)}</td><td style="color:${bad?'#b91c1c':'#15803d'};font-weight:600">${bad?'⚠ ':'✓ '}${c.length-bad}/${c.length}</td></tr>`;
+  }).join('');
+  tbl.innerHTML = `<thead><tr><th>#</th><th>Label</th><th>Standort</th><th>Norm</th><th>Code</th><th>Typ(en)</th><th>Inhalt</th><th class="num">Schrifthöhe</th><th class="num">Höhe</th><th class="num">Panelbreiten</th><th class="num">Gesamtlänge</th><th class="num">Fläche m²</th><th>Compliance</th></tr></thead>
+    <tbody>${rows||'<tr><td colspan="13" class="note">Keine Schilder vorhanden.</td></tr>'}</tbody>
+    <tfoot><tr><td colspan="10">Summe (${state.signs.length} Schilder)</td><td class="num">${sumLen} mm</td><td class="num">${sumArea.toFixed(2)}</td><td></td></tr></tfoot>`;
+}
+function overviewCSV(){
+  const lines = [['Nr','Label','Standort','Beschreibung','Norm','Code','Typen','Inhalt','Schrifthoehe_mm','Hoehe_mm','Panelbreiten_mm','Gesamtlaenge_mm','Flaeche_m2','Compliance']];
+  state.signs.forEach((s,i)=>{ const d=signDims(s); const c=complianceChecks(s);
+    lines.push([i+1,s.name,s.location||'',s.description||'',s.norm,s.codeNo,s.panels.map(p=>p.type).join('|'),s.panels.map(p=>(p.text||'')+(p.arrow!=='none'&&PANEL_TYPES[p.type].arrow?' '+p.arrow:'')).join('|'),s.h,d.face,d.widths.join('+'),d.total,d.area,c.filter(x=>x.ok).length+'/'+c.length]); });
+  return lines.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\n');
+}
+
+/* ================= Parameter-UI ================= */
+function renderParams(){
+  const norm = $('#param-norm').value;
+  const p = state.params[norm];
+  const tbl = $('#param-table');
+  tbl.innerHTML = `<thead><tr><th>Parameter</th>${p.heights.map(h=>`<th class="num">h = ${h} mm</th>`).join('')}</tr></thead><tbody>`+
+    Object.entries(p.rows).map(([k,r])=>`<tr><td>${r.label}</td>${p.heights.map(h=>`<td class="num"><input type="number" data-k="${k}" data-h="${h}" value="${r.v[h]}"></td>`).join('')}</tr>`).join('')+'</tbody>';
+  tbl.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{ p.rows[inp.dataset.k].v[inp.dataset.h]=Number(inp.value)||0; renderSigns(); renderOverview(); }));
+  const ct = $('#code-table');
+  ct.innerHTML = `<thead><tr><th>Code-Nummer</th><th class="num">Mandatory</th><th class="num">Runway exit</th><th class="num">Übrige Info</th></tr></thead><tbody>`+
+    Object.entries(state.code).map(([c,r])=>`<tr><td>${c}</td>${['mandatory','runwayExit','info'].map(f=>`<td class="num"><input type="number" data-c="${c}" data-f="${f}" value="${r[f]}"></td>`).join('')}</tr>`).join('')+'</tbody>';
+  ct.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{ state.code[inp.dataset.c][inp.dataset.f]=Number(inp.value)||0; renderSigns(); }));
+  const sc = $('#spacing-codes');
+  const CODE_LABELS={1:'Code 1 (z. B. 1→2, B→B)',2:'Code 2 (z. B. 2→2, A→B)',3:'Code 3 (z. B. C→E)',4:'Code 4 (z. B. A→V, L→T)',5:'vor/nach Leerzeichen (Wortabstand = Breite „Leerzeichen“, 0,5–0,75 h)',6:'Buchstabe↔Zahl, Bindestrich/Punkt/Schrägstrich (= Code 1)',7:'Code 7 (Pfeil ↔ Text; Doc 9157 12.7.12 Gruppenabstand 0,7 H = 140/210/280, Excel: 100/150/200; Norm 0,5–0,75 H)',8:'Code 8 (Übergang Kleinbuchst./Zahl; wie Code 7)',9:'Code 9 (Rand / Trenner Farbwechsel)'};
+  sc.innerHTML = `<thead><tr><th>Abstandscode</th><th class="num">200</th><th class="num">300</th><th class="num">400</th></tr></thead><tbody>`+
+    Object.keys(state.spacingCodes).map(k=>`<tr><td>${CODE_LABELS[k]||'Code '+k}</td>${[0,1,2].map(i=>`<td class="num"><input type="number" data-sc="${k}" data-i="${i}" value="${state.spacingCodes[k][i]??''}"></td>`).join('')}</tr>`).join('')+'</tbody>';
+  sc.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{ state.spacingCodes[inp.dataset.sc][inp.dataset.i]=Number(inp.value)||0; renderSigns(); renderOverview(); }));
+  const cw = $('#char-widths');
+  const names={'ç':'← Pfeil','è':'→ Pfeil','é':'↑ Pfeil','ê':'↓ Pfeil','ë':'↖ Pfeil','ì':'↗ Pfeil','í':'↙ Pfeil','î':'↘ Pfeil',' ':'Leerzeichen'};
+  cw.innerHTML = `<thead><tr><th>Zeichen</th><th class="num">200</th><th class="num">300</th><th class="num">400</th><th>Zeichen</th><th class="num">200</th><th class="num">300</th><th class="num">400</th></tr></thead><tbody>`;
+  const keys = Object.keys(state.fontWidths); let rows='';
+  for(let i=0;i<keys.length;i+=2){
+    rows+='<tr>'+[keys[i],keys[i+1]].map(k=>k===undefined?'<td></td><td></td><td></td><td></td>':`<td>${names[k]||k}</td>`+[0,1,2].map(j=>`<td class="num"><input type="number" data-fw="${k}" data-i="${j}" value="${state.fontWidths[k][j]}"></td>`).join('')).join('')+'</tr>';
+  }
+  cw.innerHTML += rows+'</tbody>';
+  cw.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{ state.fontWidths[inp.dataset.fw][inp.dataset.i]=Number(inp.value)||0; renderSigns(); renderOverview(); }));
+}
+$('#param-norm').addEventListener('change', renderParams);
+$('#copy-norm').addEventListener('click', ()=>{ const n=$('#param-norm').value, o=n==='ICAO'?'EASA':'ICAO'; state.params[n]=deepCopy(state.params[o]); renderParams(); renderSigns(); renderOverview(); toast('Werte von '+o+' übernommen'); });
+$('#reset-params').addEventListener('click', ()=>{ state.params={ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; state.code=deepCopy(DEFAULT_CODE); state.fontWidths=deepCopy(FONT_WIDTHS); state.spacingCodes=deepCopy(SPACING_CODES); renderParams(); renderSigns(); renderOverview(); toast('Vorgaben wiederhergestellt'); });
+
+/* ================= Export: Datei speichern ================= */
+let downloadsNS = null;
+(async()=>{ try{ if(window.claude&&claude.use){ downloadsNS = await claude.use('downloads'); } }catch(e){ downloadsNS=null; } })();
+async function saveFile(name, data){
+  try{
+    if(downloadsNS){ await downloadsNS.save({filename:name, data}); toast('Gespeichert: '+name); return; }
+  }catch(e){ if(e&&e.code==='declined'){ toast('Speichern abgebrochen'); return; } }
+  try{
+    const blob = data instanceof Blob ? data : new Blob([data],{type:'application/octet-stream'});
+    const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),2000);
+    toast('Download gestartet: '+name);
+  }catch(e){ toast('Download in dieser Ansicht nicht möglich – Seite auf SharePoint/lokal öffnen.'); }
+}
+
+/* ================= PDF (jsPDF, A4 quer, 1 Schild je Seite) ================= */
+function svgToPng(svgStr, scale){
+  return new Promise((res,rej)=>{
+    const img = new Image();
+    const url = 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgStr);
+    img.onload = ()=>{ const c=document.createElement('canvas'); c.width=img.width*scale; c.height=img.height*scale; const g=c.getContext('2d'); g.fillStyle='#fff'; g.fillRect(0,0,c.width,c.height); g.drawImage(img,0,0,c.width,c.height); res({data:c.toDataURL('image/png'), w:img.width, h:img.height}); };
+    img.onerror = rej; img.src = url;
+  });
+}
+async function makePDF(signs, name){
+  if(!window.jspdf){ toast('PDF-Bibliothek nicht geladen (Netzwerk?)'); return; }
+  if(!signs.length){ toast('Keine Schilder'); return; }
+  toast('PDF wird erstellt …');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
+  const pw = 297, ph = 210, m = 15;
+  for(let i=0;i<signs.length;i++){
+    const s = signs[i]; const d = signDims(s);
+    if(i>0) doc.addPage();
+    doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.text(`${s.name}${s.location?'  ·  '+s.location:''}`, m, m+2);
+    doc.setFontSize(10); doc.setFont('helvetica','normal');
+    if(s.description) doc.text(String(s.description).slice(0,160), m, m+5.5);
+    doc.text(`Norm: ${s.norm==='ICAO'?'ICAO Annex 14 Vol. I':'EASA CS-ADR-DSN'}   Code: ${s.codeNo}   Schrifthöhe: ${s.h} mm   Schildhöhe: ${d.face} mm   Gesamtlänge: ${d.total} mm   Fläche: ${d.area} m²`, m, m+9);
+    const svg = renderSignSVG(s,{dims:true,bg:true,pad:60});
+    const png = await svgToPng(svg, 2);
+    const availW = pw-2*m, availH = ph-2*m-45;
+    let w = availW, h = w*png.h/png.w; if(h>availH){ h=availH; w=h*png.w/png.h; }
+    doc.addImage(png.data,'PNG', m, m+16, w, h);
+    // Panel-Tabelle
+    let y = m+16+h+8; doc.setFontSize(9);
+    doc.text('Panel', m, y); doc.text('Typ', m+15, y); doc.text('Inhalt', m+95, y); doc.text('Breite [mm]', m+150, y);
+    s.panels.forEach((p,pi)=>{ y+=5; doc.text(`P${pi+1}`, m, y); doc.text(PANEL_TYPES[p.type].label, m+15, y); doc.text((p.text||'')+(PANEL_TYPES[p.type].arrow&&p.arrow!=='none'?'  '+ARROWS[p.arrow]:''), m+95, y); doc.text(String(d.widths[pi]), m+150, y);
+      if(!PANEL_TYPES[p.type].symbol){ y+=4; doc.setFontSize(7.5); doc.setTextColor(90); doc.text('Maßkette: '+panelChain(p,s.h,s.norm,s.panels.length===1).map(c=>c.kind==='char'?((ARROW_GLYPH_REV[c.label]?ARROWS[ARROW_GLYPH_REV[c.label]]:c.label)+' '+c.w):(c.kind==='margin'?'Rand '+c.w:String(c.w))).join(' | '), m+15, y, {maxWidth:250}); doc.setFontSize(9); doc.setTextColor(0); y+=2; } });
+    { const c=complianceChecks(s), bad=c.filter(x=>!x.ok); y+=7; doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.text(`Compliance (${s.norm}): ${c.length-bad.length}/${c.length} bestanden`, m, y); doc.setFont('helvetica','normal'); bad.forEach(b=>{ y+=4.5; doc.text('✗ '+b.label, m+4, y, {maxWidth:250}); }); }
+    doc.setFontSize(8); doc.setTextColor(120); doc.text(`Rollverkehrszeichen-Generator · Seite ${i+1}/${signs.length} · Maße Näherung, gegen gültige Norm prüfen`, m, ph-8); doc.setTextColor(0);
+  }
+  if(signs.length>1){
+    doc.addPage(); doc.setFontSize(14); doc.setFont('helvetica','bold'); doc.text('Gesamtübersicht', m, m+2); doc.setFont('helvetica','normal'); doc.setFontSize(9);
+    let y=m+12; const cols=[m, m+10, m+50, m+65, m+80, m+170, m+200, m+225, m+255];
+    ['#','Name','Norm','Code','Inhalt','Schrifth.','Höhe','Länge','m²'].forEach((t,i)=>doc.text(t,cols[i],y));
+    let sum=0; signs.forEach((s,i)=>{ const d=signDims(s); sum+=d.total; y+=5; if(y>ph-15){doc.addPage(); y=m;}
+      [String(i+1), s.name.slice(0,22), s.norm, s.codeNo, s.panels.map(p=>(p.text||PANEL_TYPES[p.type].label.split(' ')[0])+(PANEL_TYPES[p.type].arrow&&p.arrow!=='none'?' '+ARROWS[p.arrow]:'')).join(' | ').slice(0,55), String(s.h), String(d.face), String(d.total), d.area.toFixed(2)].forEach((t,j)=>doc.text(t,cols[j],y)); });
+    y+=7; doc.setFont('helvetica','bold'); doc.text(`Summe Gesamtlänge: ${sum} mm · ${signs.length} Schilder`, m, y);
+  }
+  const blob = doc.output('blob');
+  await saveFile(name, blob);
+}
+
+/* ================= Drucken (Browser) ================= */
+function printAll(){
+  const area = $('#print-area');
+  area.innerHTML = state.signs.map((s,i)=>{ const d=signDims(s); return `<div class="print-page"><h2>${esc(s.name)}</h2><div class="note">${s.norm==='ICAO'?'ICAO Annex 14 Vol. I':'EASA CS-ADR-DSN'} · Code ${s.codeNo} · Schrifthöhe ${s.h} mm · Höhe ${d.face} mm · Gesamtlänge ${d.total} mm</div>${renderSignSVG(s,{dims:true,pad:60})}</div>`; }).join('') +
+    `<div class="print-page"><h2>Gesamtübersicht</h2>${$('#overview-table').outerHTML}</div>`;
+  try{ window.print(); }catch(e){ toast('Drucken in dieser Ansicht nicht möglich – bitte PDF verwenden.'); }
+}
+
+/* ================= Allgemein ================= */
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',2600); }
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); $('#view-'+b.dataset.view).classList.add('active');
+  if(b.dataset.view==='params') renderParams(); if(b.dataset.view==='overview') renderOverview();
+}));
+/* ---- Vorlagen-Dialog ---- */
+const tpl = { norm:'ICAO', cat:'all', code:'3-4', h:'auto', sel:null };
+function tplSign(t, norm, code, h){
+  const s = newSign(); signCounter--; // Zähler erst beim Hinzufügen erhöhen
+  s.norm = norm; s.codeNo = code; s.panels = deepCopy(t.panels); s.name = t.name;
+  s.h = (h==='auto') ? recommendedHeight(s) : Number(h);
+  return s;
+}
+function renderTplModal(){
+  $('#tpl-cats').innerHTML = Object.entries(TEMPLATE_CATS).map(([k,v])=>`<button data-cat="${k}" class="${tpl.cat===k?'active':''}">${v}</button>`).join('');
+  $('#tpl-cats').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ tpl.cat=b.dataset.cat; renderTplModal(); }));
+  $('#tpl-norms').querySelectorAll('.chip').forEach(c=>{ c.classList.toggle('active',c.dataset.norm===tpl.norm); c.onclick=()=>{ tpl.norm=c.dataset.norm; renderTplModal(); }; });
+  $('#tpl-codes').querySelectorAll('.chip').forEach(c=>{ c.classList.toggle('active',c.dataset.code===tpl.code); c.onclick=()=>{ tpl.code=c.dataset.code; renderTplModal(); }; });
+  $('#tpl-heights').querySelectorAll('.chip').forEach(c=>{ c.classList.toggle('active',c.dataset.h===tpl.h); c.onclick=()=>{ tpl.h=c.dataset.h; renderTplModal(); }; });
+  const list = TEMPLATES.map((t,i)=>({t,i})).filter(({t})=>tpl.cat==='all'||t.cat===tpl.cat);
+  $('#tpl-grid').innerHTML = list.map(({t,i})=>{
+    const s = tplSign(t, tpl.norm, tpl.code, tpl.h); const d = signDims(s);
+    return `<div class="tpl ${tpl.sel===i?'sel':''}" data-i="${i}"><div class="thumb">${renderSignSVG(s,{pad:20})}</div><div class="nm">${esc(t.name)}</div><div class="tag">${tpl.norm} · ${s.h} mm · ${d.total}×${d.face} mm</div></div>`;
+  }).join('');
+  $('#tpl-grid').querySelectorAll('.tpl').forEach(el=>{
+    el.addEventListener('click',()=>{ tpl.sel=Number(el.dataset.i); renderTplModal(); });
+    el.addEventListener('dblclick',()=>{ tpl.sel=Number(el.dataset.i); addFromTemplate(); });
+  });
+  $('#tpl-add').disabled = tpl.sel===null;
+}
+function addFromTemplate(){
+  if(tpl.sel===null) return;
+  const s = tplSign(TEMPLATES[tpl.sel], tpl.norm, tpl.code, tpl.h); signCounter++; s.id=signCounter;
+  state.signs.push(s); closeTpl(); renderSigns(); renderOverview(); window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
+}
+function openTpl(){ tpl.sel=null; renderTplModal(); $('#tpl-modal').classList.add('open'); }
+function closeTpl(){ $('#tpl-modal').classList.remove('open'); }
+$('#add-sign').addEventListener('click', openTpl);
+$('#tpl-close').addEventListener('click', closeTpl);
+$('#tpl-modal').addEventListener('click', e=>{ if(e.target.id==='tpl-modal') closeTpl(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeTpl(); });
+$('#tpl-add').addEventListener('click', addFromTemplate);
+$('#tpl-blank').addEventListener('click', ()=>{ const s=newSign(); s.norm=tpl.norm; s.codeNo=tpl.code; if(tpl.h!=='auto') s.h=Number(tpl.h); else s.h=recommendedHeight(s); state.signs.push(s); closeTpl(); renderSigns(); renderOverview(); });
+$('#pdf-all').addEventListener('click',()=>makePDF(state.signs,'Rollverkehrszeichen_gesamt.pdf'));
+$('#pdf-all-2').addEventListener('click',()=>makePDF(state.signs,'Rollverkehrszeichen_gesamt.pdf'));
+$('#print-all').addEventListener('click',printAll);
+$('#copy-csv').addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText(overviewCSV()); toast('CSV kopiert'); }catch(e){ toast('Zwischenablage nicht verfügbar'); } });
+$('#csv-download').addEventListener('click',()=>saveFile('Rollverkehrszeichen_uebersicht.csv','﻿'+overviewCSV()));
+$('#save-json').addEventListener('click',()=>saveFile('Rollverkehrszeichen_projekt.json', JSON.stringify(state,null,2)));
+$('#load-json').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const o=JSON.parse(r.result); if(o.signs){ state=o; state.fontWidths=state.fontWidths||deepCopy(FONT_WIDTHS); state.spacingCodes=state.spacingCodes||deepCopy(SPACING_CODES); state.params=state.params||{ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; ['ICAO','EASA'].forEach(n=>{ const d=makeDefaults(n); state.params[n]=state.params[n]||d; Object.keys(d.rows).forEach(k=>{ if(!state.params[n].rows[k]) state.params[n].rows[k]=d.rows[k]; }); }); state.signs.forEach(s=>{ if(!s.faceMode) s.faceMode = s.vpad==='H/4' ? 'norm' : (s.norm==='ICAO' && s.vpad==='H/2' ? '2H' : 'norm'); }); signCounter=Math.max(0,...state.signs.map(s=>s.id||0)); renderSigns(); renderOverview(); toast('Projekt geladen'); } }catch(err){ toast('Ungültige Datei'); } }; r.readAsText(f); e.target.value=''; });
+
+// Startbeispiele
+state.signs.push(newSign());
+state.signs[0].name='Rollhalteort 25'; state.signs[0].location='TWY A / RWY 25'; state.signs[0].panels=[{type:'location',text:'A',arrow:'none'},{type:'holding',text:'25-07',arrow:'none'}]; state.signs[0].h=400;
+state.signs.push(newSign());
+state.signs[1].name='Richtung B/C'; state.signs[1].location='TWY A, Kreuzung B/C'; state.signs[1].panels=[{type:'direction',text:'B',arrow:'left'},{type:'location',text:'A',arrow:'none'},{type:'direction',text:'C',arrow:'right'}];
+renderSigns(); renderOverview(); renderParams();
+</script>
+</body>
+</html>
