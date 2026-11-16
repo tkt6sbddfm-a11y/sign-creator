@@ -6,38 +6,34 @@
 <title>Sign Creator – Erläuterungen</title>
 <base target="_blank">
 <style>
-  :root{--ink:#242424;--muted:#616161;--line:#e0e0e0;--accent:#0f6cbd;}
+  :root{--ink:#212529;--muted:#6c6f73;--y:#ffd550;--yd:#e9b100;}
   html,body{margin:0;background:transparent;}
-  body{font:14px/1.5 "Segoe UI","Segoe UI Web (West European)",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;color:var(--ink);padding:4px 6px 16px;}
-  .links{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
-  .links a{display:block;padding:8px 12px;border-radius:4px;text-decoration:none;font-weight:600;}
-  .links a.primary{background:var(--accent);color:#fff;}
-  .links a.secondary{border:1px solid var(--line);color:var(--accent);}
-  details{border-bottom:1px solid var(--line);}
-  details:first-of-type{border-top:1px solid var(--line);}
-  summary{cursor:pointer;list-style:none;padding:10px 4px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px;}
+  body{font:14px/1.5 neo-sans,"Neo Sans Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;color:var(--ink);}
+  .panel{background:#f2f2f0;border-radius:16px;padding:16px 14px 18px;border-top:4px solid var(--y);margin:6px;}
+  .head{display:flex;align-items:center;gap:8px;margin:0 2px 12px;}
+  .head b{background:#000;color:var(--y);letter-spacing:.08em;font-size:12px;padding:3px 8px;border-radius:4px;}
+  .head span{font-size:17px;font-weight:600;}
+  .links{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+  .links a{display:block;padding:9px 14px;border-radius:16px;text-decoration:none;font-weight:600;text-align:center;}
+  .links a.primary{background:var(--y);color:#000;border:1px solid var(--y);}
+  .links a.primary:hover{background:var(--yd);}
+  .links a.secondary{background:#fff;color:#000;border:1px solid #cfd0cc;}
+  .links a.secondary:hover{border-color:var(--yd);}
+  details{background:#fff;border-radius:16px;box-shadow:0 0 15px 5px rgba(0,0,0,.08);margin-bottom:12px;overflow:hidden;}
+  summary{cursor:pointer;list-style:none;padding:12px 16px;font-size:16px;font-weight:500;display:flex;align-items:center;justify-content:space-between;gap:10px;}
   summary::-webkit-details-marker{display:none;}
-  summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s;flex:none;margin-left:2px;}
-  details[open] summary::before{transform:rotate(45deg);}
-  summary:hover{color:var(--accent);}
-  .body{padding:0 4px 12px 21px;color:var(--ink);}
+  summary::after{content:"";flex:none;width:22px;height:22px;border-radius:50%;background:#212529 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cpath d='M9 6.5l4.5 4.5L9 15.5' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/22px no-repeat;transition:transform .15s,background-color .15s;}
+  details[open] summary::after{transform:rotate(90deg);background-color:var(--yd);}
+  details[open] summary{border-bottom:3px solid var(--y);}
+  summary:hover::after{background-color:var(--yd);}
+  .body{padding:12px 16px 14px;}
   .body p{margin:0 0 8px;} .body ul,.body ol{margin:0 0 8px;padding-left:18px;} .body li{margin-bottom:4px;}
-  a{color:var(--accent);}
-  @media (prefers-color-scheme: dark){
-    :root{--ink:#f0f0f0;--muted:#bdbdbd;--line:#4a4a4a;--accent:#62abf5;}
-    .links a.primary{background:#2886de;}
-  }
-</style>
-<script>
-  /* SharePoint-Design übernehmen, wenn die Seite ?theme=dark|light mitgibt */
-  try{const t=new URLSearchParams(location.search).get('theme'); if(t) document.documentElement.dataset.theme=t;}catch(e){}
-</script>
-<style>
-  html[data-theme=light]{--ink:#242424;--muted:#616161;--line:#e0e0e0;--accent:#0f6cbd;}
-  html[data-theme=dark]{--ink:#f0f0f0;--muted:#bdbdbd;--line:#4a4a4a;--accent:#62abf5;}
+  a{color:#000;text-decoration-color:var(--yd);}
 </style>
 </head>
 <body>
+<div class="panel">
+<div class="head"><b>INNOVENCE</b><span>Sign Creator</span></div>
 <div class="links">
   <a class="primary" href="https://tkt6sbddfm-a11y.github.io/sign-creator/">Sign Creator in neuem Tab öffnen</a>
   <a class="secondary" href="https://innovencede.sharepoint.com/sites/IVTeamSharing/Sign%20Creator%20Projekte/Forms/AllItems.aspx">Gespeicherte Projekte</a>
@@ -127,5 +123,6 @@
 <li><a href="https://www.wingframe.com/">Wingframe</a> · <a href="https://aasinternational.nl/sign-configurator">AAS Sign Configurator</a> · <a href="https://www.airport-signs.work/">Airfield Sign Builder (FAA)</a></li>
 </ul></div>
 </details>
+</div>
 </body>
 </html>

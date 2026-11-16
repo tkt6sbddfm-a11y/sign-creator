@@ -111,10 +111,54 @@
     .print-page table{margin-top:10px;font-size:12px}
   }
   #print-area{display:none}
+
+  /* ===== Innovence-Design (innovence.de: Schwarz/Weiß, Gelb #FFD550, Kacheln mit 16px Rundung und weichem Schatten) ===== */
+  :root{--bg:#f2f2f0;--ink:#212529;--muted:#6c6f73;--line:#e3e3e0;--acc:#e9b100;--acc2:#fff8dc;--y:#ffd550;--yd:#e9b100;}
+  body{font-family:neo-sans,"Neo Sans Pro","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg)}
+  header{background:#000;border-bottom:4px solid var(--y);padding:12px 24px}
+  header .brand{font-weight:700;letter-spacing:.08em;color:var(--y);font-size:18px;text-transform:uppercase;margin-right:8px}
+  header h1{font-weight:500}
+  header .sub{color:#bdbdbd}
+  nav button{border:1px solid #444;color:#eee;border-radius:16px;padding:6px 14px}
+  nav button:hover{border-color:var(--y);color:var(--y)}
+  nav button.active{background:var(--y);color:#000;border-color:var(--y);font-weight:600}
+  .card{border:0;border-radius:16px;box-shadow:0 0 15px 5px rgba(0,0,0,.08);padding:16px 18px}
+  .sign-card{border-left:0;border-top:4px solid var(--y)}
+  #project-card{background:linear-gradient(0deg,#fff8dc,#fff8dc);border:1px solid #f3dc8a;box-shadow:0 0 15px 5px rgba(0,0,0,.10);position:relative;overflow:hidden}
+  #project-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--y)}
+  #project-card h3{font-size:18px!important;font-weight:700}
+  #project-card label{color:#5c4a00}
+  #project-card input,#project-card select{border-color:#e8d48f}
+  select,input[type=text],input[type=number]{border-radius:8px;border:1px solid #cfd0cc}
+  select:focus,input:focus{outline:2px solid var(--y);outline-offset:0;border-color:var(--yd)}
+  .btn{border-radius:16px;border:1px solid #cfd0cc;padding:7px 14px}
+  .btn:hover{border-color:var(--yd);background:#fffbea}
+  button.primary,.btn.primary{background:var(--y);color:#000;border-color:var(--y);font-weight:600}
+  button.primary:hover{background:var(--yd);border-color:var(--yd)}
+  .panel-row{border-radius:12px;background:#fafaf8}
+  .panel-row.sel{outline:2px solid var(--yd)}
+  .preview{border-radius:12px;background:#ececea}
+  th{background:#f6f6f4;color:#3a3d40}
+  tfoot td{background:#fff8dc}
+  .chip{border-radius:16px}.chip.active{background:#000;color:var(--y);border-color:#000}
+  .modal{border-radius:16px}
+  .modal-head{background:#000;color:#fff;border-bottom:4px solid var(--y)}
+  .modal-head .btn{background:transparent;color:#fff;border-color:#555}
+  .modal-side button.active{background:#fff3c4;color:#000}
+  .tpl{border-radius:16px;border:0;box-shadow:0 0 12px 3px rgba(0,0,0,.08)}
+  .tpl:hover{box-shadow:0 0 0 3px var(--y),0 0 12px 3px rgba(0,0,0,.08)}
+  .tpl.sel{background:#fff8dc;box-shadow:0 0 0 3px var(--yd)}
+  .ins button:hover{border-color:var(--yd);color:#000}
+  .toast{background:#000;color:#fff;border-left:4px solid var(--y)}
+  .src a{color:#000;text-decoration:underline;text-decoration-color:var(--y)}
+  footer.site{background:#000;color:#fff;padding:14px 24px;font-size:13px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:24px}
+  footer.site b{color:var(--y);letter-spacing:.08em}
+  @media print{footer.site{display:none!important}}
 </style>
 </head>
 <body>
 <header>
+  <span class="brand">Innovence</span>
   <div>
     <h1>Rollverkehrszeichen-Generator</h1>
     <div class="sub">Airfield Guidance Signs · ICAO Annex 14 Vol. I (9. Ausg. 2022) / EASA CS-ADR-DSN Issue 7 (2025) · Maße je gewählter Norm</div>
@@ -218,6 +262,7 @@
     </div>
   </section>
 </main>
+<footer class="site no-print"><b>INNOVENCE</b><span>Innovence Airport Systems GmbH</span><span style="color:#bdbdbd">Sign Creator · ICAO Annex 14 / EASA CS-ADR-DSN</span></footer>
 
 <div id="print-area"></div>
 <div class="modal-bg" id="tpl-modal">
@@ -814,6 +859,7 @@ async function saveFile(name, data){
 const LOGO_JPG = 'data:image/jpeg;base64,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';
 const COMPANY = 'Innovence Airport Systems GmbH';
 const SHEETS = { A4:{w:297,h:210, tbW:190, tbH:32}, A3:{w:420,h:297, tbW:230, tbH:38} };
+const DRAFTERS = ['B. Müller','M. Müller','B. Dembski'];
 const PROJECT_DEFAULTS = { customer:'', airport:'', title:'', status:'Ausführungsplan', drawingTitle:'Detailzeichnung RVZ', planNo:'', drawnBy:'', rev:'-', format:'A4', housing:true, housingSide:30, housingTB:25 };
 function pj(){ state.project = Object.assign({}, PROJECT_DEFAULTS, state.project||{}); return state.project; }
 const fx = v => Math.round(v*100)/100;
@@ -1111,11 +1157,12 @@ function printAll(){
 /* ---- Projektangaben (Schriftfeld, Ablage) ---- */
 function renderProjectCard(){
   const pr=pj(), el=$('#project-card'); if(!el) return;
+  const drafterSel=(k,l,v)=>{ const opts=DRAFTERS.includes(v)||!v?DRAFTERS:[...DRAFTERS,v]; return `<div class="field" style="min-width:130px"><label>${l}</label><select data-pj="${k}"><option value="">– bitte wählen –</option>${opts.map(n=>`<option${n===v?' selected':''}>${esc(n)}</option>`).join('')}</select></div>`; };
   const f=(k,l,w,ph='')=>`<div class="field" style="min-width:${w}px"><label>${l}</label><input type="text" data-pj="${k}" value="${esc(pr[k]||'')}" placeholder="${esc(ph)}" style="text-transform:none"></div>`;
   el.innerHTML = `<div class="row" style="align-items:flex-end">
     <h3 style="margin:0 8px 6px 0;font-size:15px">Projekt</h3>
     ${f('customer','Referenz / Kunde',170,'z. B. Fraport AG')}${f('airport','Flughafen / Ort',160,'Flughafen Frankfurt')}${f('title','Bauvorhaben',200,'Sanierung TWY L21 und L22')}
-    ${f('status','Planstatus',130,'Ausführungsplan')}${f('drawingTitle','Zeichnungstitel',150)}${f('planNo','Plan-Nr. (INN …)',120,'B-002856')}${f('drawnBy','Gez. von',80,'Kürzel')}${f('rev','Rev. Datum',90)}
+    ${f('status','Planstatus',130,'Ausführungsplan')}${f('drawingTitle','Zeichnungstitel',150)}${f('planNo','Plan-Nr. (INN …)',120,'B-002856')}${drafterSel('drawnBy','Gez. von',pr.drawnBy)}${f('rev','Rev. Datum',90)}
     <div class="field" style="min-width:80px"><label>Blatt</label><select data-pj="format"><option${pr.format==='A4'?' selected':''}>A4</option><option${pr.format==='A3'?' selected':''}>A3</option></select></div>
     <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px"><input type="checkbox" data-pjc="housing" ${pr.housing?'checked':''}> Gehäuserahmen</label>
     ${pr.housing?`<div class="field" style="min-width:70px"><label>seitlich [mm]</label><input type="number" data-pj="housingSide" value="${pr.housingSide}" style="width:70px"></div><div class="field" style="min-width:70px"><label>oben/unten</label><input type="number" data-pj="housingTB" value="${pr.housingTB}" style="width:70px"></div>`:''}
@@ -1737,7 +1784,7 @@ function openSaveDialog(msg){
     <div class="row" style="margin-bottom:10px">
       <div class="field" style="min-width:240px"><label>Referenz / Kunde *</label><input type="text" id="save-ref" value="${esc(pr.customer||'')}" style="text-transform:none"></div>
       <div class="field" style="min-width:200px"><label>Bauvorhaben</label><input type="text" id="save-title" value="${esc(pr.title||'')}" style="text-transform:none"></div>
-      <div class="field" style="min-width:110px"><label>Bearbeiter</label><input type="text" id="save-by" value="${esc(pr.drawnBy||'')}" style="text-transform:none"></div>
+      <div class="field" style="min-width:140px"><label>Bearbeiter</label><select id="save-by"><option value="">– bitte wählen –</option>${(DRAFTERS.includes(pr.drawnBy)||!pr.drawnBy?DRAFTERS:[...DRAFTERS,pr.drawnBy]).map(n=>`<option${n===pr.drawnBy?' selected':''}>${esc(n)}</option>`).join('')}</select></div>
     </div>
     ${msg?`<div class="hint">${esc(msg)}</div>`:''}
     ${configured?'':`<div class="hint">Die automatische Ablage braucht noch die einmalige Microsoft-Anmeldung (App-Registrierung). Bis dahin wird die Projektdatei heruntergeladen – bitte in <a href="${SP_SAVE.listUrl}" target="_blank" rel="noopener">Sign Creator Projekte</a> hochladen und die Spalten ausfüllen.</div>`}`;
