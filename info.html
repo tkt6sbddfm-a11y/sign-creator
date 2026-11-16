@@ -23,6 +23,18 @@
   .body{padding:0 4px 12px 21px;color:var(--ink);}
   .body p{margin:0 0 8px;} .body ul,.body ol{margin:0 0 8px;padding-left:18px;} .body li{margin-bottom:4px;}
   a{color:var(--accent);}
+  @media (prefers-color-scheme: dark){
+    :root{--ink:#f0f0f0;--muted:#bdbdbd;--line:#4a4a4a;--accent:#62abf5;}
+    .links a.primary{background:#2886de;}
+  }
+</style>
+<script>
+  /* SharePoint-Design übernehmen, wenn die Seite ?theme=dark|light mitgibt */
+  try{const t=new URLSearchParams(location.search).get('theme'); if(t) document.documentElement.dataset.theme=t;}catch(e){}
+</script>
+<style>
+  html[data-theme=light]{--ink:#242424;--muted:#616161;--line:#e0e0e0;--accent:#0f6cbd;}
+  html[data-theme=dark]{--ink:#f0f0f0;--muted:#bdbdbd;--line:#4a4a4a;--accent:#62abf5;}
 </style>
 </head>
 <body>
