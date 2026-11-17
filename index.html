@@ -98,7 +98,7 @@
   .src a{color:var(--acc);text-decoration:none}.src li{margin-bottom:6px}
   .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
   @media print{
-    header,nav,.toolbar,.no-print,.sign-card .row,.sgroups,.panels,.sign-head button,.hint{display:none!important}
+    header,nav,.toolbar,.no-print,.sign-card .row,.sgroups,.sign-top button,.panels,.sign-head button,.hint{display:none!important}
     body{background:#fff}
     main{max-width:none;padding:0}
     .view{display:none!important}
@@ -173,6 +173,11 @@
   .sg-g2 .field select,.sg-g2 .field input{width:100%}
   .hf{display:flex;flex-direction:column;gap:2px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#6c6f73}
   .hf input{font-size:14px;letter-spacing:normal}
+  .hf-grow{flex:1 1 380px;min-width:240px}
+  .sign-top{display:flex;align-items:center;gap:8px;margin:-4px 0 6px}
+  .sign-top h3{margin:0;font-size:15px}
+  .sign-top .spacer{flex:1}
+  .sign-head .hf:not(.hf-grow) input{width:100%}
   .sgroup{background:#fafaf8;border:1px solid var(--line);border-radius:12px;padding:8px 12px 8px}
   .sg-title{font-weight:700;font-size:13px;display:flex;align-items:center;gap:7px;margin-bottom:4px}
   .sg-n{display:inline-flex;width:20px;height:20px;border-radius:50%;background:#000;color:var(--y);align-items:center;justify-content:center;font-size:11px}
@@ -702,19 +707,19 @@ function renderSigns(){
     card.className = 'card sign-card';
     const rec = recommendedHeight(sign);
     card.innerHTML = `
-      <div class="sign-head">
-        <h3>#${si+1}</h3>
-        <label class="hf">Schild-Nr.<input type="text" value="${esc(sign.number||'')}" data-f="number" placeholder="z. B. 442.2" title="Schildnummer – erscheint vor der Bezeichnung" style="text-transform:none;width:100px"></label>
-        <label class="hf">Bezeichnung<input type="text" value="${esc(sign.name)}" data-f="name" placeholder="Bezeichnung" style="text-transform:none;font-weight:600;min-width:200px"></label>
-        <label class="hf">Standort / Position<input type="text" value="${esc(sign.location||'')}" data-f="location" placeholder="z. B. TWY A / RWY 25" style="text-transform:none;min-width:190px"></label>
-        <label class="hf">Beschreibung<input type="text" value="${esc(sign.description||'')}" data-f="description" placeholder="optional" style="text-transform:none;min-width:150px"></label>
-        <span class="spacer"></span>
+      <div class="sign-top"><h3>Schild ${si+1}</h3><span class="spacer"></span>
         <button class="btn small" data-act="dup">Duplizieren</button>
         <button class="btn small" data-act="up" ${si===0?'disabled':''}>▲</button>
         <button class="btn small" data-act="down" ${si===state.signs.length-1?'disabled':''}>▼</button>
         <button class="btn small" data-act="svg">SVG-Blatt</button>
         <button class="btn small" data-act="pdf">PDF-Blatt</button>
         <button class="btn small danger" data-act="del">Löschen</button>
+      </div>
+      <div class="sign-head">
+        <label class="hf">Schild-Nr.<input type="text" value="${esc(sign.number||'')}" data-f="number" placeholder="z. B. 442.2" title="Schildnummer – erscheint vor der Bezeichnung" style="text-transform:none;width:100px"></label>
+        <label class="hf hf-grow">Bezeichnung<input type="text" value="${esc(sign.name)}" data-f="name" data-fit placeholder="Bezeichnung" title="${esc(sign.name)}" style="text-transform:none;font-weight:600;width:100%"></label>
+        <label class="hf">Standort / Position<input type="text" value="${esc(sign.location||'')}" data-f="location" placeholder="z. B. TWY A / RWY 25" style="text-transform:none;min-width:190px"></label>
+        <label class="hf">Beschreibung<input type="text" value="${esc(sign.description||'')}" data-f="description" placeholder="optional" style="text-transform:none;min-width:150px"></label>
       </div>
       <div class="sgroups">
         <div class="sgroup"><div class="sg-title"><span class="sg-n">1</span>Norm &amp; Schrift</div><div class="sg-g2">
@@ -753,6 +758,7 @@ function renderSigns(){
       <div class="compliance">${complianceHTML(sign)}</div>
     `;
     // Events
+    card.querySelectorAll('[data-fit]').forEach(el=>{ const fit=()=>{ el.style.fontSize=''; let fs=parseFloat(getComputedStyle(el).fontSize)||14; while(el.scrollWidth>el.clientWidth+1 && fs>11){ fs-=0.5; el.style.fontSize=fs+'px'; } el.title=el.value; }; el.addEventListener('input',fit); requestAnimationFrame(fit); });
     card.querySelectorAll('[data-f]').forEach(el=>{
       el.addEventListener('change', e=>{
         const f = el.dataset.f;
@@ -1312,6 +1318,7 @@ function renderProjectCard(){
 }
 /* Schild normalisieren (Großbuchstaben, Schildnummer aus „\442.3“) */
 function normalizeSign(s){
+  if(typeof s.name==='string') s.name=s.name.replace(/(\s*\(Kopie\))+\s*$/,'');
   if(!s.number && /^\s*\\?\s*\d+(\.\d+)*\s*$/.test(s.description||'')){ s.number=String(s.description).replace(/^\s*\\\s*/,'').trim(); s.description=''; }
   if(s.number) s.number=String(s.number).replace(/^[^0-9A-Za-z]+/,'').trim();
   (s.panels||[]).forEach(p=>{ if(p.text) p.text=String(p.text).toUpperCase(); });
@@ -2336,7 +2343,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.16';
+const APP_VERSION='2026-11-17.18';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
