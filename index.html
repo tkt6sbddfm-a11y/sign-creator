@@ -670,7 +670,7 @@ function renderSigns(){
         const f = el.dataset.f;
         if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else sign[f] = el.value;
         if(f==='norm'){ sign.faceMode = sign.faceMode||'norm'; }
-        if(f==='name'||f==='location'||f==='description'||f==='number'){ if(f==='number') sign.number=String(el.value).replace(/^\s*\\\s*/,'').trim(); renderOverview(); return; }
+        if(f==='name'||f==='location'||f==='description'||f==='number'){ if(f==='number') sign.number=String(el.value).replace(/^[^0-9A-Za-z]+/,'').trim(); renderOverview(); return; }
         if(f==='codeNo'){ /* Empfehlung anwenden */ sign.h = recommendedHeight(sign); }
         renderSigns(); renderOverview();
       });
@@ -680,7 +680,7 @@ function renderSigns(){
       btn.addEventListener('click', ()=>{
         const a = btn.dataset.act;
         if(a==='del'){ state.signs.splice(si,1); }
-        if(a==='dup'){ const c = deepCopy(sign); signCounter++; c.id=signCounter; c.name=sign.name+' (Kopie)'; state.signs.splice(si+1,0,c); }
+        if(a==='dup'){ const c = deepCopy(sign); signCounter++; c.id=signCounter; c.name=sign.name; state.signs.splice(si+1,0,c); }
         if(a==='up'){ [state.signs[si-1],state.signs[si]]=[state.signs[si],state.signs[si-1]]; }
         if(a==='down'){ [state.signs[si+1],state.signs[si]]=[state.signs[si],state.signs[si+1]]; }
         if(a==='addpanel'){ sign.panels.push({type:'direction', text:'', arrow:'right'}); }
@@ -1187,7 +1187,7 @@ function renderProjectCard(){
 /* Schild normalisieren (Großbuchstaben, Schildnummer aus „\442.3“) */
 function normalizeSign(s){
   if(!s.number && /^\s*\\?\s*\d+(\.\d+)*\s*$/.test(s.description||'')){ s.number=String(s.description).replace(/^\s*\\\s*/,'').trim(); s.description=''; }
-  if(s.number) s.number=String(s.number).replace(/^\s*\\\s*/,'').trim();
+  if(s.number) s.number=String(s.number).replace(/^[^0-9A-Za-z]+/,'').trim();
   (s.panels||[]).forEach(p=>{ if(p.text) p.text=String(p.text).toUpperCase(); });
   return s;
 }
@@ -1686,7 +1686,7 @@ async function imageImport(file){
     toast('Bild wird analysiert …');
     const url=URL.createObjectURL(file);
     const im=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('Bild nicht lesbar')); i.src=url; });
-    { const st=Math.min(1, 3000/Math.max(im.width,im.height)); const ct=document.createElement('canvas'); ct.width=Math.max(1,Math.round(im.width*st)); ct.height=Math.max(1,Math.round(im.height*st));
+    { let st=Math.min(2.5, 2800/Math.max(im.width,im.height)); if(st>0.9 && st<1.2) st=1; const ct=document.createElement('canvas'); ct.width=Math.max(1,Math.round(im.width*st)); ct.height=Math.max(1,Math.round(im.height*st));
       const gt=ct.getContext('2d',{willReadFrequently:true}); gt.drawImage(im,0,0,ct.width,ct.height);
       const tbl=analyzeTableImage(gt.getImageData(0,0,ct.width,ct.height));
       if(tbl && tbl.rows.length>=3 && tbl.rows.filter(r=>r.tokens.length>=2).length>=3){ URL.revokeObjectURL(url); await tableImport(file, tbl); return; } }
@@ -1930,6 +1930,7 @@ function compsCanvas(comps, W){
 }
 /* Pfeilsymbol der Schilderschrift (gefüllter Pfeil) über das Dickenprofil entlang der 8 Richtungen */
 function arrowByProfile(c, W){
+  arrowByProfile.lastScore=0;
   if(c.n<20) return null;
   const bw=c.x2-c.x1+1, bh2=c.y2-c.y1+1; if(c.n < 0.42*bw*bh2) return null;   // Pfeilsymbole sind kräftig gefüllt
   const pts=c.px.map(i=>{ const x=i%W; return [x,(i-x)/W]; });
@@ -1956,6 +1957,7 @@ function arrowByProfile(c, W){
     const score=mx/Math.max(...tail);
     if(!best||score>best.score) best={name,score};
   }
+  arrowByProfile.lastScore = best ? best.score : 0;
   return best && best.score>2.2 ? best.name : null;
 }
 /* Anzahl senkrechter Striche (für II / III): gleiche Lauf-Anzahl und -Lage auf 30/50/70 % Höhe */
@@ -2002,8 +2004,15 @@ async function tableImport(file, tbl){
       const body=tk.comps.filter(c=>!acc.includes(c));
       // gezeichneter Pfeil?
       const g={x1:Math.min(...body.map(c=>c.x1)),x2:Math.max(...body.map(c=>c.x2)),y1:Math.min(...body.map(c=>c.y1)),y2:Math.max(...body.map(c=>c.y2))};
-      const ar = tk.color==='R' ? null : body.length===1 ? (arrowByProfile(body[0],W) || detectArrow(g, tk.mask, W)) : (body.length===2 ? detectArrow(g, tk.mask, W) : null);
-      if(ar){ tokens.push({col:tk.col,color:tk.color,arrow:ar}); continue; }
+      const ap = tk.color!=='R' && body.length===1 ? arrowByProfile(body[0],W) : null, apScore = ap ? arrowByProfile.lastScore : 0;
+      const ar = tk.color==='R' ? null : (ap || (body.length<=2 ? detectArrow(g, tk.mask, W) : null));
+      if(ar){
+        // eindeutiges Pfeilprofil gewinnt; sonst entscheidet die Texterkennung, ob es doch ein Zeichen ist
+        let asChar='';
+        if(ap && apScore<3.0){ const o=(await rec(compsCanvas(body,W),'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',10)).replace(/\s+/g,''); if(/^[A-Z0-9]$/.test(o) && !/^[4]$/.test(o)) asChar=o; }
+        if(!asChar){ tokens.push({col:tk.col,color:tk.color,arrow:ar}); continue; }
+        tokens.push({col:tk.col,color:tk.color,ch:asChar, bodyH:g.y2-g.y1+1}); continue;
+      }
       const bodyH=g.y2-g.y1+1, bodyW=g.x2-g.x1+1;
       let t='';
       if(bodyW>1.8*bodyH && bodyH<0.35*capH) t='-';
