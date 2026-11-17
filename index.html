@@ -348,8 +348,8 @@ const DEFAULT_CODE = { // ICAO App. 4 Nr. 1 = EASA Tab. N-2
 };
 /* Zeichenbreiten [mm] je Schrifthöhe 200/300/400 und paarweise Abstandscodes (ICAO Annex 14 App. 4 /
    Master-SignsDef-Halogen). Pfeil-Glyphen: ç=links è=rechts é=oben ê=unten ë/ì/í/î=diagonal */
-const FONT_WIDTHS={"A":[170,255,340],"B":[137,205,274],"C":[137,205,274],"D":[137,205,274],"E":[124,186,248],"F":[124,186,248],"G":[137,205,274],"H":[137,205,274],"I":[32,48,64],"J":[127,190,254],"K":[140,210,280],"L":[124,186,248],"M":[157,236,314],"N":[137,205,274],"O":[143,214,286],"P":[137,205,274],"Q":[143,214,286],"R":[137,205,274],"S":[137,205,274],"T":[124,186,248],"U":[137,205,274],"V":[152,229,304],"W":[178,267,356],"X":[137,205,274],"Y":[171,257,342],"Z":[137,205,274],"0":[143,214,286],"1":[50,74,98],"2":[137,205,274],"3":[137,205,274],"4":[149,224,298],"5":[137,205,274],"6":[137,205,274],"7":[137,205,274],"8":[137,205,274],"9":[137,205,274],"-":[68,102,137],".":[32,48,64],"/":[137,205,274]," ":[140,210,280],"ç":[200,300,400],"è":[200,300,400],"é":[140,190,280],"ê":[140,190,280],"ë":[167,232,333],"ì":[167,232,333],"í":[167,232,333],"î":[167,232,333]};
-const SPACING_CODES={"1":[48,71,96],"2":[38,57,76],"3":[25,38,50],"4":[13,19,26],"5":[0,0,0],"6":[48,71,96],"7":[140,210,280],"8":[140,210,280],"9":[100,150,200]};
+const FONT_WIDTHS={"A":[170,255,340],"B":[137,205,274],"C":[137,205,274],"D":[137,205,274],"E":[124,186,248],"F":[124,186,248],"G":[137,205,274],"H":[137,205,274],"I":[32,48,64],"J":[127,190,254],"K":[140,210,280],"L":[124,186,248],"M":[157,236,314],"N":[137,205,274],"O":[143,214,286],"P":[137,205,274],"Q":[143,214,286],"R":[137,205,274],"S":[137,205,274],"T":[124,186,248],"U":[137,205,274],"V":[152,229,304],"W":[178,267,356],"X":[137,205,274],"Y":[171,257,342],"Z":[137,205,274],"0":[143,214,286],"1":[50,74,98],"2":[137,205,274],"3":[137,205,274],"4":[149,224,298],"5":[137,205,274],"6":[137,205,274],"7":[137,205,274],"8":[137,205,274],"9":[137,205,274],"-":[68,102,137],".":[32,48,64],"/":[130,195,260]," ":[100,150,200],"ç":[200,300,400],"è":[200,300,400],"é":[140,190,280],"ê":[140,190,280],"ë":[167,232,333],"ì":[167,232,333],"í":[167,232,333],"î":[167,232,333]};
+const SPACING_CODES={"1":[48,71,96],"2":[38,57,76],"3":[25,38,50],"4":[13,19,26],"5":[0,0,0],"6":[48,71,96],"7":[100,150,200],"8":[100,150,200],"9":[100,150,200]};
 const PAIR_CODES={"AA":4,"AB":2,"AC":2,"AD":2,"AE":2,"AF":2,"AG":2,"AH":2,"AI":2,"AJ":4,"AK":2,"AL":2,"AM":2,"AN":2,"AO":2,"AP":2,"AQ":2,"AR":2,"AS":2,"AT":4,"AU":2,"AV":4,"AW":4,"AX":2,"AY":4,"AZ":2,"A0":6,"A1":6,"A2":6,"A3":6,"A4":6,"A5":6,"A6":6,"A7":6,"A8":6,"A9":6,"A-":6,"A.":6,"A/":6,"A ":5,"Aç":7,"Aè":7,"Aé":7,"Aê":7,"Aë":7,"Aì":7,"Aí":7,"Aî":7,"BA":2,"BB":1,"BC":2,"BD":1,"BE":1,"BF":1,"BG":2,"BH":1,"BI":1,"BJ":2,"BK":1,"BL":1,"BM":1,"BN":1,"BO":2,"BP":1,"BQ":2,"BR":1,"BS":2,"BT":2,"BU":1,"BV":2,"BW":2,"BX":2,"BY":2,"BZ":2,"B0":6,"B1":6,"B2":6,"B3":6,"B4":6,"B5":6,"B6":6,"B7":6,"B8":6,"B9":6,"B-":6,"B.":6,"B/":6,"B ":5,"Bç":7,"Bè":7,"Bé":7,"Bê":7,"Bë":7,"Bì":7,"Bí":7,"Bî":7,"CA":3,"CB":2,"CC":2,"CD":2,"CE":2,"CF":2,"CG":2,"CH":2,"CI":2,"CJ":3,"CK":2,"CL":2,"CM":2,"CN":2,"CO":2,"CP":2,"CQ":2,"CR":2,"CS":2,"CT":3,"CU":2,"CV":3,"CW":3,"CX":2,"CY":3,"CZ":2,"C0":6,"C1":6,"C2":6,"C3":6,"C4":6,"C5":6,"C6":6,"C7":6,"C8":6,"C9":6,"C-":6,"C.":6,"C/":6,"C ":5,"Cç":7,"Cè":7,"Cé":7,"Cê":7,"Cë":7,"Cì":7,"Cí":7,"Cî":7,"DA":2,"DB":1,"DC":2,"DD":1,"DE":1,"DF":1,"DG":2,"DH":1,"DI":1,"DJ":2,"DK":1,"DL":1,"DM":1,"DN":1,"DO":2,"DP":1,"DQ":2,"DR":1,"DS":2,"DT":2,"DU":1,"DV":2,"DW":2,"DX":2,"DY":2,"DZ":2,"D0":6,"D1":6,"D2":6,"D3":6,"D4":6,"D5":6,"D6":6,"D7":6,"D8":6,"D9":6,"D-":6,"D.":6,"D/":6,"D ":5,"Dç":7,"Dè":7,"Dé":7,"Dê":7,"Dë":7,"Dì":7,"Dí":7,"Dî":7,"EA":3,"EB":2,"EC":2,"ED":2,"EE":2,"EF":2,"EG":2,"EH":2,"EI":2,"EJ":3,"EK":2,"EL":2,"EM":2,"EN":2,"EO":2,"EP":2,"EQ":2,"ER":2,"ES":2,"ET":3,"EU":2,"EV":3,"EW":3,"EX":2,"EY":3,"EZ":2,"E0":6,"E1":6,"E2":6,"E3":6,"E4":6,"E5":6,"E6":6,"E7":6,"E8":6,"E9":6,"E-":6,"E.":6,"E/":6,"E ":5,"Eç":7,"Eè":7,"Eé":7,"Eê":7,"Eë":7,"Eì":7,"Eí":7,"Eî":7,"FA":3,"FB":2,"FC":2,"FD":2,"FE":2,"FF":2,"FG":2,"FH":2,"FI":2,"FJ":3,"FK":2,"FL":2,"FM":2,"FN":2,"FO":2,"FP":2,"FQ":2,"FR":2,"FS":2,"FT":3,"FU":2,"FV":3,"FW":3,"FX":2,"FY":3,"FZ":2,"F0":6,"F1":6,"F2":6,"F3":6,"F4":6,"F5":6,"F6":6,"F7":6,"F8":6,"F9":6,"F-":6,"F.":6,"F/":6,"F ":5,"Fç":7,"Fè":7,"Fé":7,"Fê":7,"Fë":7,"Fì":7,"Fí":7,"Fî":7,"GA":2,"GB":1,"GC":2,"GD":1,"GE":1,"GF":1,"GG":2,"GH":1,"GI":1,"GJ":2,"GK":1,"GL":1,"GM":1,"GN":1,"GO":2,"GP":1,"GQ":2,"GR":1,"GS":2,"GT":2,"GU":1,"GV":2,"GW":2,"GX":2,"GY":2,"GZ":2,"G0":6,"G1":6,"G2":6,"G3":6,"G4":6,"G5":6,"G6":6,"G7":6,"G8":6,"G9":6,"G-":6,"G.":6,"G/":6,"G ":5,"Gç":7,"Gè":7,"Gé":7,"Gê":7,"Gë":7,"Gì":7,"Gí":7,"Gî":7,"HA":2,"HB":1,"HC":1,"HD":1,"HE":1,"HF":1,"HG":1,"HH":1,"HI":1,"HJ":2,"HK":1,"HL":1,"HM":1,"HN":1,"HO":1,"HP":1,"HQ":1,"HR":1,"HS":1,"HT":2,"HU":1,"HV":2,"HW":2,"HX":1,"HY":2,"HZ":1,"H0":6,"H1":6,"H2":6,"H3":6,"H4":6,"H5":6,"H6":6,"H7":6,"H8":6,"H9":6,"H-":6,"H.":6,"H/":6,"H ":5,"Hç":7,"Hè":7,"Hé":7,"Hê":7,"Hë":7,"Hì":7,"Hí":7,"Hî":7,"IA":2,"IB":1,"IC":1,"ID":1,"IE":1,"IF":1,"IG":1,"IH":1,"II":1,"IJ":2,"IK":1,"IL":1,"IM":1,"IN":1,"IO":1,"IP":1,"IQ":1,"IR":1,"IS":1,"IT":2,"IU":1,"IV":2,"IW":2,"IX":1,"IY":2,"IZ":1,"I0":6,"I1":6,"I2":6,"I3":6,"I4":6,"I5":6,"I6":6,"I7":6,"I8":6,"I9":6,"I-":6,"I.":6,"I/":6,"I ":5,"Iç":7,"Iè":7,"Ié":7,"Iê":7,"Ië":7,"Iì":7,"Ií":7,"Iî":7,"JA":2,"JB":1,"JC":1,"JD":1,"JE":1,"JF":1,"JG":1,"JH":1,"JI":1,"JJ":2,"JK":1,"JL":1,"JM":1,"JN":1,"JO":1,"JP":1,"JQ":1,"JR":1,"JS":1,"JT":2,"JU":1,"JV":2,"JW":2,"JX":1,"JY":2,"JZ":1,"J0":6,"J1":6,"J2":6,"J3":6,"J4":6,"J5":6,"J6":6,"J7":6,"J8":6,"J9":6,"J-":6,"J.":6,"J/":6,"J ":5,"Jç":7,"Jè":7,"Jé":7,"Jê":7,"Jë":7,"Jì":7,"Jí":7,"Jî":7,"KA":3,"KB":2,"KC":2,"KD":2,"KE":2,"KF":2,"KG":2,"KH":2,"KI":2,"KJ":3,"KK":2,"KL":2,"KM":2,"KN":2,"KO":2,"KP":2,"KQ":2,"KR":2,"KS":2,"KT":3,"KU":2,"KV":3,"KW":3,"KX":2,"KY":3,"KZ":2,"K0":6,"K1":6,"K2":6,"K3":6,"K4":6,"K5":6,"K6":6,"K7":6,"K8":6,"K9":6,"K-":6,"K.":6,"K/":6,"K ":5,"Kç":7,"Kè":7,"Ké":7,"Kê":7,"Kë":7,"Kì":7,"Kí":7,"Kî":7,"LA":4,"LB":2,"LC":2,"LD":2,"LE":2,"LF":2,"LG":2,"LH":2,"LI":2,"LJ":4,"LK":2,"LL":2,"LM":2,"LN":2,"LO":2,"LP":2,"LQ":2,"LR":2,"LS":2,"LT":4,"LU":2,"LV":4,"LW":4,"LX":2,"LY":4,"LZ":2,"L0":6,"L1":6,"L2":6,"L3":6,"L4":6,"L5":6,"L6":6,"L7":6,"L8":6,"L9":6,"L-":6,"L.":6,"L/":6,"L ":5,"Lç":7,"Lè":7,"Lé":7,"Lê":7,"Lë":7,"Lì":7,"Lí":7,"Lî":7,"MA":2,"MB":1,"MC":1,"MD":1,"ME":1,"MF":1,"MG":1,"MH":1,"MI":1,"MJ":2,"MK":1,"ML":1,"MM":1,"MN":1,"MO":1,"MP":1,"MQ":1,"MR":1,"MS":1,"MT":2,"MU":1,"MV":2,"MW":2,"MX":1,"MY":2,"MZ":1,"M0":6,"M1":6,"M2":6,"M3":6,"M4":6,"M5":6,"M6":6,"M7":6,"M8":6,"M9":6,"M-":6,"M.":6,"M/":6,"M ":5,"Mç":7,"Mè":7,"Mé":7,"Mê":7,"Më":7,"Mì":7,"Mí":7,"Mî":7,"NA":2,"NB":1,"NC":1,"ND":1,"NE":1,"NF":1,"NG":1,"NH":1,"NI":1,"NJ":2,"NK":1,"NL":1,"NM":1,"NN":1,"NO":1,"NP":1,"NQ":1,"NR":1,"NS":1,"NT":2,"NU":1,"NV":2,"NW":2,"NX":1,"NY":2,"NZ":1,"N0":6,"N1":6,"N2":6,"N3":6,"N4":6,"N5":6,"N6":6,"N7":6,"N8":6,"N9":6,"N-":6,"N.":6,"N/":6,"N ":5,"Nç":7,"Nè":7,"Né":7,"Nê":7,"Në":7,"Nì":7,"Ní":7,"Nî":7,"OA":2,"OB":1,"OC":2,"OD":1,"OE":1,"OF":1,"OG":2,"OH":1,"OI":1,"OJ":2,"OK":1,"OL":1,"OM":1,"ON":1,"OO":2,"OP":1,"OQ":2,"OR":1,"OS":2,"OT":2,"OU":1,"OV":2,"OW":2,"OX":2,"OY":2,"OZ":2,"O0":6,"O1":6,"O2":6,"O3":6,"O4":6,"O5":6,"O6":6,"O7":6,"O8":6,"O9":6,"O-":6,"O.":6,"O/":6,"O ":5,"Oç":7,"Oè":7,"Oé":7,"Oê":7,"Oë":7,"Oì":7,"Oí":7,"Oî":7,"PA":2,"PB":1,"PC":2,"PD":1,"PE":1,"PF":1,"PG":2,"PH":1,"PI":1,"PJ":2,"PK":1,"PL":1,"PM":1,"PN":1,"PO":2,"PP":1,"PQ":2,"PR":1,"PS":2,"PT":2,"PU":1,"PV":2,"PW":2,"PX":2,"PY":2,"PZ":2,"P0":6,"P1":6,"P2":6,"P3":6,"P4":6,"P5":6,"P6":6,"P7":6,"P8":6,"P9":6,"P-":6,"P.":6,"P/":6,"P ":5,"Pç":7,"Pè":7,"Pé":7,"Pê":7,"Pë":7,"Pì":7,"Pí":7,"Pî":7,"QA":2,"QB":1,"QC":2,"QD":1,"QE":1,"QF":1,"QG":2,"QH":1,"QI":1,"QJ":2,"QK":1,"QL":1,"QM":1,"QN":1,"QO":2,"QP":1,"QQ":2,"QR":1,"QS":2,"QT":2,"QU":1,"QV":2,"QW":2,"QX":2,"QY":2,"QZ":2,"Q0":6,"Q1":6,"Q2":6,"Q3":6,"Q4":6,"Q5":6,"Q6":6,"Q7":6,"Q8":6,"Q9":6,"Q-":6,"Q.":6,"Q/":6,"Q ":5,"Qç":7,"Qè":7,"Qé":7,"Qê":7,"Që":7,"Qì":7,"Qí":7,"Qî":7,"RA":2,"RB":1,"RC":2,"RD":1,"RE":1,"RF":1,"RG":2,"RH":1,"RI":1,"RJ":2,"RK":1,"RL":1,"RM":1,"RN":1,"RO":2,"RP":1,"RQ":2,"RR":1,"RS":2,"RT":2,"RU":1,"RV":2,"RW":2,"RX":2,"RY":2,"RZ":2,"R0":6,"R1":6,"R2":6,"R3":6,"R4":6,"R5":6,"R6":6,"R7":6,"R8":6,"R9":6,"R-":6,"R.":6,"R/":6,"R ":5,"Rç":7,"Rè":7,"Ré":7,"Rê":7,"Rë":7,"Rì":7,"Rí":7,"Rî":7,"SA":2,"SB":1,"SC":2,"SD":1,"SE":1,"SF":1,"SG":2,"SH":1,"SI":1,"SJ":2,"SK":1,"SL":1,"SM":1,"SN":1,"SO":2,"SP":1,"SQ":2,"SR":1,"SS":2,"ST":2,"SU":1,"SV":2,"SW":2,"SX":2,"SY":2,"SZ":2,"S0":6,"S1":6,"S2":6,"S3":6,"S4":6,"S5":6,"S6":6,"S7":6,"S8":6,"S9":6,"S-":6,"S.":6,"S/":6,"S ":5,"Sç":7,"Sè":7,"Sé":7,"Sê":7,"Së":7,"Sì":7,"Sí":7,"Sî":7,"TA":4,"TB":2,"TC":2,"TD":2,"TE":2,"TF":2,"TG":2,"TH":2,"TI":2,"TJ":4,"TK":2,"TL":2,"TM":2,"TN":2,"TO":2,"TP":2,"TQ":2,"TR":2,"TS":2,"TT":4,"TU":2,"TV":4,"TW":4,"TX":2,"TY":4,"TZ":2,"T0":6,"T1":6,"T2":6,"T3":6,"T4":6,"T5":6,"T6":6,"T7":6,"T8":6,"T9":6,"T-":6,"T.":6,"T/":6,"T ":5,"Tç":7,"Tè":7,"Té":7,"Tê":7,"Të":7,"Tì":7,"Tí":7,"Tî":7,"UA":2,"UB":1,"UC":1,"UD":1,"UE":1,"UF":1,"UG":1,"UH":1,"UI":1,"UJ":2,"UK":1,"UL":1,"UM":1,"UN":1,"UO":1,"UP":1,"UQ":1,"UR":1,"US":1,"UT":2,"UU":1,"UV":2,"UW":2,"UX":1,"UY":2,"UZ":1,"U0":6,"U1":6,"U2":6,"U3":6,"U4":6,"U5":6,"U6":6,"U7":6,"U8":6,"U9":6,"U-":6,"U.":6,"U/":6,"U ":5,"Uç":7,"Uè":7,"Ué":7,"Uê":7,"Uë":7,"Uì":7,"Uí":7,"Uî":7,"VA":4,"VB":2,"VC":2,"VD":2,"VE":2,"VF":2,"VG":2,"VH":2,"VI":2,"VJ":4,"VK":2,"VL":2,"VM":2,"VN":2,"VO":2,"VP":2,"VQ":2,"VR":2,"VS":2,"VT":4,"VU":2,"VV":4,"VW":4,"VX":2,"VY":4,"VZ":2,"V0":6,"V1":6,"V2":6,"V3":6,"V4":6,"V5":6,"V6":6,"V7":6,"V8":6,"V9":6,"V-":6,"V.":6,"V/":6,"V ":5,"Vç":7,"Vè":7,"Vé":7,"Vê":7,"Vë":7,"Vì":7,"Ví":7,"Vî":7,"WA":4,"WB":2,"WC":2,"WD":2,"WE":2,"WF":2,"WG":2,"WH":2,"WI":2,"WJ":4,"WK":2,"WL":2,"WM":2,"WN":2,"WO":2,"WP":2,"WQ":2,"WR":2,"WS":2,"WT":4,"WU":2,"WV":4,"WW":4,"WX":2,"WY":4,"WZ":2,"W0":6,"W1":6,"W2":6,"W3":6,"W4":6,"W5":6,"W6":6,"W7":6,"W8":6,"W9":6,"W-":6,"W.":6,"W/":6,"W ":5,"Wç":7,"Wè":7,"Wé":7,"Wê":7,"Wë":7,"Wì":7,"Wí":7,"Wî":7,"XA":3,"XB":2,"XC":2,"XD":2,"XE":2,"XF":2,"XG":2,"XH":2,"XI":2,"XJ":3,"XK":2,"XL":2,"XM":2,"XN":2,"XO":2,"XP":2,"XQ":2,"XR":2,"XS":2,"XT":3,"XU":2,"XV":3,"XW":3,"XX":2,"XY":3,"XZ":2,"X0":6,"X1":6,"X2":6,"X3":6,"X4":6,"X5":6,"X6":6,"X7":6,"X8":6,"X9":6,"X-":6,"X.":6,"X/":6,"X ":5,"Xç":7,"Xè":7,"Xé":7,"Xê":7,"Xë":7,"Xì":7,"Xí":7,"Xî":7,"YA":4,"YB":2,"YC":2,"YD":2,"YE":2,"YF":2,"YG":2,"YH":2,"YI":2,"YJ":4,"YK":2,"YL":2,"YM":2,"YN":2,"YO":2,"YP":2,"YQ":2,"YR":2,"YS":2,"YT":4,"YU":2,"YV":4,"YW":4,"YX":2,"YY":4,"YZ":2,"Y0":6,"Y1":6,"Y2":6,"Y3":6,"Y4":6,"Y5":6,"Y6":6,"Y7":6,"Y8":6,"Y9":6,"Y-":6,"Y.":6,"Y/":6,"Y ":5,"Yç":7,"Yè":7,"Yé":7,"Yê":7,"Yë":7,"Yì":7,"Yí":7,"Yî":7,"ZA":3,"ZB":2,"ZC":2,"ZD":2,"ZE":2,"ZF":2,"ZG":2,"ZH":2,"ZI":2,"ZJ":3,"ZK":2,"ZL":2,"ZM":2,"ZN":2,"ZO":2,"ZP":2,"ZQ":2,"ZR":2,"ZS":2,"ZT":3,"ZU":2,"ZV":3,"ZW":3,"ZX":2,"ZY":3,"ZZ":2,"Z0":6,"Z1":6,"Z2":6,"Z3":6,"Z4":6,"Z5":6,"Z6":6,"Z7":6,"Z8":6,"Z9":6,"Z-":6,"Z.":6,"Z/":6,"Z ":5,"Zç":7,"Zè":7,"Zé":7,"Zê":7,"Zë":7,"Zì":7,"Zí":7,"Zî":7,"0A":6,"0B":6,"0C":6,"0D":6,"0E":6,"0F":6,"0G":6,"0H":6,"0I":6,"0J":6,"0K":6,"0L":6,"0M":6,"0N":6,"0O":6,"0P":6,"0Q":6,"0R":6,"0S":6,"0T":6,"0U":6,"0V":6,"0W":6,"0X":6,"0Y":6,"0Z":6,"00":2,"01":1,"02":2,"03":2,"04":2,"05":1,"06":2,"07":2,"08":2,"09":2,"0-":6,"0.":6,"0/":6,"0 ":5,"0ç":7,"0è":7,"0é":7,"0ê":7,"0ë":7,"0ì":7,"0í":7,"0î":7,"1A":6,"1B":6,"1C":6,"1D":6,"1E":6,"1F":6,"1G":6,"1H":6,"1I":6,"1J":6,"1K":6,"1L":6,"1M":6,"1N":6,"1O":6,"1P":6,"1Q":6,"1R":6,"1S":6,"1T":6,"1U":6,"1V":6,"1W":6,"1X":6,"1Y":6,"1Z":6,"10":1,"11":1,"12":1,"13":1,"14":2,"15":1,"16":1,"17":2,"18":1,"19":1,"1-":6,"1.":6,"1/":6,"1 ":5,"1ç":7,"1è":7,"1é":7,"1ê":7,"1ë":7,"1ì":7,"1í":7,"1î":7,"2A":6,"2B":6,"2C":6,"2D":6,"2E":6,"2F":6,"2G":6,"2H":6,"2I":6,"2J":6,"2K":6,"2L":6,"2M":6,"2N":6,"2O":6,"2P":6,"2Q":6,"2R":6,"2S":6,"2T":6,"2U":6,"2V":6,"2W":6,"2X":6,"2Y":6,"2Z":6,"20":2,"21":1,"22":2,"23":2,"24":2,"25":1,"26":2,"27":2,"28":2,"29":2,"2-":6,"2.":6,"2/":6,"2 ":5,"2ç":7,"2è":7,"2é":7,"2ê":7,"2ë":7,"2ì":7,"2í":7,"2î":7,"3A":6,"3B":6,"3C":6,"3D":6,"3E":6,"3F":6,"3G":6,"3H":6,"3I":6,"3J":6,"3K":6,"3L":6,"3M":6,"3N":6,"3O":6,"3P":6,"3Q":6,"3R":6,"3S":6,"3T":6,"3U":6,"3V":6,"3W":6,"3X":6,"3Y":6,"3Z":6,"30":2,"31":1,"32":2,"33":2,"34":2,"35":1,"36":2,"37":2,"38":2,"39":2,"3-":6,"3.":6,"3/":6,"3 ":5,"3ç":7,"3è":7,"3é":7,"3ê":7,"3ë":7,"3ì":7,"3í":7,"3î":7,"4A":6,"4B":6,"4C":6,"4D":6,"4E":6,"4F":6,"4G":6,"4H":6,"4I":6,"4J":6,"4K":6,"4L":6,"4M":6,"4N":6,"4O":6,"4P":6,"4Q":6,"4R":6,"4S":6,"4T":6,"4U":6,"4V":6,"4W":6,"4X":6,"4Y":6,"4Z":6,"40":2,"41":2,"42":2,"43":2,"44":4,"45":2,"46":2,"47":4,"48":2,"49":2,"4-":6,"4.":6,"4/":6,"4 ":5,"4ç":7,"4è":7,"4é":7,"4ê":7,"4ë":7,"4ì":7,"4í":7,"4î":7,"5A":6,"5B":6,"5C":6,"5D":6,"5E":6,"5F":6,"5G":6,"5H":6,"5I":6,"5J":6,"5K":6,"5L":6,"5M":6,"5N":6,"5O":6,"5P":6,"5Q":6,"5R":6,"5S":6,"5T":6,"5U":6,"5V":6,"5W":6,"5X":6,"5Y":6,"5Z":6,"50":2,"51":1,"52":2,"53":2,"54":2,"55":1,"56":2,"57":2,"58":2,"59":2,"5-":6,"5.":6,"5/":6,"5 ":5,"5ç":7,"5è":7,"5é":7,"5ê":7,"5ë":7,"5ì":7,"5í":7,"5î":7,"6A":6,"6B":6,"6C":6,"6D":6,"6E":6,"6F":6,"6G":6,"6H":6,"6I":6,"6J":6,"6K":6,"6L":6,"6M":6,"6N":6,"6O":6,"6P":6,"6Q":6,"6R":6,"6S":6,"6T":6,"6U":6,"6V":6,"6W":6,"6X":6,"6Y":6,"6Z":6,"60":2,"61":1,"62":2,"63":2,"64":2,"65":1,"66":2,"67":2,"68":2,"69":2,"6-":6,"6.":6,"6/":6,"6 ":5,"6ç":7,"6è":7,"6é":7,"6ê":7,"6ë":7,"6ì":7,"6í":7,"6î":7,"7A":6,"7B":6,"7C":6,"7D":6,"7E":6,"7F":6,"7G":6,"7H":6,"7I":6,"7J":6,"7K":6,"7L":6,"7M":6,"7N":6,"7O":6,"7P":6,"7Q":6,"7R":6,"7S":6,"7T":6,"7U":6,"7V":6,"7W":6,"7X":6,"7Y":6,"7Z":6,"70":2,"71":2,"72":2,"73":2,"74":4,"75":2,"76":2,"77":4,"78":2,"79":2,"7-":6,"7.":6,"7/":6,"7 ":5,"7ç":7,"7è":7,"7é":7,"7ê":7,"7ë":7,"7ì":7,"7í":7,"7î":7,"8A":6,"8B":6,"8C":6,"8D":6,"8E":6,"8F":6,"8G":6,"8H":6,"8I":6,"8J":6,"8K":6,"8L":6,"8M":6,"8N":6,"8O":6,"8P":6,"8Q":6,"8R":6,"8S":6,"8T":6,"8U":6,"8V":6,"8W":6,"8X":6,"8Y":6,"8Z":6,"80":2,"81":1,"82":2,"83":2,"84":2,"85":1,"86":2,"87":2,"88":2,"89":2,"8-":6,"8.":6,"8/":6,"8 ":5,"8ç":7,"8è":7,"8é":7,"8ê":7,"8ë":7,"8ì":7,"8í":7,"8î":7,"9A":6,"9B":6,"9C":6,"9D":6,"9E":6,"9F":6,"9G":6,"9H":6,"9I":6,"9J":6,"9K":6,"9L":6,"9M":6,"9N":6,"9O":6,"9P":6,"9Q":6,"9R":6,"9S":6,"9T":6,"9U":6,"9V":6,"9W":6,"9X":6,"9Y":6,"9Z":6,"90":2,"91":1,"92":2,"93":2,"94":2,"95":1,"96":2,"97":2,"98":2,"99":2,"9-":6,"9.":6,"9/":6,"9 ":5,"9ç":7,"9è":7,"9é":7,"9ê":7,"9ë":7,"9ì":7,"9í":7,"9î":7,"-A":6,"-B":6,"-C":6,"-D":6,"-E":6,"-F":6,"-G":6,"-H":6,"-I":6,"-J":6,"-K":6,"-L":6,"-M":6,"-N":6,"-O":6,"-P":6,"-Q":6,"-R":6,"-S":6,"-T":6,"-U":6,"-V":6,"-W":6,"-X":6,"-Y":6,"-Z":6,"-0":6,"-1":6,"-2":6,"-3":6,"-4":6,"-5":6,"-6":6,"-7":6,"-8":6,"-9":6,"--":6,"-.":6,"-/":6,"- ":5,".A":6,".B":6,".C":6,".D":6,".E":6,".F":6,".G":6,".H":6,".I":6,".J":6,".K":6,".L":6,".M":6,".N":6,".O":6,".P":6,".Q":6,".R":6,".S":6,".T":6,".U":6,".V":6,".W":6,".X":6,".Y":6,".Z":6,".0":6,".1":6,".2":6,".3":6,".4":6,".5":6,".6":6,".7":6,".8":6,".9":6,".-":6,"..":6,"./":6,". ":5,".ç":7,".è":7,".é":7,".ê":7,".ë":7,".ì":7,".í":7,".î":7,"/A":6,"/B":6,"/C":6,"/D":6,"/E":6,"/F":6,"/G":6,"/H":6,"/I":6,"/J":6,"/K":6,"/L":6,"/M":6,"/N":6,"/O":6,"/P":6,"/Q":6,"/R":6,"/S":6,"/T":6,"/U":6,"/V":6,"/W":6,"/X":6,"/Y":6,"/Z":6,"/0":6,"/1":6,"/2":6,"/3":6,"/4":6,"/5":6,"/6":6,"/7":6,"/8":6,"/9":6,"/-":6,"/.":6,"//":6,"/ ":5,"/ç":7,"/è":7,"/é":7,"/ê":7,"/ë":7,"/ì":7,"/í":7,"/î":7," A":5," B":5," C":5," D":5," E":5," F":5," G":5," H":5," I":5," J":5," K":5," L":5," M":5," N":5," O":5," P":5," Q":5," R":5," S":5," T":5," U":5," V":5," W":5," X":5," Y":5," Z":5," 0":5," 1":5," 2":5," 3":5," 4":5," 5":5," 6":5," 7":5," 8":5," 9":5," -":5," .":5," /":5,"  ":5," ç":5," è":5," é":5," ê":5," ë":5," ì":5," í":5," î":5,"çA":7,"çB":7,"çC":7,"çD":7,"çE":7,"çF":7,"çG":7,"çH":7,"çI":7,"çJ":7,"çK":7,"çL":7,"çM":7,"çN":7,"çO":7,"çP":7,"çQ":7,"çR":7,"çS":7,"çT":7,"çU":7,"çV":7,"çW":7,"çX":7,"çY":7,"çZ":7,"ç0":7,"ç1":7,"ç2":7,"ç3":7,"ç4":7,"ç5":7,"ç6":7,"ç7":7,"ç8":7,"ç9":7,"ç/":1,"ç ":5,"çç":5,"çè":5,"çé":5,"çê":5,"çë":5,"çì":5,"çí":5,"çî":5,"èA":7,"èB":7,"èC":7,"èD":7,"èE":7,"èF":7,"èG":7,"èH":7,"èI":7,"èJ":7,"èK":7,"èL":7,"èM":7,"èN":7,"èO":7,"èP":7,"èQ":7,"èR":7,"èS":7,"èT":7,"èU":7,"èV":7,"èW":7,"èX":7,"èY":7,"èZ":7,"è0":7,"è1":7,"è2":7,"è3":7,"è4":7,"è5":7,"è6":7,"è7":7,"è8":7,"è9":7,"è/":1,"è ":5,"èç":5,"èè":5,"èé":5,"èê":5,"èë":5,"èì":5,"èí":5,"èî":5,"éA":7,"éB":7,"éC":7,"éD":7,"éE":7,"éF":7,"éG":7,"éH":7,"éI":7,"éJ":7,"éK":7,"éL":7,"éM":7,"éN":7,"éO":7,"éP":7,"éQ":7,"éR":7,"éS":7,"éT":7,"éU":7,"éV":7,"éW":7,"éX":7,"éY":7,"éZ":7,"é0":7,"é1":7,"é2":7,"é3":7,"é4":7,"é5":7,"é6":7,"é7":7,"é8":7,"é9":7,"é/":1,"é ":5,"éç":5,"éè":5,"éé":5,"éê":5,"éë":5,"éì":5,"éí":5,"éî":5,"êA":7,"êB":7,"êC":7,"êD":7,"êE":7,"êF":7,"êG":7,"êH":7,"êI":7,"êJ":7,"êK":7,"êL":7,"êM":7,"êN":7,"êO":7,"êP":7,"êQ":7,"êR":7,"êS":7,"êT":7,"êU":7,"êV":7,"êW":7,"êX":7,"êY":7,"êZ":7,"ê0":7,"ê1":7,"ê2":7,"ê3":7,"ê4":7,"ê5":7,"ê6":7,"ê7":7,"ê8":7,"ê9":7,"ê/":1,"ê ":5,"êç":5,"êè":5,"êé":5,"êê":5,"êë":5,"êì":5,"êí":5,"êî":5,"ëA":7,"ëB":7,"ëC":7,"ëD":7,"ëE":7,"ëF":7,"ëG":7,"ëH":7,"ëI":7,"ëJ":7,"ëK":7,"ëL":7,"ëM":7,"ëN":7,"ëO":7,"ëP":7,"ëQ":7,"ëR":7,"ëS":7,"ëT":7,"ëU":7,"ëV":7,"ëW":7,"ëX":7,"ëY":7,"ëZ":7,"ë0":7,"ë1":7,"ë2":7,"ë3":7,"ë4":7,"ë5":7,"ë6":7,"ë7":7,"ë8":7,"ë9":7,"ë/":1,"ë ":5,"ëç":5,"ëè":5,"ëé":5,"ëê":5,"ëë":5,"ëì":5,"ëí":5,"ëî":5,"ìA":7,"ìB":7,"ìC":7,"ìD":7,"ìE":7,"ìF":7,"ìG":7,"ìH":7,"ìI":7,"ìJ":7,"ìK":7,"ìL":7,"ìM":7,"ìN":7,"ìO":7,"ìP":7,"ìQ":7,"ìR":7,"ìS":7,"ìT":7,"ìU":7,"ìV":7,"ìW":7,"ìX":7,"ìY":7,"ìZ":7,"ì0":7,"ì1":7,"ì2":7,"ì3":7,"ì4":7,"ì5":7,"ì6":7,"ì7":7,"ì8":7,"ì9":7,"ì/":1,"ì ":5,"ìç":5,"ìè":5,"ìé":5,"ìê":5,"ìë":5,"ìì":5,"ìí":5,"ìî":5,"íA":7,"íB":7,"íC":7,"íD":7,"íE":7,"íF":7,"íG":7,"íH":7,"íI":7,"íJ":7,"íK":7,"íL":7,"íM":7,"íN":7,"íO":7,"íP":7,"íQ":7,"íR":7,"íS":7,"íT":7,"íU":7,"íV":7,"íW":7,"íX":7,"íY":7,"íZ":7,"í0":7,"í1":7,"í2":7,"í3":7,"í4":7,"í5":7,"í6":7,"í7":7,"í8":7,"í9":7,"í/":1,"í ":5,"íç":5,"íè":5,"íé":5,"íê":5,"íë":5,"íì":5,"íí":5,"íî":5,"îA":7,"îB":7,"îC":7,"îD":7,"îE":7,"îF":7,"îG":7,"îH":7,"îI":7,"îJ":7,"îK":7,"îL":7,"îM":7,"îN":7,"îO":7,"îP":7,"îQ":7,"îR":7,"îS":7,"îT":7,"îU":7,"îV":7,"îW":7,"îX":7,"îY":7,"îZ":7,"î0":7,"î1":7,"î2":7,"î3":7,"î4":7,"î5":7,"î6":7,"î7":7,"î8":7,"î9":7,"î/":1,"î ":5,"îç":5,"îè":5,"îé":5,"îê":5,"îë":5,"îì":5,"îí":5,"îî":5};
 /* Zeichenformen: „Open Taxiway Mandatory Sign“ (Open Runway Fonts, ryo-a, CC0 1.0) – Annex-14-Formen,
    normiert auf Höhe 1000; die Breite wird je Zeichen auf Tab. A4-1 skaliert (hebt die 2,5-fache Markierungsstreckung auf). */
@@ -422,19 +422,30 @@ function newSign(){
 /* ================= Geometrie ================= */
 function P(norm, key, h){ return Number(state.params[norm].rows[key].v[h]); }
 function charWidth(ch, h){
+  if(ROMAN[ch]) return Math.round(ROMAN[ch].w*h);
   const w = state.fontWidths[ch];
   if(w) return Number(w[H_IDX[h]])||0;
   return Math.round(0.68*h); // unbekanntes Zeichen: Näherung
 }
+/* Römische Ziffern für CAT-Schilder nach ICAO Annex 14 Abb. A4-2 (Raster 10 × 10 je Schrifthöhe):
+   I = 6, II = 8, III = 11 Rasterfelder breit; Balken oben/unten und Stämme 1,25 Felder stark */
+const ROMAN = {'Ⅰ':{w:0.6, stems:[3.0]}, 'Ⅱ':{w:0.8, stems:[2.5,5.5]}, 'Ⅲ':{w:1.1, stems:[2.55,5.5,8.45]}};
+const ROMAN_OF = {'I':'Ⅰ','II':'Ⅱ','III':'Ⅲ'};
+function pairCode(a,b){
+  if(ROMAN[a]||ROMAN[b]){ const o=ROMAN[a]?b:a; return o===' '?5:1; }   // Ziffer↔Schrägstrich/Zeichen = Code 1 (App. 4, Instruction 3/4)
+  return PAIR_CODES[a+b];
+}
 function pairSpace(a, b, h){
-  const code = PAIR_CODES[a+b];
+  const code = pairCode(a,b);
   const row = state.spacingCodes[code||6] || state.spacingCodes[6];
   return Number(row[H_IDX[h]])||0;
 }
 /* Glyphfolge eines Panels: Text + ggf. Pfeil als Glyph */
 function panelGlyphs(p){
   const t = PANEL_TYPES[p.type];
-  let txt = [...(p.text||'').toUpperCase()];
+  let raw = (p.text||'').toUpperCase();
+  if(/CAT/.test(raw)) raw = raw.replace(/(^|[ \/])(III|II|I)(?=$|[ \/])/g, (m,a,b)=>a+ROMAN_OF[b]);   // CAT I / II / III als eigene Zeichen (Abb. A4-2)
+  let txt = [...raw];
   if(p.type==='intersection') txt = txt.map((c,i)=> (c==='M' && i===txt.length-1) ? 'm' : c);
   if(!(t.arrow && p.arrow!=='none')) return txt;
   const g = ARROW_GLYPH[p.arrow];
@@ -449,24 +460,32 @@ function isSingleDesignator(gl, solo){
   return !!solo && gl.length>0 && !gl.some(g=>ARROW_GLYPH_REV[g]||g===' '||g==='-'||g==='/');
 }
 /* Faktor für Ränder und Abstände je Schild (Feld „Abstände [%]“, 100 % = Normwert) */
-function spf(sign){ const v=Number(sign&&sign.spacing); return v>0 ? v/100 : 1; }
-function panelChain(p, h, norm, solo, f=1){
+/* Abstände je Schild: Zeichenabstände in % (Codes 1–4/6), seitlicher Rand und Wort-/Pfeilabstand in mm (leer = Normwert) */
+function spOpts(sign){ const v=Number(sign&&sign.spacing), m=Number(sign&&sign.marginMM), w=Number(sign&&sign.wordGapMM); return {cf: v>0? v/100 : 1, m: m>0? m : null, wg: w>0? w : null}; }
+function spf(sign){ return spOpts(sign); }
+function normMargin(sign){ const solo=sign.panels.length===1; const gl=sign.panels[0]?panelGlyphs(sign.panels[0]):[]; return Math.round(P(sign.norm, isSingleDesignator(gl,solo)?'sideMarginSingle':'sideMargin', sign.h)); }
+function charPct(sign){ return Math.round(spOpts(sign).cf*100); }
+function panelChain(p, h, norm, solo, o){
+  if(!o || typeof o!=='object') o={cf:(typeof o==='number'&&o>0)?o:1, m:null, wg:null};
   const gl = panelGlyphs(p);
   const single = isSingleDesignator(gl, solo);
-  const m = Math.round(P(norm, single?'sideMarginSingle':'sideMargin', h)*f);
-  const chain = [{kind:'margin',label:single?'Rand (H)':'Rand',w:m}];
+  const m = o.m!=null ? Math.round(o.m) : Math.round(P(norm, single?'sideMarginSingle':'sideMargin', h));
+  const chain = [{kind:'margin',label:o.m!=null?'Rand (manuell)':(single?'Rand (H)':'Rand'),w:m}];
   gl.forEach((g,i)=>{
-    chain.push({kind:'char',label:g,w:charWidth(g,h)});
+    chain.push({kind:'char',label:g,w: (g===' ' && o.wg!=null) ? Math.round(o.wg) : charWidth(g,h)});
     if(i<gl.length-1){
+      const code = pairCode(g,gl[i+1]);
       let sp = pairSpace(g,gl[i+1],h);
+      if(code===7||code===8){ if(o.wg!=null) sp=o.wg; }            // Pfeil ↔ Text = Wortabstand
+      else if(code!==5) sp = sp*o.cf;                                // Zeichenabstände in %
       if(p.arrowTight && gl.length===2 && (ARROW_GLYPH_REV[g]||ARROW_GLYPH_REV[gl[i+1]])) sp = Math.round(0.25*h); // ICAO App. 4, Instruction 2
-      chain.push({kind:'space',label:'↔',w:Math.round(sp*f)});
+      chain.push({kind:'space',label:'↔',w:Math.round(sp)});
     }
   });
   chain.push({kind:'margin',label:single?'Rand (H)':'Rand',w:m});
   return chain;
 }
-function panelWidth(panel, h, norm, solo, f=1){
+function panelWidth(panel, h, norm, solo, f){
   const t = PANEL_TYPES[panel.type];
   if(t.symbol==='noentry') return 3*h;                    // Abb. A4-3 / N-2G: Feld 3 H breit
   if(t.symbol==='vacated') return Math.round(4.8*h);      // Abb. A4-3 / N-2F: dargestellte Breite ≈ 4,8 H (nicht bemaßt)
@@ -484,7 +503,7 @@ function signDims(sign){
   const face = faceHeight(sign);
   const solo = sign.panels.length===1;
   const widths = sign.panels.map(p=>panelWidth(p,h,norm,solo,spf(sign)));
-  const gap = Math.round(P(norm,'panelGap',h)*spf(sign));
+  const gap = Math.round(P(norm,'panelGap',h));
   const total = widths.reduce((a,b)=>a+b,0) + gap*Math.max(0,sign.panels.length-1);
   return { face, widths, total, area: Math.round(face*total/1e6*100)/100 };
 }
@@ -497,7 +516,7 @@ function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 function renderSignSVG(sign, opts={}){
   const d = signDims(sign);
   const h = sign.h, norm = sign.norm;
-  const face = d.face, gap = Math.round(P(norm,'panelGap',h)*spf(sign));
+  const face = d.face, gap = Math.round(P(norm,'panelGap',h));
   const pad = opts.pad ?? 40;
   const vmargin = (face - h)/2; // vertikale Lage der Beschriftung
   const W = d.total + 2*pad, H = face + 2*pad + (opts.dims?110:0);
@@ -604,8 +623,15 @@ function renderPanel(p, x, y, w, face, h, norm, sign){
         s += `<rect x="${cx}" y="${cy-st/2}" width="${c.w}" height="${st}" fill="${fg}"${olAttr}/>`;   // Bindestrich: Strichstärke hoch, auf Mittellinie (Abb. N-2H)
       } else if(g==='.'){
         s += `<circle cx="${cx+c.w/2}" cy="${baseline-c.w/2}" r="${c.w/2}" fill="${fg}"${olAttr}/>`;   // Punkt: rund, Ø ≈ Strichstärke (Abb. N-2H)
+      } else if(ROMAN[g]){
+        // Abb. A4-2: Balken oben und unten über die volle Breite, senkrechte Stämme; Raster = H/10
+        const u=h/10, t=1.25*u, top=cy-h/2;
+        let d=`M${cx} ${top}h${c.w}v${t}h${-c.w}z M${cx} ${baseline-t}h${c.w}v${t}h${-c.w}z`;
+        ROMAN[g].stems.forEach(xc=>{ d+=` M${cx+xc*u*(c.w/(ROMAN[g].w*h))-t/2} ${top+t}h${t}v${h-2*t}h${-t}z`; });
+        s += `<path d="${d}" fill="${fg}"${olAttr}/>`;
       } else if(g==='/'){
-        s += `<polygon points="${cx+c.w-st},${cy-h/2} ${cx+c.w},${cy-h/2} ${cx+st},${baseline} ${cx},${baseline}" fill="${fg}"/>`;
+        const sw=0.13*h;   // Abb. A4-2: Schrägstrich 6,5 Felder breit, Strich 1,3 Felder (waagerecht gemessen)
+        s += `<polygon points="${cx+c.w-sw},${cy-h/2} ${cx+c.w},${cy-h/2} ${cx+sw},${baseline} ${cx},${baseline}" fill="${fg}"${olAttr}/>`;
       } else if(g!==' '){
         s += `<text x="${cx}" y="${baseline}" font-size="${fs}" font-weight="bold" fill="${fg}" textLength="${c.w}" lengthAdjust="spacingAndGlyphs">${esc(g)}</text>`;
       }
@@ -655,7 +681,9 @@ function renderSigns(){
         <div class="field" style="min-width:auto"><label>Schildhöhe</label>
           <select data-f="faceMode"><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
         ${sign.faceMode==='custom'?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
-        <div class="field" style="min-width:auto" title="Seitliche Ränder, Zeichen-, Gruppen- und Pfeilabstände gemeinsam skalieren (100 % = Normwert). Panelbreiten, Gesamtlänge und Maßketten passen sich an."><label>Ränder/Abstände [%]</label><div style="display:flex;gap:4px;align-items:center"><button class="btn small" data-spstep="-5" title="−5 %">−</button><input type="number" data-f="spacing" value="${Math.round(spf(sign)*100)}" min="30" max="200" step="5" style="width:70px;${spf(sign)!==1?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-spstep="5" title="+5 %">+</button>${spf(sign)!==1?'<button class="btn small" data-spstep="0" title="Normwert (100 %)">Norm</button>':''}</div></div>
+        <div class="field" style="min-width:auto" title="Seitlicher Rand je Panel in mm. Leer = Normwert (H/2, bei Einzelbezeichner H)."><label>Rand seitlich [mm]</label><input type="number" data-f="marginMM" min="0" step="5" value="${sign.marginMM||''}" placeholder="${normMargin(sign)} (Norm)" style="width:110px;${sign.marginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
+        <div class="field" style="min-width:auto" title="Abstände zwischen den Zeichen nach Tab. A4-1 (Codes 1–4), 100 % = Normwert."><label>Zeichenabstände [%]</label><div style="display:flex;gap:4px;align-items:center"><button class="btn small" data-spstep="-5" title="−5 %">−</button><input type="number" data-f="spacing" value="${charPct(sign)}" min="30" max="200" step="5" style="width:66px;${charPct(sign)!==100?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-spstep="5" title="+5 %">+</button>${charPct(sign)!==100?'<button class="btn small" data-spstep="0" title="Normwert (100 %)">Norm</button>':''}</div></div>
+        <div class="field" style="min-width:auto" title="Abstand zwischen Wörtern bzw. Zeichengruppen und zwischen Pfeil und Text in mm. Leer = 0,5 H. ICAO App. 4: 0,5–0,75 H."><label>Wort-/Pfeilabstand [mm]</label><input type="number" data-f="wordGapMM" min="0" step="5" value="${sign.wordGapMM||''}" placeholder="${Math.round(0.5*sign.h)} (0,5 H)" style="width:110px;${sign.wordGapMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
         <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="A14 5.4.2.13 / CS N.780(c)(1): schwarze Kontur 10 mm (Code 1–2) bzw. 20 mm (Code 3–4) um die weiße Schrift"><input type="checkbox" data-fchk="outline" ${sign.outline?'checked':''}> Schwarze Kontur (${sign.codeNo==='1-2'?10:20} mm)</label>
         <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="App. 4 Nr. 11 / CS N.775(c)(19): Gebotszeichen nur auf einer Rollbahnseite → Mindestbreite 1,46 m (Code 1–2) / 1,94 m (Code 3–4)"><input type="checkbox" data-fchk="singleSided" ${sign.singleSided?'checked':''}> Nur einseitig aufgestellt</label>
       </div>
@@ -664,7 +692,7 @@ function renderSigns(){
       <div style="margin-top:8px"><button class="btn small" data-act="addpanel">+ Panel / Nachricht anhängen</button> <span class="note">Tipp: Panel in der Vorschau anklicken, um es zu bearbeiten.</span></div>
       ${sign.h!=rec?`<div class="hint">Die gewählte Schrifthöhe (${sign.h} mm) weicht von der Mindesthöhe nach ${NORM_INFO[sign.norm].height} (${NORM_INFO[sign.norm].short}) für Code ${sign.codeNo} ab (${rec} mm).</div>`:''}
       <div class="preview">${previewSVG(sign)}</div>
-      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${spf(sign)!==1?`<span>Ränder/Abstände <b>${Math.round(spf(sign)*100)} %</b></span>`:''}</div>
+      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${(sign.marginMM||sign.wordGapMM||charPct(sign)!==100)?`<span>Abweichend: <b>${[sign.marginMM?'Rand '+sign.marginMM+' mm':'', charPct(sign)!==100?'Zeichenabst. '+charPct(sign)+' %':'', sign.wordGapMM?'Wort-/Pfeilabst. '+sign.wordGapMM+' mm':''].filter(Boolean).join(' · ')}</b></span>`:''}</div>
       <details class="chain"><summary>Maßkette als Text</summary>${chainHTML(sign)}</details>
       <div class="compliance">${complianceHTML(sign)}</div>
     `;
@@ -672,14 +700,14 @@ function renderSigns(){
     card.querySelectorAll('[data-f]').forEach(el=>{
       el.addEventListener('change', e=>{
         const f = el.dataset.f;
-        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else sign[f] = el.value;
+        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='marginMM'||f==='wordGapMM') sign[f] = Number(el.value)>0 ? Math.round(Number(el.value)) : ''; else sign[f] = el.value;
         if(f==='norm'){ sign.faceMode = sign.faceMode||'norm'; }
         if(f==='name'||f==='location'||f==='description'||f==='number'){ if(f==='number') sign.number=String(el.value).replace(/^[^0-9A-Za-z]+/,'').trim(); renderOverview(); return; }
         if(f==='codeNo'){ /* Empfehlung anwenden */ sign.h = recommendedHeight(sign); }
         renderSigns(); renderOverview();
       });
     });
-    card.querySelectorAll('[data-spstep]').forEach(b=>b.addEventListener('click',()=>{ const st=Number(b.dataset.spstep); sign.spacing = st? Math.min(200,Math.max(30,Math.round(spf(sign)*100)+st)) : 100; renderSigns(); renderOverview(); }));
+    card.querySelectorAll('[data-spstep]').forEach(b=>b.addEventListener('click',()=>{ const st=Number(b.dataset.spstep); sign.spacing = st? Math.min(200,Math.max(30,charPct(sign)+st)) : 100; renderSigns(); renderOverview(); }));
     card.querySelectorAll('[data-act]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const a = btn.dataset.act;
@@ -726,7 +754,7 @@ function updatePreview(card, sign){
 function chainText(p, sign){
   const t = PANEL_TYPES[p.type];
   if(t.symbol) return 'Symbolfeld '+panelWidth(p,sign.h,sign.norm,sign.panels.length===1,spf(sign))+' mm';
-  return panelChain(p,sign.h,sign.norm,sign.panels.length===1,spf(sign)).map(c=>c.kind==='char'?`<b>${esc(ARROW_GLYPH_REV[c.label]?ARROWS[ARROW_GLYPH_REV[c.label]]:(c.label===' '?'␣':c.label))}</b> ${c.w}`:(c.kind==='margin'?`Rand ${c.w}`:`${c.w}`)).join(' · ');
+  return panelChain(p,sign.h,sign.norm,sign.panels.length===1,spf(sign)).map(c=>c.kind==='char'?`<b>${esc(ARROW_GLYPH_REV[c.label]?ARROWS[ARROW_GLYPH_REV[c.label]]:(c.label===' '?'␣':(ROMAN[c.label]?{'Ⅰ':'I','Ⅱ':'II','Ⅲ':'III'}[c.label]:c.label)))}</b> ${c.w}`:(c.kind==='margin'?`Rand ${c.w}`:`${c.w}`)).join(' · ');
 }
 function chainHTML(sign){
   return sign.panels.map((p,i)=>`<div><span class="pl">P${i+1}</span> ${chainText(p,sign)} <span class="pl">= ${panelWidth(p,sign.h,sign.norm,sign.panels.length===1,spf(sign))} mm</span></div>`).join('');
@@ -779,7 +807,9 @@ function complianceChecks(sign){
     {ok:d.face>=faceMin, label:`Schildhöhe ≥ Norm-Minimum ${N.short} (${N.face}): ${faceMin} mm bei h = ${sign.h} – ist ${d.face} mm`},
     {ok:singleSidedOk, label:`Einseitig aufgestelltes Gebotszeichen ≥ ${sign.codeNo==='1-2'?'1460':'1940'} mm breit (App. 4 Nr. 11; CS N.775(c)(19))`},
     {ok:!badDesig.length, label:`Rollbahnbezeichner ohne I, O, X (A14 5.4.3.37; CS N.785(c)(12))${badDesig.length?' – gefunden: '+badDesig.join(', '):''}`},
-    {ok:spf(sign)>=1, label:`Ränder und Zeichenabstände ≥ Normwert (Tab. A4-1 / N-3, Abb. A4-4 / N-3)${spf(sign)!==1?' – eingestellt '+Math.round(spf(sign)*100)+' %':''}`},
+    {ok:!sign.marginMM || sign.marginMM>=normMargin(sign), label:`Seitlicher Rand ≥ Normwert ${normMargin(sign)} mm (Abb. A4-4 / N-3)${sign.marginMM?' – eingestellt '+sign.marginMM+' mm':''}`},
+    {ok:charPct(sign)>=100, label:`Zeichenabstände ≥ Normwert (Tab. A4-1 / N-3)${charPct(sign)!==100?' – eingestellt '+charPct(sign)+' %':''}`},
+    {ok:!sign.wordGapMM || (sign.wordGapMM>=0.5*sign.h-0.5 && sign.wordGapMM<=0.75*sign.h+0.5), label:`Wort-/Pfeilabstand 0,5–0,75 H = ${Math.round(0.5*sign.h)}–${Math.round(0.75*sign.h)} mm (App. 4)${sign.wordGapMM?' – eingestellt '+sign.wordGapMM+' mm':''}`},
     {ok:sign.panels.length>=1, label:'Mindestens eine Nachricht'},
     {ok:nLoc<=1, label:'Höchstens ein Standort-Panel (Location)'},
     {ok:!(hasMand&&hasInfo), label:'Keine Kombination Information + Mandatory auf einem Schild (Standort ist zulässig)'},
@@ -832,7 +862,7 @@ function renderParams(){
     Object.entries(state.code).map(([c,r])=>`<tr><td>${c}</td>${['mandatory','runwayExit','info'].map(f=>`<td class="num"><input type="number" data-c="${c}" data-f="${f}" value="${r[f]}"></td>`).join('')}</tr>`).join('')+'</tbody>';
   ct.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{ state.code[inp.dataset.c][inp.dataset.f]=Number(inp.value)||0; renderSigns(); }));
   const sc = $('#spacing-codes');
-  const CODE_LABELS={1:'Code 1 (z. B. 1→2, B→B)',2:'Code 2 (z. B. 2→2, A→B)',3:'Code 3 (z. B. C→E)',4:'Code 4 (z. B. A→V, L→T)',5:'vor/nach Leerzeichen (Wortabstand = Breite „Leerzeichen“, 0,5–0,75 h)',6:'Buchstabe↔Zahl, Bindestrich/Punkt/Schrägstrich (= Code 1)',7:'Code 7 (Pfeil ↔ Text; Doc 9157 12.7.12 Gruppenabstand 0,7 H = 140/210/280, Excel: 100/150/200; Norm 0,5–0,75 H)',8:'Code 8 (Übergang Kleinbuchst./Zahl; wie Code 7)',9:'Code 9 (Rand / Trenner Farbwechsel)'};
+  const CODE_LABELS={1:'Code 1 (z. B. 1→2, B→B)',2:'Code 2 (z. B. 2→2, A→B)',3:'Code 3 (z. B. C→E)',4:'Code 4 (z. B. A→V, L→T)',5:'vor/nach Leerzeichen (Wortabstand = Breite „Leerzeichen“, Standard 0,5 H, zulässig 0,5–0,75 H)',6:'Buchstabe↔Zahl, Bindestrich/Punkt/Schrägstrich (= Code 1)',7:'Code 7 (Pfeil ↔ Text; Standard 0,5 H = 100/150/200 wie Innovence-Zeichnungen/Excel; zulässig nach App. 4: 0,5–0,75 H, Doc 9157 nennt 0,7 H)',8:'Code 8 (Übergang Kleinbuchst./Zahl; wie Code 7)',9:'Code 9 (Rand / Trenner Farbwechsel)'};
   sc.innerHTML = `<thead><tr><th>Abstandscode</th><th class="num">200</th><th class="num">300</th><th class="num">400</th></tr></thead><tbody>`+
     Object.keys(state.spacingCodes).map(k=>`<tr><td>${CODE_LABELS[k]||'Code '+k}</td>${[0,1,2].map(i=>`<td class="num"><input type="number" data-sc="${k}" data-i="${i}" value="${state.spacingCodes[k][i]??''}"></td>`).join('')}</tr>`).join('')+'</tbody>';
   sc.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{ state.spacingCodes[inp.dataset.sc][inp.dataset.i]=Number(inp.value)||0; renderSigns(); renderOverview(); }));
@@ -930,7 +960,7 @@ function inscriptionSVG(p, x, y, fs){
 
 /* ---- Maßkette eines Schildes in Schild-mm ---- */
 function chainSegments(sign){
-  const d=signDims(sign), solo=sign.panels.length===1, gap=Math.round(P(sign.norm,'panelGap',sign.h)*spf(sign));
+  const d=signDims(sign), solo=sign.panels.length===1, gap=Math.round(P(sign.norm,'panelGap',sign.h));
   let x=0; const segs=[], panels=[];
   sign.panels.forEach((p,i)=>{
     const x0=x, t=PANEL_TYPES[p.type];
@@ -1251,8 +1281,15 @@ $('#print-all').addEventListener('click',printAll);
 $('#copy-csv').addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText(overviewCSV()); toast('CSV kopiert'); }catch(e){ toast('Zwischenablage nicht verfügbar'); } });
 $('#csv-download').addEventListener('click',()=>saveFile('Rollverkehrszeichen_uebersicht.csv','﻿'+overviewCSV()));
 $('#save-json').addEventListener('click',()=>{ saveFile(projectJsonName(), JSON.stringify(state,null,2)); projectSaveManual(); });
-function applyProject(o, fileName){ if(!o || !Array.isArray(o.signs)) throw new Error('keine Projektdatei'); state=o; state.code=state.code||deepCopy(DEFAULT_CODE); state.signs=state.signs.map(sg=>{ const d=newSign(); signCounter--; return Object.assign(d, sg, {panels:(sg.panels&&sg.panels.length?sg.panels:d.panels)}); }); state.fontWidths=state.fontWidths||deepCopy(FONT_WIDTHS); state.spacingCodes=state.spacingCodes||deepCopy(SPACING_CODES); state.params=state.params||{ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; ['ICAO','EASA'].forEach(n=>{ const d=makeDefaults(n); state.params[n]=state.params[n]||d; Object.keys(d.rows).forEach(k=>{ if(!state.params[n].rows[k]) state.params[n].rows[k]=d.rows[k]; }); }); state.project=Object.assign({},PROJECT_DEFAULTS,state.project||{}); state.signs.forEach(normalizeSign); renderProjectCard(); state.signs.forEach(s=>{ if(!s.faceMode) s.faceMode = s.vpad==='H/4' ? 'norm' : (s.norm==='ICAO' && s.vpad==='H/2' ? '2H' : 'norm'); }); signCounter=Math.max(0,...state.signs.map(s=>s.id||0)); openedFileName = fileName||''; renderSigns(); renderOverview(); toast('Projekt geladen'+(fileName?': '+fileName:'')); }
+function applyProject(o, fileName){ if(!o || !Array.isArray(o.signs)) throw new Error('keine Projektdatei'); state=o; migrateDefaults(state); state.code=state.code||deepCopy(DEFAULT_CODE); state.signs=state.signs.map(sg=>{ const d=newSign(); signCounter--; return Object.assign(d, sg, {panels:(sg.panels&&sg.panels.length?sg.panels:d.panels)}); }); state.fontWidths=state.fontWidths||deepCopy(FONT_WIDTHS); state.spacingCodes=state.spacingCodes||deepCopy(SPACING_CODES); state.params=state.params||{ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; ['ICAO','EASA'].forEach(n=>{ const d=makeDefaults(n); state.params[n]=state.params[n]||d; Object.keys(d.rows).forEach(k=>{ if(!state.params[n].rows[k]) state.params[n].rows[k]=d.rows[k]; }); }); state.project=Object.assign({},PROJECT_DEFAULTS,state.project||{}); state.signs.forEach(normalizeSign); renderProjectCard(); state.signs.forEach(s=>{ if(!s.faceMode) s.faceMode = s.vpad==='H/4' ? 'norm' : (s.norm==='ICAO' && s.vpad==='H/2' ? '2H' : 'norm'); }); signCounter=Math.max(0,...state.signs.map(s=>s.id||0)); openedFileName = fileName||''; renderSigns(); renderOverview(); toast('Projekt geladen'+(fileName?': '+fileName:'')); }
 let openedFileName='';
+/* alte Standardwerte (Wortabstand und Pfeil↔Text 0,7 H, Schrägstrich 0,685 H) auf die neuen Werte heben; eigene Änderungen bleiben */
+function migrateDefaults(st){
+  const eq=(a,b)=>Array.isArray(a)&&a.join()===b.join();
+  if(st.fontWidths){ if(eq(st.fontWidths[' '],[140,210,280])) st.fontWidths[' ']=[100,150,200]; if(eq(st.fontWidths['/'],[137,205,274])) st.fontWidths['/']=[130,195,260]; }
+  if(st.spacingCodes){ ['7','8'].forEach(k=>{ if(eq(st.spacingCodes[k],[140,210,280])) st.spacingCodes[k]=[100,150,200]; }); }
+  (st.signs||[]).forEach(sg=>{ if(sg.spacing && sg.spacing!==100 && sg.marginMM==null && sg._spMig==null){ sg._spMig=1; } });
+}
 $('#load-json').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ applyProject(JSON.parse(r.result), ''); }catch(err){ toast('Ungültige Datei'); } }; r.readAsText(f); e.target.value=''; });
 
 
@@ -2205,7 +2242,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.3';
+const APP_VERSION='2026-11-17.4';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
