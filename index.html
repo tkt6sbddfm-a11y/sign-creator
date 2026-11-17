@@ -156,6 +156,16 @@
   .ins button:hover{border-color:var(--yd);color:#000}
   .toast{background:#000;color:#fff;border-left:4px solid var(--y)}
   .src a{color:#000;text-decoration:underline;text-decoration-color:var(--y)}
+  .norm-pick{background:#fff8dc;border:2px solid var(--y);border-radius:16px;padding:14px 16px;margin:6px 0 14px}
+  .np-title{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .np-step{display:inline-flex;width:24px;height:24px;border-radius:50%;background:#000;color:var(--y);align-items:center;justify-content:center;font-size:13px}
+  .np-btns{display:flex;gap:10px;flex-wrap:wrap}
+  .np-btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:230px;padding:10px 16px;border-radius:14px;border:2px solid #cfd0cc;background:#fff;cursor:pointer;font:inherit;text-align:left}
+  .np-btn b{font-size:18px} .np-btn span{font-size:12px;color:#6c6f73}
+  .np-btn:hover{border-color:var(--yd)}
+  .np-btn.on{background:#000;border-color:#000;color:#fff;box-shadow:0 0 0 3px var(--y)} .np-btn.on span{color:#ddd}
+  .np-btn.on b::before{content:"✓ ";color:var(--y)}
+  .np-note{font-size:12.5px;color:#5c4a00;margin-top:8px}
   footer.site{background:#000;color:#fff;padding:14px 24px;font-size:13px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:24px}
   footer.site b{color:var(--y);letter-spacing:.08em}
   @media print{footer.site{display:none!important}}
@@ -213,9 +223,16 @@
     <div class="card">
       <h3 style="margin-top:0">Normparameter je Schrifthöhe</h3>
       <p class="note">Werte in mm bzw. als Faktor der Schrifthöhe. Änderungen wirken sofort auf alle Schilder. Später können die Werte aus Ihrer Excel-Tabelle hier eingetragen oder per JSON importiert werden.</p>
+      <div class="norm-pick">
+        <div class="np-title"><span class="np-step">1</span> Norm auswählen, deren Werte unten angezeigt und bearbeitet werden:</div>
+        <div class="np-btns" role="radiogroup" aria-label="Norm auswählen">
+          <button type="button" class="np-btn" data-norm="ICAO" role="radio"><b>ICAO</b><span>Annex 14 Vol. I · 9. Ausg. 2022</span></button>
+          <button type="button" class="np-btn" data-norm="EASA" role="radio"><b>EASA</b><span>CS-ADR-DSN · Issue 7</span></button>
+        </div>
+        <div class="np-note" id="np-note"></div>
+        <select id="param-norm" style="display:none"><option value="ICAO">ICAO Annex 14 Vol. I</option><option value="EASA">EASA CS-ADR-DSN</option></select>
+      </div>
       <div class="row" style="margin-bottom:10px">
-        <div class="field"><label>Norm bearbeiten</label>
-          <select id="param-norm"><option value="ICAO">ICAO Annex 14 Vol. I</option><option value="EASA">EASA CS-ADR-DSN</option></select></div>
         <button class="btn" id="copy-norm">Werte von der anderen Norm übernehmen</button>
         <button class="btn" id="reset-params">Auf Vorgaben zurücksetzen</button>
       </div>
@@ -887,7 +904,7 @@ function renderRomanTable(){
   el.innerHTML=h;
 }
 function renderParams(){
-  renderRomanTable();
+  renderRomanTable(); syncNormPick();
   const norm = $('#param-norm').value;
   const p = state.params[norm];
   const tbl = $('#param-table');
@@ -914,6 +931,8 @@ function renderParams(){
   cw.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{ state.fontWidths[inp.dataset.fw][inp.dataset.i]=Number(inp.value)||0; renderSigns(); renderOverview(); }));
 }
 $('#param-norm').addEventListener('change', renderParams);
+function syncNormPick(){ const n=$('#param-norm').value; document.querySelectorAll('.np-btn').forEach(b=>{ const on=b.dataset.norm===n; b.classList.toggle('on',on); b.setAttribute('aria-checked',on); }); const note=$('#np-note'); if(note){ const cnt=state.signs.filter(s=>s.norm===n).length; note.textContent=`Angezeigt: ${n==='ICAO'?'ICAO Annex 14':'EASA CS-ADR-DSN'} – Änderungen wirken auf alle Schilder mit dieser Norm (${cnt} im Projekt). Die Norm je Schild wählst du im Reiter „Schilder“.`; } }
+document.querySelectorAll('.np-btn').forEach(b=>b.addEventListener('click',()=>{ $('#param-norm').value=b.dataset.norm; renderParams(); }));
 $('#copy-norm').addEventListener('click', ()=>{ const n=$('#param-norm').value, o=n==='ICAO'?'EASA':'ICAO'; state.params[n]=deepCopy(state.params[o]); renderParams(); renderSigns(); renderOverview(); toast('Werte von '+o+' übernommen'); });
 $('#reset-params').addEventListener('click', ()=>{ state.params={ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; state.code=deepCopy(DEFAULT_CODE); state.fontWidths=deepCopy(FONT_WIDTHS); state.spacingCodes=deepCopy(SPACING_CODES); renderParams(); renderSigns(); renderOverview(); toast('Vorgaben wiederhergestellt'); });
 
@@ -2286,7 +2305,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.9';
+const APP_VERSION='2026-11-17.10';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
