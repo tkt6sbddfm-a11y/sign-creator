@@ -1014,9 +1014,10 @@ function drawingParts(sign, k, fs){
   const step = fs*4.4, gap0 = fs*2.4;
   const nLev = 2 + (sign.panels.length>1 ? 1 : 0);
   const top = gap0 + ht*k + step*(nLev-1) + fs*3.6;
-  const left = hs*k + gap0 + step*(hs||ht ? 2 : 1) + fs*3.4;
-  const right = hs*k + gap0 + fs*3.4;
-  const bottom = ht*k + (border ? gap0 + fs*3.6 : fs*1.2);
+  const hb = !!(hs||ht);   // Gehäuserahmen: innen (Schild) oben/links, Gesamtmaß unten/rechts
+  const left = hs*k + gap0 + step + fs*3.4;
+  const right = hs*k + gap0 + (hb ? step : 0) + fs*3.4;
+  const bottom = ht*k + (border ? gap0 + fs*3.6 : fs*1.2) + (hb ? (border ? step : gap0) + fs*2.4 : 0);
   return {pr,C,W,Hf,h,hs,ht,border,step,gap0,top,left,right,bottom, width:left+W*k+right, height:top+Hf*k+bottom};
 }
 function drawingSVG(sign, k, fs, ox0=0, oy0=0){
@@ -1049,18 +1050,24 @@ function drawingSVG(sign, k, fs, ox0=0, oy0=0){
   xl-=step;
   s+=ext(X(-hs)-0.8,Y(0),xl-1.2,Y(0))+ext(X(-hs)-0.8,Y(Hf),xl-1.2,Y(Hf));
   s+=dimV(Y(0),Y(Hf),xl,fmtN(Hf),fs);
-  if(hs||ht){ xl-=step; s+=ext(X(-hs)-0.8,Y(-ht),xl-1.2,Y(-ht))+ext(X(-hs)-0.8,Y(Hf+ht),xl-1.2,Y(Hf+ht)); s+=dimV(Y(-ht),Y(Hf+ht),xl,fmtN(Hf+2*ht),fs); }
   // rechts: gelber Rand bzw. vertikale Ränder
   const xr = X(W+hs)+gap0, stv={lvl:0};
   const rch = border ? [[0,border],[border,Hf-border],[Hf-border,Hf]] : [[0,ct],[ct,cb],[cb,Hf]];
   new Set(rch.flat()).forEach(v=>{ s+=ext(X(W)+0.8,Y(v),xr+1.2,Y(v)); });
   rch.forEach(([a,b])=>{ s+=dimV(Y(a),Y(b),xr,fmtN(b-a),fs,stv); });
+  if(hs||ht){ const xr2=xr+step; s+=ext(X(W+hs)+0.8,Y(-ht),xr2+1.2,Y(-ht))+ext(X(W+hs)+0.8,Y(Hf+ht),xr2+1.2,Y(Hf+ht)); s+=dimV(Y(-ht),Y(Hf+ht),xr2,fmtN(Hf+2*ht),fs); }
   // unten: gelber Rand horizontal
   if(border){
     const yb = Y(Hf+ht)+gap0, stb={lvl:0};
     [0,border,W-border,W].forEach(v=>{ s+=ext(X(v),Y(Hf)+0.8,X(v),yb+1.2); });
     [[0,border],[border,W-border],[W-border,W]].forEach(([a,b])=>{ s+=dimH(X(a),X(b),yb,fmtN(b-a),fs,stb); });
     s+=tx(X(W)+1,yb+fs*1.4,'gelber Rand',fs*0.85,{anchor:'end',fill:'#6b7280'});
+  }
+  if(hs||ht){
+    const yb2 = Y(Hf+ht) + gap0 + (border ? step : 0);
+    s+=ext(X(-hs),Y(Hf+ht)+0.8,X(-hs),yb2+1.2)+ext(X(W+hs),Y(Hf+ht)+0.8,X(W+hs),yb2+1.2);
+    s+=dimH(X(-hs),X(W+hs),yb2,fmtN(W+2*hs),fs,null);
+    s+=tx(X(W+hs),yb2+fs*1.5,'Gesamtmaß mit Gehäuserahmen',fs*0.8,{anchor:'end',fill:'#6b7280'});
   }
   return {svg:s, width:D.width, height:D.height};
 }
@@ -2276,7 +2283,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.7';
+const APP_VERSION='2026-11-17.8';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
