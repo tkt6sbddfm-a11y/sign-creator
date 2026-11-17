@@ -2204,6 +2204,25 @@ function openDialog(path,msg){
 }
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
+/* ================= Versionshinweis: neuere Version online? ================= */
+const APP_VERSION='2026-11-17.3';
+(function(){
+  const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
+  if(!/^https?:/.test(location.protocol)) return;
+  async function check(){
+    try{ const t=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'}).then(r=>r.text()); const m=t.match(/const APP_VERSION='([^']+)'/);
+      if(m && m[1]!==APP_VERSION && !document.getElementById('upd-bar')){
+        const b=document.createElement('div'); b.id='upd-bar';
+        b.style.cssText='position:sticky;top:0;z-index:60;background:#ffd550;color:#000;padding:8px 24px;font-size:13px;display:flex;gap:12px;align-items:center;border-bottom:1px solid #e9b100';
+        b.innerHTML='<b>Neue Version des Sign Creators verfügbar ('+m[1]+').</b><span>Bitte das Projekt speichern und die Seite neu laden.</span><button class="btn small" style="margin-left:auto;background:#000;color:#fff;border-color:#000">Jetzt neu laden</button>';
+        b.querySelector('button').onclick=()=>location.reload();
+        document.body.prepend(b);
+      } }catch(e){}
+  }
+  setTimeout(check, 4000); setInterval(check, 5*60*1000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) check(); });
+})();
+
 // Start: immer genau ein Schild
 state.signs.push(newSign());
 state.signs[0].name='Rollhalteort 25'; state.signs[0].location='TWY A / RWY 25'; state.signs[0].panels=[{type:'location',text:'A',arrow:'none'},{type:'holding',text:'25-07',arrow:'none'}]; state.signs[0].h=400;
