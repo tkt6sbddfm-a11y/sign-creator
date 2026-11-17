@@ -59,6 +59,14 @@
   .badge.m{background:#fee2e2;color:#991b1b}.badge.i{background:#fef9c3;color:#854d0e}.badge.l{background:#111;color:#fde047}.badge.d{background:#111;color:#fff}
   .modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;z-index:40;align-items:center;justify-content:center;padding:16px}
   .modal-bg.open{display:flex}
+  .split-hint{margin-top:8px;padding:10px 14px;border-radius:12px;background:#fff4d1;border:1.5px solid #E9B100;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px}
+  .split-opt{display:block;border:2px solid #e5e7eb;border-radius:12px;padding:10px 12px;margin-bottom:10px;cursor:pointer;background:#fff}
+  .split-opt.sel{border-color:#E9B100;background:#fffbea}
+  .split-opt.bad{opacity:.75}
+  .split-opt .sp-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .split-opt .sp-part{flex:1 1 300px;min-width:200px}
+  .split-opt .sp-part svg{height:auto;display:block}
+  .split-opt .sp-cut{font-size:22px;font-weight:700;color:#b45309}
   .modal{background:#fff;border-radius:12px;width:min(1100px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
   .modal-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:#f8fafc}
   .modal-head h3{margin:0;font-size:16px}
@@ -354,6 +362,13 @@
     <div class="modal-head"><h3>Projekt speichern</h3><span style="flex:1"></span><button class="btn small" id="save-close">Schließen</button></div>
     <div class="modal-main" id="save-body"></div>
     <div class="modal-foot"><button class="btn primary" id="save-go">In SharePoint speichern</button></div>
+  </div>
+</div>
+<div class="modal-bg" id="split-modal">
+  <div class="modal" style="width:min(980px,100%)">
+    <div class="modal-head"><h3>Schild aufteilen</h3><span style="flex:1"></span><button class="btn small" onclick="closeSplit()">Abbrechen</button></div>
+    <div class="modal-main" id="split-body"></div>
+    <div class="modal-foot"><span class="note" id="split-info" style="margin-right:auto"></span><button class="btn primary" id="split-go" onclick="doSplit()">Teilen – rechten Teil unten einfügen</button></div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -759,6 +774,7 @@ function renderSigns(){
       ${sign.h!=rec?`<div class="hint">Die gewählte Schrifthöhe (${sign.h} mm) weicht von der Mindesthöhe nach ${NORM_INFO[sign.norm].height} (${NORM_INFO[sign.norm].short}) für Code ${sign.codeNo} ab (${rec} mm).</div>`:''}
       <div class="preview">${previewSVG(sign)}</div>
       <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${widthsText(d)} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${(sign.outerH||sign.marginMM||sign.wordGapMM||charPct(sign)!==100)?`<span>Abweichend: <b>${[sign.outerH?'Gesamthöhe '+sign.outerH+' mm':'', sign.marginMM?'Rand seitlich '+sign.marginMM+' mm':'', charPct(sign)!==100?'Zeichenabst. '+charPct(sign)+' %':'', sign.wordGapMM?'Wort-/Pfeilabst. '+sign.wordGapMM+' mm':''].filter(Boolean).join(' · ')}</b></span>`:''}</div>
+      <div class="split-wrap">${splitHintHTML(sign)}</div>
       <details class="chain"><summary>Maßkette als Text</summary>${chainHTML(sign)}</details>
       <div class="compliance">${complianceHTML(sign)}</div>
     `;
@@ -828,6 +844,65 @@ function updatePreview(card, sign){
   card.querySelector('.dims').innerHTML = `<span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${widthsText(d)} mm</b></span><span>Fläche <b>${d.area} m²</b></span>`;
   { const ch=card.querySelector('.chain'); const open=ch.open; ch.innerHTML='<summary>Maßkette als Text</summary>'+chainHTML(sign); ch.open=open; }
   card.querySelector('.compliance').innerHTML = complianceHTML(sign);
+  { const sw=card.querySelector('.split-wrap'); if(sw) sw.innerHTML = splitHintHTML(sign); }
+}
+/* ---- Schild > 3 m aufteilen (Doc 9157 Teil 6, 4.9.5: max. 3 m, sonst zwei Schilder nebeneinander) ---- */
+const MAX_SIGN_LEN = 3000;
+function splitCandidates(sign){
+  const out=[];
+  for(let i=1;i<sign.panels.length;i++) out.push({kind:'panel', at:i, left:deepCopy(sign.panels.slice(0,i)), right:deepCopy(sign.panels.slice(i)), label:`zwischen Panel ${i} und ${i+1}`});
+  // innerhalb eines Panels an Wortgrenzen (Leerzeichen)
+  sign.panels.forEach((p,pi)=>{
+    const t=PANEL_TYPES[p.type]; if(t.symbol) return;
+    const words=String(p.text||'').trim().split(/\s+/).filter(Boolean); if(words.length<2) return;
+    for(let w=1; w<words.length; w++){
+      const a={...deepCopy(p), text:words.slice(0,w).join(' ')}, b={...deepCopy(p), text:words.slice(w).join(' ')};
+      const leftArrow = /left/i.test(p.arrow||'');
+      if(t.arrow && p.arrow && p.arrow!=='none'){ if(leftArrow) b.arrow='none'; else a.arrow='none'; }
+      out.push({kind:'word', at:pi, left:[...deepCopy(sign.panels.slice(0,pi)), a], right:[b, ...deepCopy(sign.panels.slice(pi+1))], label:`in Panel ${pi+1} zwischen „${words.slice(0,w).join(' ')}“ und „${words.slice(w).join(' ')}“`});
+    }
+  });
+  return out.map(c=>{
+    const L={...deepCopy(sign), panels:c.left}, R={...deepCopy(sign), panels:c.right};
+    return {...c, L, R, wl:signDims(L).total, wr:signDims(R).total};
+  }).map(c=>({...c, ok:c.wl<=MAX_SIGN_LEN && c.wr<=MAX_SIGN_LEN, diff:Math.abs(c.wl-c.wr)}));
+}
+function splitHintHTML(sign){
+  const d=signDims(sign); if(d.total<=MAX_SIGN_LEN) return '';
+  const n=splitCandidates(sign).length;
+  return `<div class="split-hint no-print"><span>⚠ <b>Schild ist ${fmtN(d.total)} mm lang</b> – zulässig sind max. ${MAX_SIGN_LEN} mm (Doc 9157 Teil 6, 4.9.5). Längere Schilder werden auf zwei Schilder nebeneinander aufgeteilt.</span>${n?`<button class="btn small primary" onclick="openSplit(${sign.id})">Schild aufteilen …</button>`:`<span class="note">Automatische Teilung nicht möglich (nur ein Panel ohne Wortgrenze).</span>`}</div>`;
+}
+const splitState={id:null, sel:0, cands:[]};
+function openSplit(id){
+  const sign=state.signs.find(x=>x.id===id); if(!sign) return;
+  const cands=splitCandidates(sign); if(!cands.length) return;
+  // Vorauswahl: beide Teile ≤ 3 m, möglichst gleich lang; Panelgrenzen bevorzugt
+  let best=0, bs=Infinity; cands.forEach((c,i)=>{ const sc=(c.ok?0:1e6)+c.diff+(c.kind==='word'?500:0); if(sc<bs){bs=sc;best=i;} });
+  Object.assign(splitState,{id, sel:best, cands});
+  renderSplit(); $('#split-modal').classList.add('open');
+}
+function closeSplit(){ $('#split-modal').classList.remove('open'); }
+function miniSVG(sg,w,maxW){ return renderSignSVG(sg,{pad:10,bg:false}).replace('<svg ',`<svg preserveAspectRatio="xMinYMid meet" style="width:${Math.max(8,w/maxW*100).toFixed(1)}%" `); }
+function renderSplit(){
+  const sign=state.signs.find(x=>x.id===splitState.id); if(!sign) return;
+  const d=signDims(sign), maxW=Math.max(...splitState.cands.flatMap(c=>[c.wl,c.wr]));
+  $('#split-body').innerHTML = `<p style="margin-top:0">Das Schild <b>${esc(signTitle(sign)||sign.name)}</b> ist <b>${fmtN(d.total)} mm</b> lang. Wähle, wo geteilt werden soll. Der linke Teil bleibt an dieser Stelle, der rechte Teil wird als neues Schild direkt darunter eingefügt (gleiche Norm, Schrifthöhe und Einstellungen). Ränder und Trenner werden für beide Teile neu berechnet.</p>`+
+    splitState.cands.map((c,i)=>`<label class="split-opt ${i===splitState.sel?'sel':''} ${c.ok?'':'bad'}" onclick="splitState.sel=${i};renderSplit()">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><input type="radio" name="split" ${i===splitState.sel?'checked':''}> <b>Teilung ${c.label}</b> <span style="margin-left:auto;font-weight:600;color:${c.ok?'#15803d':'#b91c1c'}">${c.ok?'✓ beide Teile ≤ 3 m':'✗ ein Teil bleibt über 3 m'}</span></div>
+      <div class="sp-row"><div class="sp-part">${miniSVG(c.L,c.wl,maxW)}<div class="note">Links: <b style="color:${c.wl<=MAX_SIGN_LEN?'inherit':'#b91c1c'}">${fmtN(c.wl)} mm</b></div></div><span class="sp-cut">✂</span><div class="sp-part">${miniSVG(c.R,c.wr,maxW)}<div class="note">Rechts (neues Schild): <b style="color:${c.wr<=MAX_SIGN_LEN?'inherit':'#b91c1c'}">${fmtN(c.wr)} mm</b></div></div></div>
+    </label>`).join('');
+  const c=splitState.cands[splitState.sel];
+  $('#split-info').textContent = c ? `Ergebnis: ${fmtN(c.wl)} mm + ${fmtN(c.wr)} mm` : '';
+}
+function doSplit(){
+  const si=state.signs.findIndex(x=>x.id===splitState.id); const c=splitState.cands[splitState.sel]; if(si<0||!c) return;
+  const sign=state.signs[si];
+  const right=deepCopy(sign); signCounter++; right.id=signCounter; right.name=sign.name; right.panels=deepCopy(c.right);
+  sign.panels=deepCopy(c.left);
+  state.signs.splice(si+1,0,right);
+  closeSplit(); renderSigns(); renderOverview();
+  toast(`Schild geteilt: ${fmtN(c.wl)} mm + ${fmtN(c.wr)} mm – rechter Teil als Schild ${si+2} eingefügt`);
+  setTimeout(()=>{ const cards=document.querySelectorAll('#sign-list .sign-card'); const el=cards[si+1]; if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },60);
 }
 function chainText(p, sign){
   const t = PANEL_TYPES[p.type];
