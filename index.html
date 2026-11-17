@@ -1153,7 +1153,8 @@ async function exportPDF(signs, name){
 async function exportSVG(signs, name){
   if(!signs.length){ toast('Keine Schilder'); return; }
   const sheets=allSheets(signs); const svg = sheets.length===1 ? '<?xml version="1.0" encoding="UTF-8"?>\n'+sheets[0] : combinedSVG(sheets);
-  const blob=new Blob([svg],{type:'image/svg+xml'}); await saveFile(name, blob); afterExport({kind:'svg', name, blob});
+  if(!/\.svg$/i.test(name)) name=name.replace(/\.[a-z0-9]+$/i,'')+'.svg';
+  const blob=new Blob([svg],{type:'image/svg+xml'}); await saveFile(name, new Blob([svg],{type:'application/octet-stream'})); afterExport({kind:'svg', name, blob});
 }
 /* Wird nach jedem PDF-/SVG-Export aufgerufen → Projekt speichern */
 function afterExport(info){ if(typeof projectSaveAfterExport==='function') projectSaveAfterExport(info); }
@@ -1260,7 +1261,7 @@ $('#load-json').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f)
       Kürzel: L Standort · D Richtung · Z Ziel · X Runway exit · T Intersection take-off · V Runway vacated · R Distance remaining ·
       H Rollhalteort · C CAT · NE NO ENTRY · M Vorschrift-Freitext. Ohne Kürzel wird der Typ erraten.            */
 const XLS_ARROW = {'ç':'left','è':'right','é':'up','ê':'down','ë':'upLeft','ì':'upRight','í':'downLeft','î':'downRight'};
-const XLS_SEP = new Set(['\u009e','ž','¦','ž','¦']);
+const XLS_SEP = new Set(['\u009e','ž','¦','ž','¦','%']);
 const UNI_ARROW = {'←':'left','→':'right','↑':'up','↓':'down','↖':'upLeft','↗':'upRight','↙':'downLeft','↘':'downRight'};
 const ASCII_ARROW = [['<-','left'],['->','right'],['^','up']];
 const TYPE_CODES = {L:'location',D:'direction',Z:'destination',X:'runwayExit',T:'intersection',V:'vacated',R:'distance',H:'holding',C:'cat',NE:'noentry',M:'mandatoryText'};
@@ -1368,9 +1369,10 @@ function parseSDefRow(cells, typ){
   flush();
   const panels = segs.map(sg=>{
     let arrow='none'; const g=[...sg.glyphs];
-    if(XLS_ARROW[g[0]]){ arrow=XLS_ARROW[g.shift()]; }
-    else if(XLS_ARROW[g[g.length-1]]){ arrow=XLS_ARROW[g.pop()]; }
-    const unknown = g.filter(ch=>ch.charCodeAt(0)>=0xC0 && !XLS_ARROW[ch]);
+    const AR=ch=>XLS_ARROW[ch]||FONT_ARROW[ch];
+    if(AR(g[0])){ arrow=AR(g.shift()); }
+    else if(AR(g[g.length-1])){ arrow=AR(g.pop()); }
+    const unknown = g.filter(ch=>ch.charCodeAt(0)>=0xC0 && !AR(ch));
     if(unknown.length) warns.push('Sonderzeichen nicht zugeordnet: '+unknown.map(ch=>'CHAR('+ch.charCodeAt(0)+')').join(', '));
     const text = g.filter(ch=>!unknown.includes(ch)).join('').replace(/\s+/g,' ').trim();
     const type = guessType(text, arrow!=='none', sg.color, mandatory);
@@ -1441,6 +1443,7 @@ function importedToSign(it, defNorm, defCode){
   else if(defCode!=='auto') s.codeNo = defCode;
   else if(it.h) s.codeNo = codeFromHeight(it.h, s.panels.some(p=>PANEL_TYPES[p.type].cat==='mandatory'));
   s.h = it.h || rec();
+  if(it.face){ const f=Number(it.face); if(f===P(s.norm,'faceHeight',s.h)) s.faceMode='norm'; else if(f===2*s.h) s.faceMode='2H'; else { s.faceMode='custom'; s.faceCustom=f; } }
   if(it.nr && !s.number) s.number = String(it.nr).trim();
   return normalizeSign(s);
 }
@@ -1683,6 +1686,10 @@ async function imageImport(file){
     toast('Bild wird analysiert …');
     const url=URL.createObjectURL(file);
     const im=await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error('Bild nicht lesbar')); i.src=url; });
+    { const st=Math.min(1, 3000/Math.max(im.width,im.height)); const ct=document.createElement('canvas'); ct.width=Math.max(1,Math.round(im.width*st)); ct.height=Math.max(1,Math.round(im.height*st));
+      const gt=ct.getContext('2d',{willReadFrequently:true}); gt.drawImage(im,0,0,ct.width,ct.height);
+      const tbl=analyzeTableImage(gt.getImageData(0,0,ct.width,ct.height));
+      if(tbl && tbl.rows.length>=3 && tbl.rows.filter(r=>r.tokens.length>=2).length>=3){ URL.revokeObjectURL(url); await tableImport(file, tbl); return; } }
     const sc=Math.min(1, 1600/Math.max(im.width,im.height)); const c=document.createElement('canvas'); c.width=Math.max(1,Math.round(im.width*sc)); c.height=Math.max(1,Math.round(im.height*sc));
     const g=c.getContext('2d'); g.drawImage(im,0,0,c.width,c.height); URL.revokeObjectURL(url);
     const found=analyzeSignImage(g.getImageData(0,0,c.width,c.height));
@@ -1716,6 +1723,332 @@ async function imageImport(file){
     openImport();
   }catch(e){ toast('Bild-Import fehlgeschlagen: '+(e.message||e)); }
 }
+
+/* ================= Bild-Import: Tabellen (Screenshot einer Schilderliste, z. B. Excel) =================
+   Erwartet: links Schildnummer, daneben je Zelle ein Zeichen mit Zellfarbe (rot/gelb/schwarz), rechts Schrifthöhe und Panelhöhe.
+   Schilderschrift in Excel (anhand der gerenderten Tabelle bestätigt): Á ←, á →, À ↑, Â ↖, % Trennstrich. */
+const FONT_ARROW = {'Á':'left','á':'right','À':'up','Â':'upLeft'};
+const FONT_SEP = new Set(['%']);
+const COMBINING = {grave:'̀', acute:'́', circ:'̂', tilde:'̃', diaer:'̈'};
+
+/* Zeichenzellen einer Zeile → Panels (Farbwechsel, Lücke, Trennstrich trennen; Pfeile in der Mitte teilen Felder) */
+function tokensToPanels(tokens, mandatoryHint){
+  const warns=[], segs=[]; let cur=null, lastCol=-9;
+  const flush=()=>{ if(cur&&cur.t.length) segs.push(cur); cur=null; };
+  tokens.forEach(tk=>{
+    if(tk.sep){ flush(); lastCol=tk.col; return; }
+    if(cur && tk.color!==cur.color) flush();
+    if(!cur) cur={color:tk.color, t:[]};
+    cur.t.push(tk); lastCol=tk.col;
+  });
+  flush();
+  const panels=[];
+  segs.forEach(sg=>{
+    let p={text:[], arrow:'none', lead:false};
+    const close=()=>{ if(p.text.length||p.arrow!=='none') panels.push({color:sg.color, ...p}); p={text:[], arrow:'none', lead:false}; };
+    sg.t.forEach((tk,i)=>{
+      if(tk.arrow){
+        if(p.text.length && p.arrow==='none'){ p.arrow=tk.arrow; close(); }
+        else if(!p.text.length && p.arrow==='none'){ p.arrow=tk.arrow; p.lead=true; }
+        else warns.push('zusätzlicher Pfeil ignoriert');
+      } else {
+        if(p.arrow!=='none' && !p.lead){ close(); }
+        p.text.push(tk.ch);
+      }
+    });
+    close();
+  });
+  const joinTxt=arr=>arr.reduce((s,t,i)=>{ if(!i) return t; const prev=arr[i-1]; const sp=/^[A-Z0-9]+$/i.test(prev)&&/^[A-Z0-9]+$/i.test(t)&&(prev.length>1||t.length>1); return s+(sp?' ':'')+t; },'');
+  const out=panels.map(pn=>{
+    let text=joinTxt(pn.text);
+    if(/^CAT/i.test(text)) text=text.replace(/^CAT\s*/i,'CAT ');
+    const color=pn.color==='Y'?'yellow':pn.color==='R'?'red':'black';
+    const type=guessType(text, pn.arrow!=='none', color, mandatoryHint);
+    const fp=finishPanel(type, text, pn.arrow);
+    if(pn.arrow!=='none' && fp.arrow==='none') warns.push('Pfeil bei „'+text+'“ verworfen (Feldtyp ohne Pfeil) – bitte prüfen');
+    return fp;
+  });
+  return {panels:out, warns};
+}
+
+function analyzeTableImage(img){
+  const W=img.width, H=img.height, D=img.data, cls=new Uint8Array(W*H);
+  for(let i=0;i<W*H;i++) cls[i]=pxClass(D[i*4],D[i*4+1],D[i*4+2]);
+  const isSign=c=>c===1||c===3||c===4;
+  // linker Rand des Schildbereichs: erste breite Spaltengruppe mit vielen Schildfarb-Pixeln
+  const colCnt=new Array(W).fill(0); for(let x=0;x<W;x++){ let n=0; for(let y=0;y<H;y++){ const c=cls[y*W+x]; if(c===3||c===4) n++; } colCnt[x]=n; }
+  const cr=runsOf(colCnt, v=>v>=H*0.08, 20, 3); if(!cr.length) return null;
+  const areaX0=cr[0][0];
+  // Zeilen über die Nummern in der linken Spalte (blaue/dunkle Schrift), sonst über Farbbänder
+  let bands=[];
+  let nBlue=0; for(let y=0;y<H;y+=2) for(let x=0;x<areaX0;x+=2){ const i=(y*W+x)*4; if(D[i+2]>D[i]+50&&D[i+2]>110) nBlue++; }
+  const labelBlue=nBlue>40;
+  { const lab=inkMask(D,W,0,0,Math.max(1,areaX0-6),H-1,H,(R,G,B)=>{ const mx=Math.max(R,G,B); return (B>R+50&&B>110)||(!labelBlue&&mx<90); });
+    if(lab){ const rowHas=new Array(H).fill(0); for(let y=0;y<H;y++){ let n=0; for(let x=0;x<lab.w;x++) n+=lab.m[y*lab.w+x]; rowHas[y]=n>=2?1:0; }
+      const lr=runsOf(rowHas,v=>v,6,2).map(([a,b])=>({a,b,c:(a+b)/2}));
+      // nur Zeilen, auf deren Höhe Schildfarben liegen
+      const occAt=y=>{ let n=0; for(let x=areaX0;x<W;x+=2){ const c=cls[y*W+x]; if(c===3||c===4||c===1) n++; } return n; };
+      const lines=lr.filter(l=>occAt(Math.round(l.c))>=8);
+      if(lines.length>=3){
+        const pitch=[]; for(let i=1;i<lines.length;i++) pitch.push(lines[i].c-lines[i-1].c); pitch.sort((x,y)=>x-y); const pm=pitch[Math.floor(pitch.length/2)];
+        bands=lines.map((l,i)=>{ const up=i? (lines[i-1].c+l.c)/2 : l.c-pm/2, dn=i<lines.length-1? (lines[i+1].c+l.c)/2 : l.c+pm/2; return [Math.max(0,Math.round(Math.max(up,l.c-pm*0.55))), Math.min(H-1,Math.round(Math.min(dn,l.c+pm*0.55)))]; });
+        // auf die Zellfläche einengen
+        bands=bands.map(([y0,y1],i)=>{ const c=Math.round(lines[i].c), ref=occAt(c), thr=ref*0.6; let a=c, b=c; while(a>y0 && occAt(a-1)>=thr && occAt(a-1)<=ref*1.6) a--; while(b<y1 && occAt(b+1)>=thr && occAt(b+1)<=ref*1.6) b++; return [a,b]; });
+      }
+    }
+  }
+  if(bands.length<3){
+    const minRun=Math.max(20,Math.round(W*0.03)), occ=new Array(H).fill(0);
+    for(let y=0;y<H;y++){ let x=0, sm=0; while(x<W){ const c=cls[y*W+x]; if(isSign(c)){ let j=x; while(j<W&&cls[y*W+j]===c) j++; if(j-x>=minRun && c!==1 || j-x>=minRun*2) sm+=j-x; x=j; } else x++; } occ[y]=sm; }
+    bands=runsOf(occ, v=>v>=minRun, 6, 0);
+  }
+  if(bands.length<3) return null;
+  const hs=bands.map(([a,b])=>b-a+1).sort((a,b)=>a-b), med=hs[Math.floor(hs.length/2)];
+  bands=bands.filter(([a,b])=>{ const h=b-a+1; return h>=med*0.6 && h<=med*1.6; });
+  if(bands.length<3) return null;
+  // Zellhintergrund je Spalte (obere und untere Randzone des Bandes) → Farbsegmente
+  const rows=bands.map(([y0,y1])=>{
+    const h=y1-y0+1, zs=[[y0+1, y0+Math.max(2,Math.round(h*0.18))],[y1-Math.max(2,Math.round(h*0.18)), y1-1]];
+    const bg=new Uint8Array(W);
+    for(let x=0;x<W;x++){ const cnt=[0,0,0,0,0]; let n=0; zs.forEach(([a,b])=>{ for(let y=a;y<=b;y++){ cnt[cls[y*W+x]]++; n++; } }); const best=[1,3,4].reduce((m,c)=>cnt[c]>cnt[m]?c:m,1); bg[x]= cnt[best]>=0.6*n ? best : 0; }
+    const segs=[]; let x=0;
+    while(x<W){ const c=bg[x]; if(!c){ x++; continue; } let j=x; while(j<W && (bg[j]===c || (bg[j]===0 && j+1<W && bg[j+1]===c && false))) j++; if(j-x>=h*0.9) segs.push({x1:x,x2:j-1,c}); x=j; }
+    return {y0,y1,h,segs};
+  }).filter(r=>r.segs.length);
+  if(rows.length<3) return null;
+  // Spaltenraster: linker Rand = häufigster Segmentanfang links, Zellbreite = beste Teilung aller Segmentbreiten
+  const starts=rows.map(r=>r.segs[0].x1), gx0=Math.max(areaX0-2, Math.min(...starts));
+  const widths=[]; rows.forEach(r=>r.segs.forEach(s=>widths.push(s.x2-s.x1+1)));
+  const mh=med; let best=null;
+  // größte Teilung, die alle Segmentbreiten als ganze Vielfache erklärt (kleinere Teiler passen sonst ebenfalls)
+  const minW=Math.min(...widths);
+  for(let c=Math.round(Math.min(mh*12,minW*1.15)); c>=Math.round(mh*1.2); c--){ let err=0; widths.forEach(w=>{ const k=Math.max(1,Math.round(w/c)); err+=Math.abs(w/c-k); }); err/=widths.length; if(!best||err<best.err*0.7-0.005) best={c,err}; }
+  const cellW=best.c;
+  const signRight=Math.max(...rows.map(r=>r.segs[r.segs.length-1].x2));
+  rows.forEach(r=>{
+    r.tokens=[];
+    r.segs.forEach((sg,si)=>{
+      const prevEnd = si ? r.segs[si-1].x2 : -1e9;
+      const k0=Math.max(0,Math.round((sg.x1-gx0)/cellW)), k1=Math.max(k0,Math.round((sg.x2+1-gx0)/cellW)-1);
+      const col= sg.c===3?'Y':sg.c===4?'R':'K';
+      for(let k=k0;k<=k1;k++){
+        const gl=Math.round(gx0+k*cellW)+2, cx0= (k===k0 && sg.x1-prevEnd>cellW*0.25) ? Math.max(gl, sg.x1-Math.round(cellW*0.15)) : Math.max(sg.x1, gl), cx1=Math.min(sg.x2, Math.round(gx0+(k+1)*cellW)-3);
+        const cy0=r.y0+2, cy1=r.y1-2;
+        if(cx1-cx0<4) continue;
+        const mask=new Uint8Array(W*H); let n=0;
+        for(let y=cy0;y<=cy1;y++) for(let x=cx0;x<=cx1;x++){ const i=y*W+x, c=cls[i];
+          const R=D[i*4], G=D[i*4+1], B=D[i*4+2], lum=0.3*R+0.59*G+0.11*B;
+          const fg = col==='Y' ? lum<130 : col==='R' ? (G>150 && B>150) : (R>140 && G>120);
+          if(fg){ mask[i]=2; n++; } }
+        for(let x=cx0;x<=cx1;x++){ let cnt=0; for(let y=cy0;y<=cy1;y++) if(mask[y*W+x]) cnt++; if(cnt>0.9*(cy1-cy0+1)) for(let y=cy0;y<=cy1;y++) if(mask[y*W+x]){ mask[y*W+x]=0; n--; } }
+        for(let y=cy0;y<=cy1;y++){ let run=0; for(let x=cx0;x<=cx1+1;x++){ if(x<=cx1 && mask[y*W+x]) run++; else { if(run>r.h*1.2) for(let xx=x-run; xx<x; xx++){ mask[y*W+xx]=0; n--; } run=0; } } }
+        if(n<6) continue;
+        let comps=components(mask,W,cx0,cy0,cx1,cy1).filter(c=>c.n>=4);
+        if(!comps.length) continue;
+        r.tokens.push({col:k, color:col, comps, mask, box:[cx0,cy0,cx1,cy1]});
+      }
+    });
+    // Nummer links (blaue oder dunkle Schrift), Unterstreichung und senkrechte Linien entfernen
+    const lx0=0, lx1=Math.max(0, gx0-4);
+    const blue=(R,G,B)=>B>R+50 && B>110;
+    r.label = inkBox(D,W,lx0,r.y0-Math.round(r.h*0.1),lx1,r.y1+Math.round(r.h*0.1),H, labelBlue ? blue : (R,G,B)=>blue(R,G,B)||Math.max(R,G,B)<90);
+    // Zahlen rechts
+    const rx0=Math.min(W-1, Math.round(signRight+cellW*0.4));
+    r.nums = inkGroups(D,W,rx0,r.y0,W-1,r.y1,H,(R,G,B)=>Math.max(R,G,B)<110, r.h);
+  });
+  return {rows, cellW, gx0, W, D, labelBlue};
+}
+/* Tinte in einem Bereich als Maske; lange waagerechte/senkrechte Linien raus */
+function inkMask(D,W,x0,y0,x1,y1,H,test){
+  y0=Math.max(0,y0); y1=Math.min(H-1,y1); x0=Math.max(0,x0); x1=Math.min(W-1,x1);
+  const w=x1-x0+1, h=y1-y0+1; if(w<2||h<2) return null;
+  const m=new Uint8Array(w*h);
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){ const i=((y+y0)*W+x+x0)*4; if(test(D[i],D[i+1],D[i+2])) m[y*w+x]=1; }
+  for(let x=0;x<w;x++){ let n=0; for(let y=0;y<h;y++) n+=m[y*w+x]; if(n>0.7*h) for(let y=0;y<h;y++) m[y*w+x]=0; }
+  const lim=Math.max(12, Math.min(h,60)*1.2);
+  for(let y=0;y<h;y++){ let run=0; for(let x=0;x<=w;x++){ if(x<w && m[y*w+x]) run++; else { if(run>lim) for(let xx=x-run; xx<x; xx++) m[y*w+xx]=0; run=0; } } }
+  return {m,w,h,x0,y0};
+}
+function inkBox(D,W,x0,y0,x1,y1,H,test){
+  const k=inkMask(D,W,x0,y0,x1,y1,H,test); if(!k) return null;
+  let a=1e9,b=-1,c=1e9,d=-1; for(let y=0;y<k.h;y++) for(let x=0;x<k.w;x++) if(k.m[y*k.w+x]){ if(x<a)a=x; if(x>b)b=x; if(y<c)c=y; if(y>d)d=y; }
+  if(b<0) return null; return {...k, bx:[a,c,b,d]};
+}
+function inkGroups(D,W,x0,y0,x1,y1,H,test,rh){
+  const k=inkMask(D,W,x0,y0,x1,y1,H,test); if(!k) return [];
+  const colHas=new Array(k.w).fill(0); for(let x=0;x<k.w;x++) for(let y=0;y<k.h;y++) if(k.m[y*k.w+x]){ colHas[x]=1; break; }
+  const gr=runsOf(colHas, v=>v, 2, Math.round(rh*0.6));
+  return gr.map(([a,b])=>{ let c=1e9,d=-1; for(let y=0;y<k.h;y++) for(let x=a;x<=b;x++) if(k.m[y*k.w+x]){ if(y<c)c=y; if(y>d)d=y; } return d<0?null:{...k, bx:[a,c,b,d]}; }).filter(Boolean).slice(0,3);
+}
+/* führenden Backslash („\442.2“) aus der Nummernmaske entfernen: erste Spaltengruppe, schräg und dünn */
+function stripBackslash(k){
+  const [a,c,b,d]=k.bx, h=d-c+1; let x=a, gapStart=-1;
+  const colN=x=>{ let n=0; for(let y=c;y<=d;y++) n+=k.m[y*k.w+x]; return n; };
+  while(x<=b && colN(x)===0) x++;
+  let x2=x; while(x2<=b && colN(x2)>0) x2++;
+  const w=x2-x; if(w<=0||w>h*0.9) return;
+  // Schräglage: oben links, unten rechts
+  let tops=0, bots=0; for(let xx=x; xx<x2; xx++){ for(let y=c;y<=c+h*0.3;y++) if(k.m[y*k.w+xx]) tops+=xx; for(let y=d-h*0.3;y<=d;y++) if(k.m[Math.round(y)*k.w+xx]) bots+=xx; }
+  let nT=0,nB=0; for(let xx=x; xx<x2; xx++){ for(let y=c;y<=c+h*0.3;y++) nT+=k.m[y*k.w+xx]; for(let y=d-h*0.3;y<=d;y++) nB+=k.m[Math.round(y)*k.w+xx]; }
+  if(nT&&nB && tops/nT < bots/nB - w*0.2){ for(let xx=x; xx<x2; xx++) for(let y=c;y<=d;y++) k.m[y*k.w+xx]=0; let na=x2; while(na<=b && colN(na)===0) na++; k.bx=[na,c,b,d]; }
+}
+/* Nummern/Zahlen aus den Originalpixeln (weiche Kanten) – Linien bleiben über die Maske entfernt */
+function softCanvas(D,W,k,blue){
+  const [a,c,b,d]=k.bx, bw=b-a+1, bh=d-c+1, sc=Math.max(1,64/bh), pad=Math.round(bh*0.5);
+  const sw=bw+2*pad, shh=bh+2*pad, small=document.createElement('canvas'); small.width=sw; small.height=shh;
+  const sg=small.getContext('2d'), id=sg.createImageData(sw,shh); id.data.fill(255);
+  const near=(x,y)=>{ for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ const xx=x+dx, yy=y+dy; if(xx>=0&&yy>=0&&xx<k.w&&yy<k.h&&k.m[yy*k.w+xx]) return true; } return false; };
+  for(let y=c;y<=d;y++) for(let x=a;x<=b;x++){ if(!near(x,y)) continue; const i=((y+k.y0)*W+x+k.x0)*4, R=D[i],G=D[i+1],B=D[i+2];
+    const ink = blue ? Math.max(0,Math.min(1,(B-Math.max(R,G)-10)/120)) : Math.max(0,Math.min(1,(200-(0.3*R+0.59*G+0.11*B))/160));
+    const j=((y-c+pad)*sw+(x-a+pad))*4; id.data[j]=id.data[j+1]=id.data[j+2]=Math.round(255*(1-ink)); }
+  sg.putImageData(id,0,0);
+  const cv=document.createElement('canvas'); cv.width=Math.round(sw*sc); cv.height=Math.round(shh*sc);
+  const g=cv.getContext('2d'); g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high'; g.drawImage(small,0,0,cv.width,cv.height);
+  return cv;
+}
+/* Maske → Canvas (schwarz auf weiß, ca. 64 px Zeichenhöhe) */
+function maskCanvas(k){
+  const [a,c,b,d]=k.bx, bw=b-a+1, bh=d-c+1, sc=Math.max(1,64/bh), pad=Math.round(bh*0.5);
+  const sw=bw+2*pad, shh=bh+2*pad, small=document.createElement('canvas'); small.width=sw; small.height=shh;
+  const sg=small.getContext('2d'), id=sg.createImageData(sw,shh); id.data.fill(255);
+  for(let y=c;y<=d;y++) for(let x=a;x<=b;x++) if(k.m[y*k.w+x]){ const j=((y-c+pad)*sw+(x-a+pad))*4; id.data[j]=id.data[j+1]=id.data[j+2]=0; }
+  sg.putImageData(id,0,0);
+  const cv=document.createElement('canvas'); cv.width=Math.round(sw*sc); cv.height=Math.round(shh*sc);
+  const g=cv.getContext('2d'); g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high'; g.drawImage(small,0,0,cv.width,cv.height);
+  return cv;
+}
+function compsCanvas(comps, W){
+  const x0=Math.min(...comps.map(c=>c.x1)), x1=Math.max(...comps.map(c=>c.x2)), y0=Math.min(...comps.map(c=>c.y1)), y1=Math.max(...comps.map(c=>c.y2));
+  const bh=y1-y0+1, sc=Math.max(1,64/Math.max(bh,8)), pad=Math.round(Math.max(bh,8)*0.5);
+  const sw=x1-x0+1+2*pad, shh=bh+2*pad, small=document.createElement('canvas'); small.width=sw; small.height=shh;
+  const sg=small.getContext('2d'), id=sg.createImageData(sw,shh); id.data.fill(255);
+  comps.forEach(p=>p.px.forEach(i=>{ const x=i%W, y=(i-x)/W, j=((y-y0+pad)*sw+(x-x0+pad))*4; id.data[j]=id.data[j+1]=id.data[j+2]=0; }));
+  sg.putImageData(id,0,0);
+  const cv=document.createElement('canvas'); cv.width=Math.round(sw*sc); cv.height=Math.round(shh*sc);
+  const g=cv.getContext('2d'); g.imageSmoothingEnabled=true; g.imageSmoothingQuality='high'; g.drawImage(small,0,0,cv.width,cv.height);
+  return cv;
+}
+/* Pfeilsymbol der Schilderschrift (gefüllter Pfeil) über das Dickenprofil entlang der 8 Richtungen */
+function arrowByProfile(c, W){
+  if(c.n<20) return null;
+  const bw=c.x2-c.x1+1, bh2=c.y2-c.y1+1; if(c.n < 0.42*bw*bh2) return null;   // Pfeilsymbole sind kräftig gefüllt
+  const pts=c.px.map(i=>{ const x=i%W; return [x,(i-x)/W]; });
+  const dirs={right:[1,0],left:[-1,0],down:[0,1],up:[0,-1],downRight:[0.7071,0.7071],upLeft:[-0.7071,-0.7071],upRight:[0.7071,-0.7071],downLeft:[-0.7071,0.7071]};
+  let best=null;
+  for(const [name,[dx,dy]] of Object.entries(dirs)){
+    const u=pts.map(([x,y])=>x*dx+y*dy), v=pts.map(([x,y])=>-x*dy+y*dx);
+    const u0=Math.min(...u), u1=Math.max(...u), L=u1-u0+1; if(L<8) continue;
+    const NB=16, lo=new Array(NB).fill(1e9), hi=new Array(NB).fill(-1e9);
+    u.forEach((uu,i)=>{ const b=Math.min(NB-1,Math.floor((uu-u0)/L*NB)); if(v[i]<lo[b]) lo[b]=v[i]; if(v[i]>hi[b]) hi[b]=v[i]; });
+    const th=lo.map((l,i)=>hi[i]>=l? hi[i]-l+1 : 0), mid=lo.map((l,i)=>(l+hi[i])/2), mx=Math.max(...th);
+    if(mx<4 || L<mx*0.9) continue;
+    // Schaft: dünn und gleichmäßig; dann abrupter Sprung auf den Kopf; Kopf läuft zur Spitze schmal zu
+    let hs=th.findIndex(t=>t>=0.8*mx); if(hs<2) continue;
+    const tail=th.slice(0,Math.max(2,hs-1));
+    if(hs<NB*0.15 || hs>NB*0.6) continue;
+    if(Math.max(...tail)>0.45*mx || Math.min(...tail)<0.2*mx || Math.max(...tail)-Math.min(...tail)>0.25*mx+1) continue;
+    if(th[hs-1]>0.7*mx) continue;
+    if(th[NB-1]>0.4*mx) continue;
+    let mono=true; let pk=hs; while(pk<NB-1 && th[pk+1]>=th[pk]-1) pk++; for(let i=pk;i<NB-1;i++) if(th[i+1]>th[i]+mx*0.12) mono=false;
+    if(!mono || pk>NB-3) continue;
+    const shaftMid=mid.slice(0,hs).reduce((a,b)=>a+b,0)/hs, headMid=mid.slice(hs,pk+1).reduce((a,b)=>a+b,0)/(pk-hs+1);
+    if(Math.abs(shaftMid-headMid)>0.15*mx) continue;
+    const score=mx/Math.max(...tail);
+    if(!best||score>best.score) best={name,score};
+  }
+  return best && best.score>2.2 ? best.name : null;
+}
+/* Anzahl senkrechter Striche (für II / III): gleiche Lauf-Anzahl und -Lage auf 30/50/70 % Höhe */
+function stemsOf(body,g,W){
+  const set=new Set(); body.forEach(c=>c.px.forEach(i=>set.add(i)));
+  const h=g.y2-g.y1+1; const lv=[0.2,0.35,0.5,0.65,0.8].map(f=>{ const y=Math.round(g.y1+h*f), runs=[]; let s=-1; for(let x=g.x1;x<=g.x2+1;x++){ const on=x<=g.x2&&set.has(y*W+x); if(on&&s<0) s=x; if(!on&&s>=0){ runs.push([s,x-1]); s=-1; } } return runs; });
+  const n=lv[0].length; if(n<2 || lv.some(r=>r.length!==n)) return 0;
+  for(let i=0;i<n;i++){ const cs=lv.map(r=>(r[i][0]+r[i][1])/2); if(Math.max(...cs)-Math.min(...cs)>0.05*h) return 0; if(lv.some(r=>r[i][1]-r[i][0]+1>0.25*h)) return 0; }
+  return n;
+}
+/* oberes und unteres Ende schmal (Schrägstrich), nicht breit wie bei L, Z, 7 */
+function endsNarrow(c,W){ const w=c.x2-c.x1+1, h=c.y2-c.y1+1; const span=y=>{ let a=1e9,b=-1; c.px.forEach(i=>{ const x=i%W, yy=(i-x)/W; if(yy===y){ if(x<a)a=x; if(x>b)b=x; } }); return b<0?0:b-a+1; }; return span(c.y1+1)<0.45*w && span(c.y2-1)<0.45*w; }
+/* Schräglage einer Komponente: >0 = von unten links nach oben rechts („/“) */
+function slantOf(c,W){ const h=c.y2-c.y1+1; let tx=0,tn=0,bx=0,bn=0; c.px.forEach(i=>{ const x=i%W, y=(i-x)/W; if(y<c.y1+h*0.3){tx+=x;tn++;} else if(y>c.y2-h*0.3){bx+=x;bn++;} }); if(!tn||!bn) return 0; return (tx/tn-bx/bn)/h; }
+/* Akzent über einem Zeichen (Á/À/Â/á …) aus der Form des kleinen Teils oberhalb */
+function accentType(c, W){
+  const mx=c.sx/c.n, my=c.sy/c.n; let sxy=0,sxx=0,syy=0;
+  c.px.forEach(i=>{ const x=i%W, y=(i-x)/W, dx=x-mx, dy=y-my; sxy+=dx*dy; sxx+=dx*dx; syy+=dy*dy; });
+  const corr=sxy/Math.sqrt(Math.max(1e-9,sxx*syy)), w=c.x2-c.x1+1, h=c.y2-c.y1+1;
+  // Mitte oben höher als Ränder → Zirkumflex
+  if(Math.abs(corr)<0.35 && w>=1.3*h) return 'circ';
+  return corr>0 ? 'grave' : 'acute';
+}
+async function tableImport(file, tbl){
+  let worker=null, ocrErr='';
+  try{ toast('Texterkennung wird geladen …'); worker=await ocrWorker(); }catch(e){ ocrErr='Texterkennung nicht verfügbar (Internet?) – Beschriftungen bitte nachtragen'; }
+  const rec=async(cv, wl, psm)=>{ if(!worker||!cv) return ''; await worker.setParameters({tessedit_char_whitelist:wl, tessedit_pageseg_mode:String(psm)}); const r=await worker.recognize(cv); return String(r.data.text||'').trim(); };
+  const items=[]; const W=tbl.W;
+  for(let ri=0; ri<tbl.rows.length; ri++){
+    const r=tbl.rows[ri], warns=[]; if(ocrErr) warns.push(ocrErr);
+    toast(`Tabelle: Zeile ${ri+1} von ${tbl.rows.length} …`);
+    // Zeichenhöhe der Zeile (für Akzent- und Kleinbuchstabenerkennung)
+    const capH=Math.max(...r.tokens.map(t=>Math.max(...t.comps.map(c=>c.y2-c.y1+1))), 1);
+    const tokens=[];
+    for(const tk of r.tokens){
+      const mainH=capH*0.45;
+      let main=tk.comps.filter(c=>c.y2-c.y1+1>=mainH*0.6 || c.n>=capH*capH*0.04);
+      if(!main.length) main=tk.comps;
+      const top=Math.min(...main.map(c=>c.y1));
+      const big=main.filter(c=>c.y2-c.y1+1>=0.5*capH);
+      const bodyTop=big.length?Math.min(...big.map(c=>c.y1)):top;
+      const bx1=big.length?Math.min(...big.map(c=>c.x1)):0, bx2=big.length?Math.max(...big.map(c=>c.x2)):0;
+      const acc=big.length? tk.comps.filter(c=>!big.includes(c) && c.y2<bodyTop+capH*0.05 && c.y2-c.y1+1<0.4*capH && c.x2>=bx1 && c.x1<=bx2 && c.n>=3) : [];
+      const body=tk.comps.filter(c=>!acc.includes(c));
+      // gezeichneter Pfeil?
+      const g={x1:Math.min(...body.map(c=>c.x1)),x2:Math.max(...body.map(c=>c.x2)),y1:Math.min(...body.map(c=>c.y1)),y2:Math.max(...body.map(c=>c.y2))};
+      const ar = tk.color==='R' ? null : body.length===1 ? (arrowByProfile(body[0],W) || detectArrow(g, tk.mask, W)) : (body.length===2 ? detectArrow(g, tk.mask, W) : null);
+      if(ar){ tokens.push({col:tk.col,color:tk.color,arrow:ar}); continue; }
+      const bodyH=g.y2-g.y1+1, bodyW=g.x2-g.x1+1;
+      let t='';
+      if(bodyW>1.8*bodyH && bodyH<0.35*capH) t='-';
+      else {
+        const thin=body.filter(c=>{ const w=c.x2-c.x1+1, h=c.y2-c.y1+1; return h>=0.6*capH && w<=0.42*h; });
+        const sl=body.length===1 ? slantOf(body[0],W) : 0;
+        if(body.length===1 && Math.abs(sl)>0.18 && (body[0].x2-body[0].x1+1)<0.7*bodyH && body[0].n<0.35*bodyW*bodyH && endsNarrow(body[0],W)) t = sl>0 ? '/' : '\\';
+        else if(bodyH>=0.75*capH && body.length>=2 && stemsOf(body,g,W)>=2) t='I'.repeat(Math.min(3,stemsOf(body,g,W)));
+        else if(body.length>=2 && thin.length===body.length) t='I'.repeat(Math.min(3,body.length));
+        else { const cv=compsCanvas(body,W), WL='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/%m'; for(const ps of [10,7,8,13]){ t=(await rec(cv,WL,ps)).replace(/\s+/g,''); if(t) break; } }
+      }
+      if(!t){ t='?'; warns.push('Zeichen nicht lesbar (Spalte '+(tk.col+1)+')'); }
+      if(t.length===2 && t[0]===t[1] && body.length===1 && /[A-Z0-9]/.test(t[0])) t=t[0];
+      if(acc.length && !/^[Aa]$/.test(t[0]||'') ) acc.length=0;
+      if(acc.length){
+        const base=(bodyH<0.8*capH ? 'a' : (t[0]||'A').toUpperCase());
+        const ty=acc.length>=2?'diaer':accentType(acc[0],W);
+        t=(base+COMBINING[ty]).normalize('NFC');
+      } else if(/^[1l|]+$/.test(t) && tk.color==='R' && t.length>1){ t='I'.repeat(Math.min(3,t.length)); }
+      if(t==='a' && !acc.length) t='a';
+      if(FONT_SEP.has(t)){ tokens.push({col:tk.col,color:tk.color,sep:true}); continue; }
+      if(FONT_ARROW[t]){ tokens.push({col:tk.col,color:tk.color,arrow:FONT_ARROW[t]}); continue; }
+      if(t==='|'){ tokens.push({col:tk.col,color:tk.color,sep:true}); continue; }
+      tokens.push({col:tk.col,color:tk.color,ch:t, bodyH});
+    }
+    // „I“ zwischen Pfeil und Text in Hinweisfeldern = Trennstrich (Schilderschrift rendert % als Balken)
+    tokens.forEach((tk,i)=>{ if(/^[I1l|]$/.test(tk.ch||'') && tk.color!=='R'){ const p=tokens[i-1], n=tokens[i+1]; if((p&&p.arrow)||(n&&n.arrow)){ tk.sep=true; delete tk.ch; } } });
+    // Ziffern/Buchstaben im Kontext angleichen
+    const letters=tokens.filter(t=>t.ch&&/^[A-Z]$/.test(t.ch)).length, digits=tokens.filter(t=>t.ch&&/^\d$/.test(t.ch)).length;
+    tokens.forEach(tk=>{ if(!tk.ch||tk.ch.length!==1) return; if(digits>letters && tk.color!=='K'){ tk.ch=tk.ch.replace('O','0').replace('I','1').replace('S','5').replace('Z','2').replace('B','8'); } else if(letters>digits && tk.color==='R'){ tk.ch=tk.ch.replace('0','O').replace('1','I'); } });
+    const mandatory=tokens.some(t=>t.color==='R');
+    const {panels, warns:w2}=tokensToPanels(tokens, mandatory); warns.push(...w2);
+    // Nummer, Schrift- und Panelhöhe
+    let nr=''; if(r.label){ const lc=softCanvas(tbl.D,W,r.label,tbl.labelBlue); let a=(await rec(lc,'0123456789.\\',7)).replace(/\s+/g,''); nr = /^\\/.test(a) ? a.slice(1) : (await rec(lc,'0123456789.',7)); nr=nr.replace(/\.{2,}/g,'.').replace(/[^0-9.\-\/]/g,'').replace(/^[.\-\/]+|[.\-\/]+$/g,''); }
+    const nums=[]; for(const gk of r.nums){ const txt=await rec(softCanvas(tbl.D,W,gk,false),'0123456789 ',7);
+      txt.split(/\s+/).map(v=>v.replace(/\D/g,'')).filter(Boolean).forEach(v=>{ if(v.length===6||v.length===7){ nums.push(Number(v.slice(0,3))); nums.push(Number(v.slice(3))); } else nums.push(Number(v)); }); }
+    let h=normHeight(nums[0]); let face=nums[1]&&nums[1]>=(h||0) ? nums[1] : null;
+    if(!h) warns.push('Schrifthöhe nicht gelesen');
+    if(!panels.length) continue;
+    items.push({row:ri+1, nr, location:'', description:'', label:'', h, face, norm:null, code:null, mandatory, panels, warns, source:'Bild-Tabelle'});
+  }
+  impResult={file:file.name, format:`Bild-Tabelle (${items.length} Schilder erkannt)`, signs:items};
+  openImport();
+}
+
 $('#load-img').addEventListener('change', e=>{ const f=e.target.files[0]; if(f) imageImport(f); e.target.value=''; });
 
 /* ================= Projektablage in SharePoint („Sign Creator Projekte“, Microsoft Graph) =================
