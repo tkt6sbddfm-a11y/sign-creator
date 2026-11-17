@@ -31,7 +31,7 @@
   button.primary:hover{background:#1e40af}
   button.danger{color:#b91c1c;border-color:#fecaca}
   button.small{padding:4px 8px;font-size:12px}
-  .sign-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .sign-head{display:flex;align-items:flex-end;gap:10px;margin-bottom:10px;flex-wrap:wrap}
   .sign-head h3{margin:0;font-size:15px}
   .sign-head .spacer{flex:1}
   .panels{margin-top:10px;display:flex;flex-direction:column;gap:6px}
@@ -98,7 +98,7 @@
   .src a{color:var(--acc);text-decoration:none}.src li{margin-bottom:6px}
   .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
   @media print{
-    header,nav,.toolbar,.no-print,.sign-card .row,.panels,.sign-head button,.hint{display:none!important}
+    header,nav,.toolbar,.no-print,.sign-card .row,.sgroups,.panels,.sign-head button,.hint{display:none!important}
     body{background:#fff}
     main{max-width:none;padding:0}
     .view{display:none!important}
@@ -166,6 +166,19 @@
   .np-btn.on{background:#000;border-color:#000;color:#fff;box-shadow:0 0 0 3px var(--y)} .np-btn.on span{color:#ddd}
   .np-btn.on b::before{content:"✓ ";color:var(--y)}
   .np-note{font-size:12.5px;color:#5c4a00;margin-top:8px}
+  .sgroups{display:grid;grid-template-columns:1.25fr 1.25fr 1fr .8fr;gap:10px;margin:4px 0 6px;align-items:stretch}
+  @media (max-width:1100px){.sgroups{grid-template-columns:1fr 1fr}}
+  .sgroup .field{min-width:0}
+  .sg-g2{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+  .sg-g2 .field select,.sg-g2 .field input{width:100%}
+  .hf{display:flex;flex-direction:column;gap:2px;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#6c6f73}
+  .hf input{font-size:14px;letter-spacing:normal}
+  .sgroup{background:#fafaf8;border:1px solid var(--line);border-radius:12px;padding:8px 12px 8px}
+  .sg-title{font-weight:700;font-size:13px;display:flex;align-items:center;gap:7px;margin-bottom:4px}
+  .sg-n{display:inline-flex;width:20px;height:20px;border-radius:50%;background:#000;color:var(--y);align-items:center;justify-content:center;font-size:11px}
+  .sg-tag{font-weight:500;font-size:11px;color:#6c6f73;background:#ececea;border-radius:8px;padding:1px 7px}
+  .sgroup .row{gap:8px}
+  .sg-note{font-size:11.5px;color:#6c6f73;margin-top:4px;line-height:1.35}
   footer.site{background:#000;color:#fff;padding:14px 24px;font-size:13px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:24px}
   footer.site b{color:var(--y);letter-spacing:.08em}
   @media print{footer.site{display:none!important}}
@@ -688,10 +701,10 @@ function renderSigns(){
     card.innerHTML = `
       <div class="sign-head">
         <h3>#${si+1}</h3>
-        <input type="text" value="${esc(sign.number||'')}" data-f="number" placeholder="Schild-Nr." title="Schildnummer – erscheint vor dem Label" style="text-transform:none;width:90px">
-        <input type="text" value="${esc(sign.name)}" data-f="name" placeholder="Label" style="text-transform:none;font-weight:600;min-width:150px">
-        <input type="text" value="${esc(sign.location||'')}" data-f="location" placeholder="Standort / Position (z. B. TWY A / RWY 25)" style="text-transform:none;min-width:220px">
-        <input type="text" value="${esc(sign.description||'')}" data-f="description" placeholder="Beschreibung" style="text-transform:none;min-width:160px">
+        <label class="hf">Schild-Nr.<input type="text" value="${esc(sign.number||'')}" data-f="number" placeholder="z. B. 442.2" title="Schildnummer – erscheint vor der Bezeichnung" style="text-transform:none;width:100px"></label>
+        <label class="hf">Bezeichnung<input type="text" value="${esc(sign.name)}" data-f="name" placeholder="Bezeichnung" style="text-transform:none;font-weight:600;min-width:200px"></label>
+        <label class="hf">Standort / Position<input type="text" value="${esc(sign.location||'')}" data-f="location" placeholder="z. B. TWY A / RWY 25" style="text-transform:none;min-width:190px"></label>
+        <label class="hf">Beschreibung<input type="text" value="${esc(sign.description||'')}" data-f="description" placeholder="optional" style="text-transform:none;min-width:150px"></label>
         <span class="spacer"></span>
         <button class="btn small" data-act="dup">Duplizieren</button>
         <button class="btn small" data-act="up" ${si===0?'disabled':''}>▲</button>
@@ -700,28 +713,35 @@ function renderSigns(){
         <button class="btn small" data-act="pdf">PDF-Blatt</button>
         <button class="btn small danger" data-act="del">Löschen</button>
       </div>
-      <div class="row">
-        <div class="field"><label>1. Norm</label>
+      <div class="sgroups">
+        <div class="sgroup"><div class="sg-title"><span class="sg-n">1</span>Norm &amp; Schrift</div><div class="sg-g2">
+        <div class="field"><label>Norm</label>
           <select data-f="norm"><option value="ICAO"${sign.norm==='ICAO'?' selected':''}>ICAO Annex 14 Vol. I</option><option value="EASA"${sign.norm==='EASA'?' selected':''}>EASA CS-ADR-DSN</option></select></div>
         <div class="field"><label>Code-Nummer (Piste)</label>
           <select data-f="codeNo"><option value="1-2"${sign.codeNo==='1-2'?' selected':''}>1 oder 2</option><option value="3-4"${sign.codeNo==='3-4'?' selected':''}>3 oder 4</option></select></div>
-        <div class="field"><label>3. Schrifthöhe</label>
+        <div class="field"><label>Schrifthöhe</label>
           <select data-f="h">${state.params[sign.norm].heights.map(h=>`<option value="${h}"${sign.h==h?' selected':''}>${h} mm</option>`).join('')}</select></div>
-        <div class="field" style="min-width:auto"><label>Empfehlung</label><div style="padding:7px 0;font-size:13px">${rec} mm</div></div>
+        <div class="field" style="min-width:auto"><label>Empfehlung (Mindesthöhe)</label><div style="padding:7px 0;font-size:13px">${rec} mm</div></div>
+        </div><div class="sg-note">${NORM_INFO[sign.norm].name}: Schrifthöhe ${NORM_INFO[sign.norm].height}</div></div>
+        <div class="sgroup"><div class="sg-title"><span class="sg-n">2</span>Schildmaße</div><div class="sg-g2">
         <div class="field" style="min-width:auto"><label>Schildhöhe</label>
           <select data-f="faceMode"${sign.vMarginMM?' disabled title="Schildhöhe ergibt sich aus „Rand vertikal“ – Feld leeren, um wieder zu wählen"':''}><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
         ${sign.vMarginMM?`<div class="field" style="min-width:auto"><label>= Schildhöhe</label><div style="padding:7px 0;font-size:13px"><b>${faceHeight(sign)} mm</b> (${sign.h} + 2 × ${sign.vMarginMM})</div></div>`:''}
         ${sign.faceMode==='custom'&&!sign.vMarginMM?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
-        <div class="field" style="min-width:auto" title="Rand über und unter der Schrift in mm (oben = unten). Leer = aus der gewählten Schildhöhe. Schildhöhe = Schrifthöhe + 2 × Rand."><label>Rand vertikal [mm]</label><input type="number" data-f="vMarginMM" min="0" step="5" value="${sign.vMarginMM||''}" placeholder="${Math.round((faceHeight(Object.assign({},sign,{vMarginMM:''}))-sign.h)/2)} (aus Schildhöhe)" style="width:130px;${sign.vMarginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
-        <div class="field" style="min-width:auto" title="Seitlicher Rand je Panel in mm. Leer = Normwert (H/2, bei Einzelbezeichner H)."><label>Rand seitlich [mm]</label><input type="number" data-f="marginMM" min="0" step="5" value="${sign.marginMM||''}" placeholder="${normMargin(sign)} (Norm)" style="width:110px;${sign.marginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
+        <div class="field" style="min-width:auto" title="Rand über und unter der Schrift in mm (oben = unten). Leer = aus der gewählten Schildhöhe. Schildhöhe = Schrifthöhe + 2 × Rand."><label>Rand vertikal [mm]</label><input type="number" data-f="vMarginMM" min="0" step="5" value="${sign.vMarginMM||''}" placeholder="${Math.round((faceHeight(Object.assign({},sign,{vMarginMM:''}))-sign.h)/2)} (auto)" style="${sign.vMarginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
+        <div class="field" style="min-width:auto" title="Seitlicher Rand je Panel in mm. Leer = Normwert (H/2, bei Einzelbezeichner H)."><label>Rand seitlich [mm]</label><input type="number" data-f="marginMM" min="0" step="5" value="${sign.marginMM||''}" placeholder="${normMargin(sign)} (Norm)" style="${sign.marginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
+        </div><div class="sg-note">Schildhöhe ${NORM_INFO[sign.norm].face} (vertikaler Rand ${NORM_INFO[sign.norm].vmargin}) · seitlicher Rand H/2, bei Einzelbezeichner H · installiert max. ${P(sign.norm,'installMax',sign.h)} mm</div></div>
+        <div class="sgroup"><div class="sg-title"><span class="sg-n">3</span>Abstände <span class="sg-tag">genormt · gesperrt</span></div><div style="display:flex;flex-direction:column;gap:6px">
         <div class="field" style="min-width:auto" title="Abstände zwischen den Zeichen nach Tab. A4-1 (Codes 1–4), 100 % = Normwert."><label>Zeichenabstände [%]</label>${(sign.spUnlock||charPct(sign)!==100)?`<div style="display:flex;gap:4px;align-items:center"><button class="btn small" data-spstep="-5" title="−5 %">−</button><input type="number" data-f="spacing" value="${charPct(sign)}" min="30" max="200" step="5" style="width:66px;${charPct(sign)!==100?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-spstep="5" title="+5 %">+</button><button class="btn small" data-act="splock" title="Auf Normwert 100 % zurücksetzen und wieder sperren">Norm + sperren</button></div>`:`<div style="display:flex;gap:6px;align-items:center"><input type="number" value="100" disabled style="width:66px;background:#f1f1ef;color:#6c6f73"><button class="btn small" data-act="spunlockask" title="Bearbeitung freigeben">🔒 Ändern …</button></div>`}</div>
         <div class="field" style="min-width:auto" title="Abstand zwischen Wörtern bzw. Zeichengruppen und zwischen Pfeil und Text in mm. Standard 0,5 H. ICAO App. 4: 0,5–0,75 H."><label>Wort-/Pfeilabstand [mm]</label>${(sign.wgUnlock||sign.wordGapMM)?`<div style="display:flex;gap:4px;align-items:center"><input type="number" data-f="wordGapMM" min="0" step="5" value="${sign.wordGapMM||''}" placeholder="${Math.round(0.5*sign.h)} (0,5 H)" style="width:110px;${sign.wordGapMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-act="wglock" title="Auf Standard 0,5 H zurücksetzen und wieder sperren">Norm + sperren</button></div>`:`<div style="display:flex;gap:6px;align-items:center"><input type="number" value="${Math.round(0.5*sign.h)}" disabled style="width:66px;background:#f1f1ef;color:#6c6f73"><button class="btn small" data-act="wgunlockask" title="Bearbeitung freigeben">🔒 Ändern …</button></div>`}</div>
-        <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="A14 5.4.2.13 / CS N.780(c)(1): schwarze Kontur 10 mm (Code 1–2) bzw. 20 mm (Code 3–4) um die weiße Schrift"><input type="checkbox" data-fchk="outline" ${sign.outline?'checked':''}> Schwarze Kontur (${sign.codeNo==='1-2'?10:20} mm)</label>
-        <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="App. 4 Nr. 11 / CS N.775(c)(19): Gebotszeichen nur auf einer Rollbahnseite → Mindestbreite 1,46 m (Code 1–2) / 1,94 m (Code 3–4)"><input type="checkbox" data-fchk="singleSided" ${sign.singleSided?'checked':''}> Nur einseitig aufgestellt</label>
+        </div><div class="sg-note">Tab. A4-1 / N-3 · Wort-/Pfeilabstand 0,5–0,75 H</div></div>
+        <div class="sgroup"><div class="sg-title"><span class="sg-n">4</span>Optionen</div><div style="display:flex;flex-direction:column;gap:6px">
+        <label class="note" style="display:flex;gap:4px;align-items:center;padding:2px 0" title="A14 5.4.2.13 / CS N.780(c)(1): schwarze Kontur 10 mm (Code 1–2) bzw. 20 mm (Code 3–4) um die weiße Schrift"><input type="checkbox" data-fchk="outline" ${sign.outline?'checked':''}> Schwarze Kontur (${sign.codeNo==='1-2'?10:20} mm)</label>
+        <label class="note" style="display:flex;gap:4px;align-items:center;padding:2px 0" title="App. 4 Nr. 11 / CS N.775(c)(19): Gebotszeichen nur auf einer Rollbahnseite → Mindestbreite 1,46 m (Code 1–2) / 1,94 m (Code 3–4)"><input type="checkbox" data-fchk="singleSided" ${sign.singleSided?'checked':''}> Nur einseitig aufgestellt</label>
+        </div><div class="sg-note">Strichstärke ${P(sign.norm,'stroke',sign.h)||''} mm</div></div>
       </div>
       ${sign._spAsk?lockHintHTML('sp',`<b>Hinweis: Zeichenabstände sind genormt.</b> Die Abstände zwischen den Zeichen sind in ICAO Annex 14 App. 4 Tab. A4-1 (= EASA Tab. N-3) je Zeichenpaar festgelegt. Eine Änderung macht das Schild <b>nicht normkonform</b>; die Compliance-Prüfung meldet dann eine Abweichung, und sie steht auf dem Zeichnungsblatt. Nur ändern, wenn es ausdrücklich gefordert ist (z. B. Vorgabe des Auftraggebers oder des Herstellers).`):''}
       ${sign._wgAsk?lockHintHTML('wg',`<b>Hinweis: Wort- und Pfeilabstand sind genormt.</b> ICAO Annex 14 App. 4 (= EASA Tab. N-3) erlaubt zwischen Wörtern bzw. Zeichengruppen und zwischen Pfeil und Text 0,5–0,75 H, bei H = ${sign.h} mm also ${Math.round(0.5*sign.h)}–${Math.round(0.75*sign.h)} mm. Standard im Sign Creator ist 0,5 H = ${Math.round(0.5*sign.h)} mm, wie in den Innovence-Zeichnungen. Werte außerhalb des Bereichs sind <b>nicht normkonform</b>; die Compliance-Prüfung meldet das. Nur ändern, wenn es ausdrücklich gefordert ist.`):''}
-      <div class="note" style="margin-top:4px">${NORM_INFO[sign.norm].name}: Schrifthöhe ${NORM_INFO[sign.norm].height} · Schildhöhe ${NORM_INFO[sign.norm].face} (vertikaler Rand ${NORM_INFO[sign.norm].vmargin}) · seitlicher Rand H/2, bei Einzelbezeichner H · Strichstärke ${P(sign.norm,'stroke',sign.h)} mm · installiert max. ${P(sign.norm,'installMax',sign.h)} mm</div>
       <div class="panels">${sign.panels.map((p,pi)=>`<div class="ins"><button data-ins="${pi}" title="Panel davor einfügen">+</button></div>`+panelRowHTML(p,pi,sign)).join('')}</div>
       <div style="margin-top:8px"><button class="btn small" data-act="addpanel">+ Panel / Nachricht anhängen</button> <span class="note">Tipp: Panel in der Vorschau anklicken, um es zu bearbeiten.</span></div>
       ${sign.h!=rec?`<div class="hint">Die gewählte Schrifthöhe (${sign.h} mm) weicht von der Mindesthöhe nach ${NORM_INFO[sign.norm].height} (${NORM_INFO[sign.norm].short}) für Code ${sign.codeNo} ab (${rec} mm).</div>`:''}
@@ -2305,7 +2325,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.10';
+const APP_VERSION='2026-11-17.11';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
