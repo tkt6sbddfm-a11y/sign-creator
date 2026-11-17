@@ -506,6 +506,7 @@ function normMargin(sign){ const solo=sign.panels.length===1; const gl=sign.pane
 function lockHintHTML(k, text){
   return `<div class="hint" style="margin-top:8px">${text}<div style="margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-lock-ack="${k}"> Ich habe den Hinweis gelesen und gebe die Bearbeitung frei.</label><button class="btn small primary" data-act="${k}unlock" disabled>Bearbeitung freigeben</button><button class="btn small" data-act="${k}cancel">Abbrechen</button></div></div>`;
 }
+function outerHDefault(sign){ const pr=pj(); return Math.round(faceHeight(sign) + 2*(Number(pr.housingTB)||0)); }
 function charPct(sign){ return Math.round(spOpts(sign).cf*100); }
 function panelChain(p, h, norm, solo, o){
   if(!o || typeof o!=='object') o={cf:(typeof o==='number'&&o>0)?o:1, m:null, wg:null};
@@ -536,7 +537,6 @@ function panelWidth(panel, h, norm, solo, f){
 /* Schildhöhe: Norm-Minimum (ICAO 1,5 H / EASA 2 H) oder 2 H erzwungen */
 function faceHeight(sign){
   const f = P(sign.norm,'faceHeight',sign.h);
-  if(Number(sign.vMarginMM)>0) return Math.round(sign.h + 2*Number(sign.vMarginMM));   // manueller vertikaler Rand (oben = unten)
   if(sign.faceMode==='2H') return Math.max(f, 2*sign.h);
   if(sign.faceMode==='custom' && Number(sign.faceCustom)>0) return Number(sign.faceCustom);
   return f;
@@ -725,10 +725,9 @@ function renderSigns(){
         </div><div class="sg-note">${NORM_INFO[sign.norm].name}: Schrifthöhe ${NORM_INFO[sign.norm].height}</div></div>
         <div class="sgroup"><div class="sg-title"><span class="sg-n">2</span>Schildmaße</div><div class="sg-g2">
         <div class="field" style="min-width:auto"><label>Schildhöhe</label>
-          <select data-f="faceMode"${sign.vMarginMM?' disabled title="Schildhöhe ergibt sich aus „Rand vertikal“ – Feld leeren, um wieder zu wählen"':''}><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
-        ${sign.vMarginMM?`<div class="field" style="min-width:auto"><label>= Schildhöhe</label><div style="padding:7px 0;font-size:13px"><b>${faceHeight(sign)} mm</b> (${sign.h} + 2 × ${sign.vMarginMM})</div></div>`:''}
-        ${sign.faceMode==='custom'&&!sign.vMarginMM?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
-        <div class="field" style="min-width:auto" title="Rand über und unter der Schrift in mm (oben = unten). Leer = aus der gewählten Schildhöhe. Schildhöhe = Schrifthöhe + 2 × Rand."><label>Rand vertikal [mm]</label><input type="number" data-f="vMarginMM" min="0" step="5" value="${sign.vMarginMM||''}" placeholder="${Math.round((faceHeight(Object.assign({},sign,{vMarginMM:''}))-sign.h)/2)} (auto)" style="${sign.vMarginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
+          <select data-f="faceMode"><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
+        ${sign.faceMode==='custom'?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
+        <div class="field" style="min-width:auto" title="Höhe des Gehäuses (Schildfläche + Rahmen oben und unten) in mm. Ändert nur den Rahmen – die Schildfläche bleibt nach Norm."><label>Gesamthöhe mit Rahmen [mm]</label><input type="number" data-f="outerH" min="0" step="5" value="${sign.outerH||''}" placeholder="${outerHDefault(sign)}" ${pj().housing?'':'disabled title="Gehäuserahmen ist in den Projektangaben ausgeschaltet"'} style="${sign.outerH?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><span style="font-size:11px;color:#6c6f73;margin-top:2px">${pj().housing?`Rahmen oben/unten: ${fmtN(((sign.outerH||outerHDefault(sign))-faceHeight(sign))/2)} mm`:'Gehäuserahmen aus'}</span></div>
         <div class="field" style="min-width:auto" title="Seitlicher Rand je Panel in mm. Leer = Normwert (H/2, bei Einzelbezeichner H)."><label>Rand seitlich [mm]</label><input type="number" data-f="marginMM" min="0" step="5" value="${sign.marginMM||''}" placeholder="${normMargin(sign)} (Norm)" style="${sign.marginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
         </div><div class="sg-note">Schildhöhe ${NORM_INFO[sign.norm].face} (vertikaler Rand ${NORM_INFO[sign.norm].vmargin}) · seitlicher Rand H/2, bei Einzelbezeichner H · installiert max. ${P(sign.norm,'installMax',sign.h)} mm</div></div>
         <div class="sgroup"><div class="sg-title"><span class="sg-n">3</span>Abstände <span class="sg-tag">genormt · gesperrt</span></div><div style="display:flex;flex-direction:column;gap:6px">
@@ -746,7 +745,7 @@ function renderSigns(){
       <div style="margin-top:8px"><button class="btn small" data-act="addpanel">+ Panel / Nachricht anhängen</button> <span class="note">Tipp: Panel in der Vorschau anklicken, um es zu bearbeiten.</span></div>
       ${sign.h!=rec?`<div class="hint">Die gewählte Schrifthöhe (${sign.h} mm) weicht von der Mindesthöhe nach ${NORM_INFO[sign.norm].height} (${NORM_INFO[sign.norm].short}) für Code ${sign.codeNo} ab (${rec} mm).</div>`:''}
       <div class="preview">${previewSVG(sign)}</div>
-      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${(sign.vMarginMM||sign.marginMM||sign.wordGapMM||charPct(sign)!==100)?`<span>Abweichend: <b>${[sign.vMarginMM?'Rand vertikal '+sign.vMarginMM+' mm':'', sign.marginMM?'Rand seitlich '+sign.marginMM+' mm':'', charPct(sign)!==100?'Zeichenabst. '+charPct(sign)+' %':'', sign.wordGapMM?'Wort-/Pfeilabst. '+sign.wordGapMM+' mm':''].filter(Boolean).join(' · ')}</b></span>`:''}</div>
+      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${(sign.outerH||sign.marginMM||sign.wordGapMM||charPct(sign)!==100)?`<span>Abweichend: <b>${[sign.outerH?'Gesamthöhe '+sign.outerH+' mm':'', sign.marginMM?'Rand seitlich '+sign.marginMM+' mm':'', charPct(sign)!==100?'Zeichenabst. '+charPct(sign)+' %':'', sign.wordGapMM?'Wort-/Pfeilabst. '+sign.wordGapMM+' mm':''].filter(Boolean).join(' · ')}</b></span>`:''}</div>
       <details class="chain"><summary>Maßkette als Text</summary>${chainHTML(sign)}</details>
       <div class="compliance">${complianceHTML(sign)}</div>
     `;
@@ -754,7 +753,7 @@ function renderSigns(){
     card.querySelectorAll('[data-f]').forEach(el=>{
       el.addEventListener('change', e=>{
         const f = el.dataset.f;
-        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='marginMM'||f==='wordGapMM'||f==='vMarginMM') sign[f] = Number(el.value)>0 ? Math.round(Number(el.value)) : ''; else sign[f] = el.value;
+        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='marginMM'||f==='wordGapMM'||f==='outerH') sign[f] = Number(el.value)>0 ? Math.round(Number(el.value)) : ''; else sign[f] = el.value;
         if(f==='norm'){ sign.faceMode = sign.faceMode||'norm'; }
         if(f==='name'||f==='location'||f==='description'||f==='number'){ if(f==='number') sign.number=String(el.value).replace(/^[^0-9A-Za-z]+/,'').trim(); renderOverview(); return; }
         if(f==='codeNo'){ /* Empfehlung anwenden */ sign.h = recommendedHeight(sign); }
@@ -871,6 +870,7 @@ function complianceChecks(sign){
     {ok:singleSidedOk, label:`Einseitig aufgestelltes Gebotszeichen ≥ ${sign.codeNo==='1-2'?'1460':'1940'} mm breit (App. 4 Nr. 11; CS N.775(c)(19))`},
     {ok:!badDesig.length, label:`Rollbahnbezeichner ohne I, O, X (A14 5.4.3.37; CS N.785(c)(12))${badDesig.length?' – gefunden: '+badDesig.join(', '):''}`},
     {ok:!sign.marginMM || sign.marginMM>=normMargin(sign), label:`Seitlicher Rand ≥ Normwert ${normMargin(sign)} mm (Abb. A4-4 / N-3)${sign.marginMM?' – eingestellt '+sign.marginMM+' mm':''}`},
+    {ok:!sign.outerH || Number(sign.outerH)>=faceHeight(sign), label:`Gesamthöhe mit Rahmen ≥ Schildhöhe ${faceHeight(sign)} mm${sign.outerH?' – eingestellt '+sign.outerH+' mm':''}`},
     {ok:charPct(sign)>=100, label:`Zeichenabstände ≥ Normwert (Tab. A4-1 / N-3)${charPct(sign)!==100?' – eingestellt '+charPct(sign)+' %':''}`},
     {ok:!sign.wordGapMM || (sign.wordGapMM>=0.5*sign.h-0.5 && sign.wordGapMM<=0.75*sign.h+0.5), label:`Wort-/Pfeilabstand 0,5–0,75 H = ${Math.round(0.5*sign.h)}–${Math.round(0.75*sign.h)} mm (App. 4)${sign.wordGapMM?' – eingestellt '+sign.wordGapMM+' mm':''}`},
     {ok:sign.panels.length>=1, label:'Mindestens eine Nachricht'},
@@ -1051,7 +1051,9 @@ function chainSegments(sign){
 /* ---- Bemaßte Zeichnung (Papierkoordinaten, k = Papier-mm je Schild-mm) ---- */
 function drawingParts(sign, k, fs){
   const pr=pj(), C=chainSegments(sign), W=C.total, Hf=C.face, h=sign.h;
-  const hs = pr.housing ? (Number(pr.housingSide)||0) : 0, ht = pr.housing ? (Number(pr.housingTB)||0) : 0;
+  const hs = pr.housing ? (Number(pr.housingSide)||0) : 0;
+  // Rahmen oben/unten: aus „Gesamthöhe mit Rahmen“ je Schild, sonst Projektwert (Schildfläche bleibt unverändert)
+  const ht = pr.housing ? (Number(sign.outerH)>Hf ? (Number(sign.outerH)-Hf)/2 : (Number(pr.housingTB)||0)) : 0;
   const border = hasBorder(sign) ? P(sign.norm,'border',h) : 0;
   const step = fs*4.4, gap0 = fs*2.4;
   const nLev = 2 + (sign.panels.length>1 ? 1 : 0);
@@ -1371,6 +1373,7 @@ function migrateDefaults(st){
   const eq=(a,b)=>Array.isArray(a)&&a.join()===b.join();
   if(st.fontWidths){ if(eq(st.fontWidths[' '],[140,210,280])) st.fontWidths[' ']=[100,150,200]; if(eq(st.fontWidths['/'],[137,205,274])) st.fontWidths['/']=[130,195,260]; }
   if(st.spacingCodes){ ['7','8'].forEach(k=>{ if(eq(st.spacingCodes[k],[140,210,280])) st.spacingCodes[k]=[100,150,200]; }); }
+  (st.signs||[]).forEach(sg=>{ if(sg.vMarginMM!=null) delete sg.vMarginMM; });
   (st.signs||[]).forEach(sg=>{ if(sg.spacing && sg.spacing!==100 && sg.marginMM==null && sg._spMig==null){ sg._spMig=1; } });
 }
 $('#load-json').addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ applyProject(JSON.parse(r.result), ''); }catch(err){ toast('Ungültige Datei'); } }; r.readAsText(f); e.target.value=''; });
@@ -2325,7 +2328,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.11';
+const APP_VERSION='2026-11-17.12';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
