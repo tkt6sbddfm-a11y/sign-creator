@@ -179,6 +179,8 @@
   .sg-tag{font-weight:500;font-size:11px;color:#6c6f73;background:#ececea;border-radius:8px;padding:1px 7px}
   .sgroup .row{gap:8px}
   .sg-note{font-size:11.5px;color:#6c6f73;margin-top:4px;line-height:1.35}
+  .sticky-bar{position:sticky;top:0;z-index:40;background:rgba(242,242,240,.96);backdrop-filter:blur(4px);padding:8px 0;margin:0 0 12px;border-bottom:1px solid transparent}
+  .sticky-bar.stuck{border-bottom-color:var(--line);box-shadow:0 6px 10px -8px rgba(0,0,0,.25)}
   footer.site{background:#000;color:#fff;padding:14px 24px;font-size:13px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:24px}
   footer.site b{color:var(--y);letter-spacing:.08em}
   @media print{footer.site{display:none!important}}
@@ -203,7 +205,7 @@
   <!-- ===== Schilder ===== -->
   <section id="view-signs" class="view active">
     <div class="card" id="project-card"></div>
-    <div class="toolbar">
+    <div class="toolbar sticky-bar">
       <button class="btn primary" id="add-sign">+ Schild hinzufügen</button>
       <button class="btn" id="save-json">Projekt speichern (JSON)</button>
       <label class="btn" style="margin:0">Projekt laden <input type="file" id="load-json" accept=".json" style="display:none"></label>
@@ -215,6 +217,7 @@
       <button class="btn" id="print-all">Alle drucken (Browser)</button>
     </div>
     <div id="sign-list"></div>
+    <div class="no-print" style="display:flex;justify-content:center;margin:4px 0 16px"><button class="btn primary" id="add-sign-bottom" style="padding:10px 22px">+ Schild hinzufügen</button></div>
     <div class="hint no-print">Die Maße werden je gewählter Norm aus dem Reiter „Parameter / Norm" berechnet. <b>ICAO</b> (Annex 14 Vol. I, 9. Ausg. 2022): Schildhöhe min. 1,5 H = 300/450/600 mm (vertikaler Rand H/4). <b>EASA</b> (CS-ADR-DSN Issue 7, Tab. N-1): Schildhöhe min. 2 H = 400/600/800 mm (vertikaler Rand H/2). Für beide gleich: Schrifthöhe nach Code (App. 4 Nr. 1 / Tab. N-2), Strichstärke 32/48/64, seitlicher Rand H/2 bzw. H bei Einzelbezeichner (Abb. A4-4 / N-3), Zeichenbreiten und -abstände (Tab. A4-1 / N-3), Trenner 0,7 × und gelber Rand 0,5 × Strichstärke, Pfeil H × 0,7 H, NO-ENTRY-Feld 3 H, Schildlänge ≤ 3 m. Belegstellen: Projekt-Dokument „RVZ-Normen-Sammlung".</div>
   </section>
 
@@ -1353,6 +1356,9 @@ function addFromTemplate(){
 function openTpl(){ tpl.sel=null; renderTplModal(); $('#tpl-modal').classList.add('open'); }
 function closeTpl(){ $('#tpl-modal').classList.remove('open'); }
 $('#add-sign').addEventListener('click', openTpl);
+$('#add-sign-bottom').addEventListener('click', openTpl);
+['#tpl-add','#tpl-blank'].forEach(sel=>{ const b=document.querySelector(sel); if(b) b.addEventListener('click',()=>setTimeout(()=>{ const cards=document.querySelectorAll('#sign-list .sign-card'); const c=cards[cards.length-1]; if(c) c.scrollIntoView({behavior:'smooth',block:'start'}); },80)); });
+{ const bar=document.querySelector('.sticky-bar'); if(bar && 'IntersectionObserver' in window){ const sen=document.createElement('div'); sen.style.height='1px'; bar.parentNode.insertBefore(sen,bar); new IntersectionObserver(([en])=>bar.classList.toggle('stuck',!en.isIntersecting)).observe(sen); } }
 $('#tpl-close').addEventListener('click', closeTpl);
 $('#tpl-modal').addEventListener('click', e=>{ if(e.target.id==='tpl-modal') closeTpl(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeTpl(); });
@@ -2328,7 +2334,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.12';
+const APP_VERSION='2026-11-17.13';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
