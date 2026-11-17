@@ -2172,8 +2172,16 @@ $('#save-go').addEventListener('click', async()=>{
 const OPEN_PARAM = new URLSearchParams(location.search).get('open');
 function libRelative(path){ const root=SP_SAVE.sitePath+'/'+SP_SAVE.library+'/'; let p=decodeURIComponent(path||''); if(p.startsWith('https://')) p=new URL(p).pathname, p=decodeURIComponent(p); return p.startsWith(root)? p.slice(root.length) : p.split('/').pop(); }
 async function openFromSP(path, interactive){
-  const rel=libRelative(path), tok=await graphToken(interactive), dId=await libDrive(tok);
+  let rel=libRelative(path); const tok=await graphToken(interactive), dId=await libDrive(tok);
   toast('Projekt wird geladen …');
+  // PDF/SVG angeklickt → zugehörige Projektdatei (gleicher Name, bei Einzelblättern der längste passende Anfang)
+  if(!/\.json$/i.test(rel)){
+    const dir=rel.includes('/')?rel.slice(0,rel.lastIndexOf('/')+1):'', stem=rel.slice(dir.length).replace(/\.[^.]+$/,'');
+    const ls=await gfetch(tok, `/drives/${dId}/root${dir?':/'+dir.slice(0,-1).split('/').map(encodeURIComponent).join('/')+':':''}/children?$select=name&$top=999`);
+    const js=ls.value.map(v=>v.name).filter(n=>/\.json$/i.test(n)).map(n=>n.replace(/\.json$/i,'')).filter(n=>stem===n||stem.startsWith(n+'_')||stem.startsWith(n)).sort((a,b)=>b.length-a.length);
+    if(!js.length) throw new Error('Zur Datei „'+stem+'“ gibt es keine Projektdatei (.json) in der Bibliothek');
+    rel=dir+js[0]+'.json';
+  }
   const r=await fetch(`https://graph.microsoft.com/v1.0/drives/${dId}/root:/${rel.split('/').map(encodeURIComponent).join('/')}:/content`,{headers:{Authorization:'Bearer '+tok}});
   if(!r.ok) throw new Error('Datei nicht gefunden ('+r.status+')');
   applyProject(await r.json(), rel.split('/').pop());
