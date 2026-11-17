@@ -473,6 +473,9 @@ function isSingleDesignator(gl, solo){
 function spOpts(sign){ const v=Number(sign&&sign.spacing), m=Number(sign&&sign.marginMM), w=Number(sign&&sign.wordGapMM); return {cf: v>0? v/100 : 1, m: m>0? m : null, wg: w>0? w : null}; }
 function spf(sign){ return spOpts(sign); }
 function normMargin(sign){ const solo=sign.panels.length===1; const gl=sign.panels[0]?panelGlyphs(sign.panels[0]):[]; return Math.round(P(sign.norm, isSingleDesignator(gl,solo)?'sideMarginSingle':'sideMargin', sign.h)); }
+function lockHintHTML(k, text){
+  return `<div class="hint" style="margin-top:8px">${text}<div style="margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-lock-ack="${k}"> Ich habe den Hinweis gelesen und gebe die Bearbeitung frei.</label><button class="btn small primary" data-act="${k}unlock" disabled>Bearbeitung freigeben</button><button class="btn small" data-act="${k}cancel">Abbrechen</button></div></div>`;
+}
 function charPct(sign){ return Math.round(spOpts(sign).cf*100); }
 function panelChain(p, h, norm, solo, o){
   if(!o || typeof o!=='object') o={cf:(typeof o==='number'&&o>0)?o:1, m:null, wg:null};
@@ -692,12 +695,12 @@ function renderSigns(){
         ${sign.faceMode==='custom'?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
         <div class="field" style="min-width:auto" title="Seitlicher Rand je Panel in mm. Leer = Normwert (H/2, bei Einzelbezeichner H)."><label>Rand seitlich [mm]</label><input type="number" data-f="marginMM" min="0" step="5" value="${sign.marginMM||''}" placeholder="${normMargin(sign)} (Norm)" style="width:110px;${sign.marginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
         <div class="field" style="min-width:auto" title="Abstände zwischen den Zeichen nach Tab. A4-1 (Codes 1–4), 100 % = Normwert."><label>Zeichenabstände [%]</label>${(sign.spUnlock||charPct(sign)!==100)?`<div style="display:flex;gap:4px;align-items:center"><button class="btn small" data-spstep="-5" title="−5 %">−</button><input type="number" data-f="spacing" value="${charPct(sign)}" min="30" max="200" step="5" style="width:66px;${charPct(sign)!==100?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-spstep="5" title="+5 %">+</button><button class="btn small" data-act="splock" title="Auf Normwert 100 % zurücksetzen und wieder sperren">Norm + sperren</button></div>`:`<div style="display:flex;gap:6px;align-items:center"><input type="number" value="100" disabled style="width:66px;background:#f1f1ef;color:#6c6f73"><button class="btn small" data-act="spunlockask" title="Bearbeitung freigeben">🔒 Ändern …</button></div>`}</div>
-        <div class="field" style="min-width:auto" title="Abstand zwischen Wörtern bzw. Zeichengruppen und zwischen Pfeil und Text in mm. Leer = 0,5 H. ICAO App. 4: 0,5–0,75 H."><label>Wort-/Pfeilabstand [mm]</label><input type="number" data-f="wordGapMM" min="0" step="5" value="${sign.wordGapMM||''}" placeholder="${Math.round(0.5*sign.h)} (0,5 H)" style="width:110px;${sign.wordGapMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
+        <div class="field" style="min-width:auto" title="Abstand zwischen Wörtern bzw. Zeichengruppen und zwischen Pfeil und Text in mm. Standard 0,5 H. ICAO App. 4: 0,5–0,75 H."><label>Wort-/Pfeilabstand [mm]</label>${(sign.wgUnlock||sign.wordGapMM)?`<div style="display:flex;gap:4px;align-items:center"><input type="number" data-f="wordGapMM" min="0" step="5" value="${sign.wordGapMM||''}" placeholder="${Math.round(0.5*sign.h)} (0,5 H)" style="width:110px;${sign.wordGapMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-act="wglock" title="Auf Standard 0,5 H zurücksetzen und wieder sperren">Norm + sperren</button></div>`:`<div style="display:flex;gap:6px;align-items:center"><input type="number" value="${Math.round(0.5*sign.h)}" disabled style="width:66px;background:#f1f1ef;color:#6c6f73"><button class="btn small" data-act="wgunlockask" title="Bearbeitung freigeben">🔒 Ändern …</button></div>`}</div>
         <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="A14 5.4.2.13 / CS N.780(c)(1): schwarze Kontur 10 mm (Code 1–2) bzw. 20 mm (Code 3–4) um die weiße Schrift"><input type="checkbox" data-fchk="outline" ${sign.outline?'checked':''}> Schwarze Kontur (${sign.codeNo==='1-2'?10:20} mm)</label>
         <label class="note" style="display:flex;gap:4px;align-items:center;padding-bottom:9px" title="App. 4 Nr. 11 / CS N.775(c)(19): Gebotszeichen nur auf einer Rollbahnseite → Mindestbreite 1,46 m (Code 1–2) / 1,94 m (Code 3–4)"><input type="checkbox" data-fchk="singleSided" ${sign.singleSided?'checked':''}> Nur einseitig aufgestellt</label>
       </div>
-      ${sign._spAsk?`<div class="hint" style="margin-top:8px"><b>Hinweis: Zeichenabstände sind genormt.</b> Die Abstände zwischen den Zeichen sind in ICAO Annex 14 App. 4 Tab. A4-1 (= EASA Tab. N-3) je Zeichenpaar festgelegt. Eine Änderung macht das Schild <b>nicht normkonform</b>; die Compliance-Prüfung meldet dann eine Abweichung, und sie steht auf dem Zeichnungsblatt. Nur ändern, wenn es ausdrücklich gefordert ist (z. B. Vorgabe des Auftraggebers oder des Herstellers).
-        <div style="margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label style="display:flex;gap:6px;align-items:center"><input type="checkbox" data-sp-ack> Ich habe den Hinweis gelesen und gebe die Bearbeitung frei.</label><button class="btn small primary" data-act="spunlock" disabled>Bearbeitung freigeben</button><button class="btn small" data-act="spcancel">Abbrechen</button></div></div>`:''}
+      ${sign._spAsk?lockHintHTML('sp',`<b>Hinweis: Zeichenabstände sind genormt.</b> Die Abstände zwischen den Zeichen sind in ICAO Annex 14 App. 4 Tab. A4-1 (= EASA Tab. N-3) je Zeichenpaar festgelegt. Eine Änderung macht das Schild <b>nicht normkonform</b>; die Compliance-Prüfung meldet dann eine Abweichung, und sie steht auf dem Zeichnungsblatt. Nur ändern, wenn es ausdrücklich gefordert ist (z. B. Vorgabe des Auftraggebers oder des Herstellers).`):''}
+      ${sign._wgAsk?lockHintHTML('wg',`<b>Hinweis: Wort- und Pfeilabstand sind genormt.</b> ICAO Annex 14 App. 4 (= EASA Tab. N-3) erlaubt zwischen Wörtern bzw. Zeichengruppen und zwischen Pfeil und Text 0,5–0,75 H, bei H = ${sign.h} mm also ${Math.round(0.5*sign.h)}–${Math.round(0.75*sign.h)} mm. Standard im Sign Creator ist 0,5 H = ${Math.round(0.5*sign.h)} mm, wie in den Innovence-Zeichnungen. Werte außerhalb des Bereichs sind <b>nicht normkonform</b>; die Compliance-Prüfung meldet das. Nur ändern, wenn es ausdrücklich gefordert ist.`):''}
       <div class="note" style="margin-top:4px">${NORM_INFO[sign.norm].name}: Schrifthöhe ${NORM_INFO[sign.norm].height} · Schildhöhe ${NORM_INFO[sign.norm].face} (vertikaler Rand ${NORM_INFO[sign.norm].vmargin}) · seitlicher Rand H/2, bei Einzelbezeichner H · Strichstärke ${P(sign.norm,'stroke',sign.h)} mm · installiert max. ${P(sign.norm,'installMax',sign.h)} mm</div>
       <div class="panels">${sign.panels.map((p,pi)=>`<div class="ins"><button data-ins="${pi}" title="Panel davor einfügen">+</button></div>`+panelRowHTML(p,pi,sign)).join('')}</div>
       <div style="margin-top:8px"><button class="btn small" data-act="addpanel">+ Panel / Nachricht anhängen</button> <span class="note">Tipp: Panel in der Vorschau anklicken, um es zu bearbeiten.</span></div>
@@ -718,7 +721,7 @@ function renderSigns(){
         renderSigns(); renderOverview();
       });
     });
-    { const ack=card.querySelector('[data-sp-ack]'); if(ack) ack.addEventListener('change',()=>{ const b=card.querySelector('[data-act="spunlock"]'); if(b) b.disabled=!ack.checked; }); }
+    card.querySelectorAll('[data-lock-ack]').forEach(ack=>ack.addEventListener('change',()=>{ const b=card.querySelector(`[data-act="${ack.dataset.lockAck}unlock"]`); if(b) b.disabled=!ack.checked; }));
     card.querySelectorAll('[data-spstep]').forEach(b=>b.addEventListener('click',()=>{ const st=Number(b.dataset.spstep); sign.spacing = st? Math.min(200,Math.max(30,charPct(sign)+st)) : 100; renderSigns(); renderOverview(); }));
     card.querySelectorAll('[data-act]').forEach(btn=>{
       btn.addEventListener('click', ()=>{
@@ -727,6 +730,10 @@ function renderSigns(){
         if(a==='spcancel'){ sign._spAsk=false; }
         if(a==='spunlock'){ sign._spAsk=false; sign.spUnlock=true; }
         if(a==='splock'){ sign.spacing=100; sign.spUnlock=false; }
+        if(a==='wgunlockask'){ sign._wgAsk=true; }
+        if(a==='wgcancel'){ sign._wgAsk=false; }
+        if(a==='wgunlock'){ sign._wgAsk=false; sign.wgUnlock=true; }
+        if(a==='wglock'){ sign.wordGapMM=''; sign.wgUnlock=false; }
         if(a==='del'){ state.signs.splice(si,1); }
         if(a==='dup'){ const c = deepCopy(sign); signCounter++; c.id=signCounter; c.name=sign.name; state.signs.splice(si+1,0,c); }
         if(a==='up'){ [state.signs[si-1],state.signs[si]]=[state.signs[si],state.signs[si-1]]; }
@@ -1307,7 +1314,7 @@ $('#svg-all-2').addEventListener('click',()=>exportSVG(state.signs,`${baseName()
 $('#print-all').addEventListener('click',printAll);
 $('#copy-csv').addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText(overviewCSV()); toast('CSV kopiert'); }catch(e){ toast('Zwischenablage nicht verfügbar'); } });
 $('#csv-download').addEventListener('click',()=>saveFile('Rollverkehrszeichen_uebersicht.csv','﻿'+overviewCSV()));
-$('#save-json').addEventListener('click',()=>{ saveFile(projectJsonName(), JSON.stringify(state,(k,v)=>k==='_spAsk'?undefined:v,2)); projectSaveManual(); });
+$('#save-json').addEventListener('click',()=>{ saveFile(projectJsonName(), JSON.stringify(state,(k,v)=>(k==='_spAsk'||k==='_wgAsk')?undefined:v,2)); projectSaveManual(); });
 function applyProject(o, fileName){ if(!o || !Array.isArray(o.signs)) throw new Error('keine Projektdatei'); state=o; migrateDefaults(state); state.code=state.code||deepCopy(DEFAULT_CODE); state.signs=state.signs.map(sg=>{ const d=newSign(); signCounter--; return Object.assign(d, sg, {panels:(sg.panels&&sg.panels.length?sg.panels:d.panels)}); }); state.fontWidths=state.fontWidths||deepCopy(FONT_WIDTHS); state.spacingCodes=state.spacingCodes||deepCopy(SPACING_CODES); state.params=state.params||{ICAO:makeDefaults('ICAO'),EASA:makeDefaults('EASA')}; ['ICAO','EASA'].forEach(n=>{ const d=makeDefaults(n); state.params[n]=state.params[n]||d; Object.keys(d.rows).forEach(k=>{ if(!state.params[n].rows[k]) state.params[n].rows[k]=d.rows[k]; }); }); state.project=Object.assign({},PROJECT_DEFAULTS,state.project||{}); state.signs.forEach(normalizeSign); renderProjectCard(); state.signs.forEach(s=>{ if(!s.faceMode) s.faceMode = s.vpad==='H/4' ? 'norm' : (s.norm==='ICAO' && s.vpad==='H/2' ? '2H' : 'norm'); }); signCounter=Math.max(0,...state.signs.map(s=>s.id||0)); openedFileName = fileName||''; renderSigns(); renderOverview(); toast('Projekt geladen'+(fileName?': '+fileName:'')); }
 let openedFileName='';
 /* alte Standardwerte (Wortabstand und Pfeil↔Text 0,7 H, Schrägstrich 0,685 H) auf die neuen Werte heben; eigene Änderungen bleiben */
@@ -2192,7 +2199,7 @@ function projectJsonName(){ return (openedFileName && !/(19|20)\d\d (19|20)\d\d\
 async function saveProjectToSP(info, interactive){
   const tok = await graphToken(interactive);
   toast('Projekt wird in SharePoint gespeichert …');
-  await uploadWithMeta(tok, projectJsonName(), new Blob([JSON.stringify(state,(k,v)=>k==='_spAsk'?undefined:v,2)],{type:'application/json'}), 'Projekt (JSON)');
+  await uploadWithMeta(tok, projectJsonName(), new Blob([JSON.stringify(state,(k,v)=>(k==='_spAsk'||k==='_wgAsk')?undefined:v,2)],{type:'application/json'}), 'Projekt (JSON)');
   if(info && info.blob) await uploadWithMeta(tok, info.name, info.blob, info.kind==='pdf'?'PDF':'SVG');
   toast('In SharePoint gespeichert: '+projectJsonName()+(info&&info.blob?' + '+info.name:''));
 }
@@ -2229,7 +2236,7 @@ $('#save-go').addEventListener('click', async()=>{
   const pr=pj(), ref=$('#save-ref').value.trim();
   if(!ref){ $('#save-ref').focus(); toast('Bitte Referenz / Kunde angeben'); return; }
   pr.customer=ref; pr.title=$('#save-title').value.trim(); pr.drawnBy=$('#save-by').value.trim(); renderProjectCard();
-  if(!SP_SAVE.clientId){ if(pendingSave) await saveFile(projectJsonName(), JSON.stringify(state,(k,v)=>k==='_spAsk'?undefined:v,2)); closeSaveDialog(); return; }
+  if(!SP_SAVE.clientId){ if(pendingSave) await saveFile(projectJsonName(), JSON.stringify(state,(k,v)=>(k==='_spAsk'||k==='_wgAsk')?undefined:v,2)); closeSaveDialog(); return; }
   try{ await saveProjectToSP(pendingSave,true); closeSaveDialog(); }
   catch(e){ openSaveDialog(e.message); }
 });
@@ -2269,7 +2276,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.6';
+const APP_VERSION='2026-11-17.7';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
