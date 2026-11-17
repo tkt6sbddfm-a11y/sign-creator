@@ -228,6 +228,15 @@
       <h3>Zeichenbreiten [mm] je Schrifthöhe</h3>
       <p class="note">Quelle: Master-SignsDef, Blatt „Zeichensatz" (entspricht ICAO Annex 14 App. 4). Alle Breiten A–Z und 0–9 geprüft gegen ICAO Annex 14 Tab. A4-1 d)/e) – identisch (200-mm-Werte G/H/I/J/K/L nach ICAO korrigiert). Pfeile/Leerzeichen aus der Excel, 200-mm-Pfeile = halbe 400-mm-Breite. Strichstärke 32/48/64 nach CS ADR-DSN.N.785(b)(9).</p>
       <div style="overflow-x:auto"><table class="param-table" id="char-widths"></table></div>
+      <h3>CAT-Zeichen: römische Ziffern I / II / III und Schrägstrich (ICAO Annex 14 App. 4 Abb. A4-2 = EASA Abb. N-2)</h3>
+      <p class="note">In „CAT I“, „CAT II“, „CAT III“ und Kombinationen wie „CAT II/III“ werden die Ziffern nicht aus einzelnen „I“-Buchstaben zusammengesetzt, sondern als eigene Zeichen nach Abb. A4-2: Balken oben und unten über die volle Zeichenbreite, dazwischen 1, 2 oder 3 senkrechte Stämme. Die Abbildung ist im Raster gezeichnet; ein Rasterfeld = H/10. Die Werte gelten für ICAO und EASA gleichermaßen und werden automatisch angewendet.</p>
+      <div style="overflow-x:auto"><table class="param-table" id="roman-table"></table></div>
+      <ul class="note" style="margin-top:6px">
+        <li><b>Abstände:</b> Ziffer ↔ Schrägstrich und Ziffer ↔ Buchstabe = Code 1 (48/71/96 mm), da Sonderzeichen wie „/“ nach Tab. A4-1 Instruction 3/4 mit Code 1 anschließen. Vor und nach dem Leerzeichen 0; das Leerzeichen selbst ist der Wortabstand.</li>
+        <li><b>Wortabstand</b> (z. B. zwischen „CAT“ und „II“, „25“ und „CAT“) und <b>Pfeil ↔ Text</b>: Standard 0,5 H = 100/150/200 mm, zulässig 0,5–0,75 H (App. 4, Instructions). Je Schild über „Wort-/Pfeilabstand [mm]“ änderbar; die Compliance prüft den zulässigen Bereich.</li>
+        <li><b>Beispiel</b> CAT II/III, H = 400, Rand 225 mm: 225 | C 274 | 50 | A 340 | 26 | T 248 | 200 | II 320 | 96 | / 260 | 96 | III 440 | 225 = 2800 mm.</li>
+        <li>Bis 16.11.2026 wurden die Ziffern als einzelne „I“ (64 mm) mit Code-1-Abstand gesetzt (III = 64+96+64+96+64 = 384 mm, ohne Balken). Das widersprach Abb. A4-2 und ist korrigiert.</li>
+      </ul>
     </div>
   </section>
 
@@ -850,7 +859,18 @@ function overviewCSV(){
 }
 
 /* ================= Parameter-UI ================= */
+function renderRomanTable(){
+  const el=$('#roman-table'); if(!el) return;
+  const rows=[['I (CAT I)','Ⅰ','6 × 10'],['II (CAT II)','Ⅱ','8 × 10'],['III (CAT III)','Ⅲ','11 × 10']];
+  const hs=[200,300,400];
+  let h='<tr><th>Zeichen</th><th>Raster (B × H)</th><th>Breite</th>'+hs.map(x=>`<th>${x} mm</th>`).join('')+'<th>Balken / Stämme</th></tr>';
+  rows.forEach(([n,g,r])=>{ h+=`<tr><td><b>${n}</b></td><td>${r}</td><td>${ROMAN[g].w.toLocaleString('de-DE')} H</td>`+hs.map(x=>`<td>${Math.round(ROMAN[g].w*x)}</td>`).join('')+`<td>${ROMAN[g].stems.length} ${ROMAN[g].stems.length===1?'Stamm':'Stämme'} + 2 Balken, Stärke 0,125 H (${hs.map(x=>Math.round(0.125*x)).join('/')})</td></tr>`; });
+  h+=`<tr><td><b>/ (Schrägstrich)</b></td><td>6,5 × 10</td><td>0,65 H</td>`+hs.map(x=>`<td>${charWidth('/',x)}</td>`).join('')+`<td>Strich waagerecht 0,13 H (${hs.map(x=>Math.round(0.13*x)).join('/')})</td></tr>`;
+  h+=`<tr><td><b>Wort-/Pfeilabstand</b></td><td>–</td><td>0,5 H</td>`+hs.map(x=>`<td>${Math.round(0.5*x)}</td>`).join('')+`<td>zulässig 0,5–0,75 H (${hs.map(x=>Math.round(0.75*x)).join('/')} max.)</td></tr>`;
+  el.innerHTML=h;
+}
 function renderParams(){
+  renderRomanTable();
   const norm = $('#param-norm').value;
   const p = state.params[norm];
   const tbl = $('#param-table');
@@ -2242,7 +2262,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.4';
+const APP_VERSION='2026-11-17.5';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
