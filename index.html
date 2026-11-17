@@ -730,7 +730,7 @@ function renderSigns(){
         <div class="field" style="min-width:auto"><label>Schildhöhe</label>
           <select data-f="faceMode"><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
         ${sign.faceMode==='custom'?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
-        <div class="field" style="min-width:auto" title="Höhe des Gehäuses (Schildfläche + Rahmen oben und unten) in mm. Ändert nur den Rahmen – die Schildfläche bleibt nach Norm."><label>Gesamthöhe mit Rahmen [mm]</label><input type="number" data-f="outerH" min="0" step="5" value="${sign.outerH||outerHDefault(sign)}" placeholder="${outerHDefault(sign)}" ${pj().housing?'':'disabled title="Gehäuserahmen ist in den Projektangaben ausgeschaltet"'} style="${sign.outerH?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><span style="font-size:11px;color:#6c6f73;margin-top:2px">${pj().housing?`Rahmen oben/unten: ${fmtN(((sign.outerH||outerHDefault(sign))-faceHeight(sign))/2)} mm`:'Gehäuserahmen aus'}</span></div>
+        <div class="field" style="min-width:auto" title="Höhe des Gehäuses (Schildfläche + Rahmen oben und unten) in mm. Ändert nur den Rahmen – die Schildfläche bleibt nach Norm."><label>Gesamthöhe mit Rahmen [mm]</label><input type="number" data-f="outerH" min="${faceHeight(sign)}" step="1" value="${sign.outerH||outerHDefault(sign)}" placeholder="${outerHDefault(sign)}" ${pj().housing?'':'disabled title="Gehäuserahmen ist in den Projektangaben ausgeschaltet"'} style="${sign.outerH?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><span style="font-size:11px;color:#6c6f73;margin-top:2px">${pj().housing?`Rahmen oben/unten: ${fmtN(((sign.outerH||outerHDefault(sign))-faceHeight(sign))/2)} mm`:'Gehäuserahmen aus'}</span></div>
         <div class="field" style="min-width:auto" title="Seitlicher Rand je Panel in mm. Leer = Normwert (H/2, bei Einzelbezeichner H)."><label>Rand seitlich [mm]</label><input type="number" data-f="marginMM" min="0" step="5" value="${sign.marginMM||normMargin(sign)}" placeholder="${normMargin(sign)} (Norm)" style="${sign.marginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
         </div><div class="sg-note">Schildhöhe ${NORM_INFO[sign.norm].face} (vertikaler Rand ${NORM_INFO[sign.norm].vmargin}) · seitlicher Rand H/2, bei Einzelbezeichner H · installiert max. ${P(sign.norm,'installMax',sign.h)} mm</div></div>
         <div class="sgroup"><div class="sg-title"><span class="sg-n">3</span>Abstände <span class="sg-tag">genormt · gesperrt</span></div><div style="display:flex;flex-direction:column;gap:6px">
@@ -756,7 +756,7 @@ function renderSigns(){
     card.querySelectorAll('[data-f]').forEach(el=>{
       el.addEventListener('change', e=>{
         const f = el.dataset.f;
-        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='marginMM'||f==='wordGapMM'||f==='outerH'){ const v=Math.round(Number(el.value)), def = f==='marginMM'?normMargin(sign) : f==='outerH'?outerHDefault(sign) : Math.round(0.5*sign.h); sign[f] = (v>0 && v!==def) ? v : ''; }   // Standardwert = keine Abweichung else sign[f] = el.value;
+        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='marginMM'||f==='wordGapMM'||f==='outerH'){ let v=Math.round(Number(el.value)); const def = f==='marginMM'?normMargin(sign) : f==='outerH'?outerHDefault(sign) : Math.round(0.5*sign.h); if(f==='outerH' && v<faceHeight(sign)){ v=faceHeight(sign); toast('Gesamthöhe kann nicht kleiner als die Schildhöhe ('+faceHeight(sign)+' mm) sein'); } sign[f] = (v>0 && v!==def) ? v : ''; }   // Standardwert = keine Abweichung else sign[f] = el.value;
         if(f==='norm'){ sign.faceMode = sign.faceMode||'norm'; }
         if(f==='name'||f==='location'||f==='description'||f==='number'){ if(f==='number') sign.number=String(el.value).replace(/^[^0-9A-Za-z]+/,'').trim(); renderOverview(); return; }
         if(f==='codeNo'){ /* Empfehlung anwenden */ sign.h = recommendedHeight(sign); }
@@ -2334,7 +2334,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.14';
+const APP_VERSION='2026-11-17.15';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
