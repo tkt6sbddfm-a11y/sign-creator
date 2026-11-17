@@ -1147,7 +1147,9 @@ async function sheetsToPDF(sheets){
 function stamp(){ const d=new Date(), z=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`; }
 /* Dateiname: RVZ_<Referenz/Kunde>_<Bauvorhaben> <JJJJ> – unzulässige Zeichen und Leerzeichen innerhalb der Felder werden zu „_“ */
 function fnPart(v){ return String(v||'').trim().replace(/[\\\/:*?"<>|#%&{}~]+/g,'-').replace(/\s+/g,'_').replace(/_+/g,'_').replace(/^[-_.]+|[-_.]+$/g,'').slice(0,60); }
-function baseName(){ const pr=pj(); return ['RVZ', fnPart(pr.customer), fnPart(pr.title)].filter(Boolean).join('_') + ' ' + new Date().getFullYear(); }
+function baseName(){ const pr=pj(); const stem=['RVZ', fnPart(pr.customer), fnPart(pr.title)].filter(Boolean).join('_');
+  // Jahreszahl nur anhängen, wenn Kunde/Bauvorhaben noch keine enthalten
+  return /(^|\D)(19|20)\d\d(\D|$)/.test(stem) ? stem : stem + ' ' + new Date().getFullYear(); }
 async function exportPDF(signs, name){
   if(!signs.length){ toast('Keine Schilder'); return; }
   toast('PDF wird erstellt …');
@@ -2122,7 +2124,7 @@ async function uploadWithMeta(tok, name, blob, kind){
     AnzahlSchilder: state.signs.length, Projektdatum: new Date().toISOString(), Dateiart: kind })});
   return item;
 }
-function projectJsonName(){ return openedFileName || `${baseName()}.json`; }
+function projectJsonName(){ return (openedFileName && !/(19|20)\d\d (19|20)\d\d\.json$/.test(openedFileName)) ? openedFileName : `${baseName()}.json`; }
 async function saveProjectToSP(info, interactive){
   const tok = await graphToken(interactive);
   toast('Projekt wird in SharePoint gespeichert …');
