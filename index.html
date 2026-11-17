@@ -506,6 +506,7 @@ function panelWidth(panel, h, norm, solo, f){
 /* Schildhöhe: Norm-Minimum (ICAO 1,5 H / EASA 2 H) oder 2 H erzwungen */
 function faceHeight(sign){
   const f = P(sign.norm,'faceHeight',sign.h);
+  if(Number(sign.vMarginMM)>0) return Math.round(sign.h + 2*Number(sign.vMarginMM));   // manueller vertikaler Rand (oben = unten)
   if(sign.faceMode==='2H') return Math.max(f, 2*sign.h);
   if(sign.faceMode==='custom' && Number(sign.faceCustom)>0) return Number(sign.faceCustom);
   return f;
@@ -691,8 +692,10 @@ function renderSigns(){
           <select data-f="h">${state.params[sign.norm].heights.map(h=>`<option value="${h}"${sign.h==h?' selected':''}>${h} mm</option>`).join('')}</select></div>
         <div class="field" style="min-width:auto"><label>Empfehlung</label><div style="padding:7px 0;font-size:13px">${rec} mm</div></div>
         <div class="field" style="min-width:auto"><label>Schildhöhe</label>
-          <select data-f="faceMode"><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
-        ${sign.faceMode==='custom'?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
+          <select data-f="faceMode"${sign.vMarginMM?' disabled title="Schildhöhe ergibt sich aus „Rand vertikal“ – Feld leeren, um wieder zu wählen"':''}><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
+        ${sign.vMarginMM?`<div class="field" style="min-width:auto"><label>= Schildhöhe</label><div style="padding:7px 0;font-size:13px"><b>${faceHeight(sign)} mm</b> (${sign.h} + 2 × ${sign.vMarginMM})</div></div>`:''}
+        ${sign.faceMode==='custom'&&!sign.vMarginMM?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
+        <div class="field" style="min-width:auto" title="Rand über und unter der Schrift in mm (oben = unten). Leer = aus der gewählten Schildhöhe. Schildhöhe = Schrifthöhe + 2 × Rand."><label>Rand vertikal [mm]</label><input type="number" data-f="vMarginMM" min="0" step="5" value="${sign.vMarginMM||''}" placeholder="${Math.round((faceHeight(Object.assign({},sign,{vMarginMM:''}))-sign.h)/2)} (aus Schildhöhe)" style="width:130px;${sign.vMarginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
         <div class="field" style="min-width:auto" title="Seitlicher Rand je Panel in mm. Leer = Normwert (H/2, bei Einzelbezeichner H)."><label>Rand seitlich [mm]</label><input type="number" data-f="marginMM" min="0" step="5" value="${sign.marginMM||''}" placeholder="${normMargin(sign)} (Norm)" style="width:110px;${sign.marginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"></div>
         <div class="field" style="min-width:auto" title="Abstände zwischen den Zeichen nach Tab. A4-1 (Codes 1–4), 100 % = Normwert."><label>Zeichenabstände [%]</label>${(sign.spUnlock||charPct(sign)!==100)?`<div style="display:flex;gap:4px;align-items:center"><button class="btn small" data-spstep="-5" title="−5 %">−</button><input type="number" data-f="spacing" value="${charPct(sign)}" min="30" max="200" step="5" style="width:66px;${charPct(sign)!==100?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-spstep="5" title="+5 %">+</button><button class="btn small" data-act="splock" title="Auf Normwert 100 % zurücksetzen und wieder sperren">Norm + sperren</button></div>`:`<div style="display:flex;gap:6px;align-items:center"><input type="number" value="100" disabled style="width:66px;background:#f1f1ef;color:#6c6f73"><button class="btn small" data-act="spunlockask" title="Bearbeitung freigeben">🔒 Ändern …</button></div>`}</div>
         <div class="field" style="min-width:auto" title="Abstand zwischen Wörtern bzw. Zeichengruppen und zwischen Pfeil und Text in mm. Standard 0,5 H. ICAO App. 4: 0,5–0,75 H."><label>Wort-/Pfeilabstand [mm]</label>${(sign.wgUnlock||sign.wordGapMM)?`<div style="display:flex;gap:4px;align-items:center"><input type="number" data-f="wordGapMM" min="0" step="5" value="${sign.wordGapMM||''}" placeholder="${Math.round(0.5*sign.h)} (0,5 H)" style="width:110px;${sign.wordGapMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-act="wglock" title="Auf Standard 0,5 H zurücksetzen und wieder sperren">Norm + sperren</button></div>`:`<div style="display:flex;gap:6px;align-items:center"><input type="number" value="${Math.round(0.5*sign.h)}" disabled style="width:66px;background:#f1f1ef;color:#6c6f73"><button class="btn small" data-act="wgunlockask" title="Bearbeitung freigeben">🔒 Ändern …</button></div>`}</div>
@@ -706,7 +709,7 @@ function renderSigns(){
       <div style="margin-top:8px"><button class="btn small" data-act="addpanel">+ Panel / Nachricht anhängen</button> <span class="note">Tipp: Panel in der Vorschau anklicken, um es zu bearbeiten.</span></div>
       ${sign.h!=rec?`<div class="hint">Die gewählte Schrifthöhe (${sign.h} mm) weicht von der Mindesthöhe nach ${NORM_INFO[sign.norm].height} (${NORM_INFO[sign.norm].short}) für Code ${sign.codeNo} ab (${rec} mm).</div>`:''}
       <div class="preview">${previewSVG(sign)}</div>
-      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${(sign.marginMM||sign.wordGapMM||charPct(sign)!==100)?`<span>Abweichend: <b>${[sign.marginMM?'Rand '+sign.marginMM+' mm':'', charPct(sign)!==100?'Zeichenabst. '+charPct(sign)+' %':'', sign.wordGapMM?'Wort-/Pfeilabst. '+sign.wordGapMM+' mm':''].filter(Boolean).join(' · ')}</b></span>`:''}</div>
+      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${d.widths.join(' + ')} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${(sign.vMarginMM||sign.marginMM||sign.wordGapMM||charPct(sign)!==100)?`<span>Abweichend: <b>${[sign.vMarginMM?'Rand vertikal '+sign.vMarginMM+' mm':'', sign.marginMM?'Rand seitlich '+sign.marginMM+' mm':'', charPct(sign)!==100?'Zeichenabst. '+charPct(sign)+' %':'', sign.wordGapMM?'Wort-/Pfeilabst. '+sign.wordGapMM+' mm':''].filter(Boolean).join(' · ')}</b></span>`:''}</div>
       <details class="chain"><summary>Maßkette als Text</summary>${chainHTML(sign)}</details>
       <div class="compliance">${complianceHTML(sign)}</div>
     `;
@@ -714,7 +717,7 @@ function renderSigns(){
     card.querySelectorAll('[data-f]').forEach(el=>{
       el.addEventListener('change', e=>{
         const f = el.dataset.f;
-        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='marginMM'||f==='wordGapMM') sign[f] = Number(el.value)>0 ? Math.round(Number(el.value)) : ''; else sign[f] = el.value;
+        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='marginMM'||f==='wordGapMM'||f==='vMarginMM') sign[f] = Number(el.value)>0 ? Math.round(Number(el.value)) : ''; else sign[f] = el.value;
         if(f==='norm'){ sign.faceMode = sign.faceMode||'norm'; }
         if(f==='name'||f==='location'||f==='description'||f==='number'){ if(f==='number') sign.number=String(el.value).replace(/^[^0-9A-Za-z]+/,'').trim(); renderOverview(); return; }
         if(f==='codeNo'){ /* Empfehlung anwenden */ sign.h = recommendedHeight(sign); }
@@ -2283,7 +2286,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-17.8';
+const APP_VERSION='2026-11-17.9';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
