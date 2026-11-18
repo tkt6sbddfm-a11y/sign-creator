@@ -59,7 +59,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .hdr2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 @media(max-width:900px){.row,.crow{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}header{flex-wrap:wrap}}
 #splash{position:fixed;inset:0;z-index:99;background:#0D1112;transition:opacity .3s ease}
-#splash::before{content:"";position:absolute;inset:0;background:url(splash.jpg) center/contain no-repeat;opacity:0;animation:flash 3.6s linear forwards}
+#splash::before{content:"";position:absolute;inset:0;background:url(splash.jpg) center 24px/48% auto no-repeat;opacity:0;animation:flash 3.6s linear forwards}
 @keyframes flash{0%{opacity:0}3%{opacity:1}9%{opacity:0}18%{opacity:1}24%{opacity:0}30%{opacity:1}62%{opacity:1}100%{opacity:0}}
 #splash.off{opacity:0;pointer-events:none}
 </style>
