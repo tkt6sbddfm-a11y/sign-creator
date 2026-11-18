@@ -68,7 +68,6 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
   <img class="logo" src="logo.png" alt="WCT">
   <div><div class="ttl">Warranty Case Tracker</div><div class="sub" id="sub"></div></div>
   <div class="sp"></div>
-  <nav><button class="pill on" id="navCases"></button></nav>
   <div class="lang"><button data-l="de">DE</button><i></i><button data-l="en">EN</button><i></i><button data-l="es">ES</button></div>
   <img class="inno" src="innovence.png" alt="INNOVENCE">
 </header>
@@ -144,7 +143,7 @@ function filtered(){
 function render(){
   document.documentElement.lang=lang;
   document.querySelectorAll("[data-t]").forEach(e=>e.textContent=T(e.dataset.t));
-  $("#sub").textContent=T("sub");$("#navCases").textContent=T("cases");
+  $("#sub").textContent=T("sub");
   $("#bNew").textContent=T("newc");$("#bRefresh").textContent=T("refresh");$("#bReset").textContent=T("reset");
   document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.l==lang));
   const f=filtered(),run=f.filter(i=>OPEN.includes(i.status)),done=f.filter(i=>!OPEN.includes(i.status));
@@ -192,7 +191,7 @@ async function save(isNew){
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;localStorage.setItem("wct-lang",lang);fill();render();if(!$("#vCase").hidden)show(cur.id)});
 ["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
-$("#bRefresh").onclick=load;$("#bNew").onclick=()=>edit(true);$("#navCases").onclick=back;
+$("#bRefresh").onclick=load;$("#bNew").onclick=()=>window.open("https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/NewForm.aspx","_blank");
 const _t0=Date.now();load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,1100-(Date.now()-_t0))));
 </script>
 </body>
