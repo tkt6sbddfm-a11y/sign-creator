@@ -4,12 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Warranty Case Tracker</title>
+<link rel="icon" href="favicon.png">
 <style>
 :root{--y:#FDD913;--yd:#E5C000;--k:#0D1112;--yl:#FFF8DC;--bg:#F2F2F0;--g:#6b7075;--line:#e4e4df;--ok:#e3f4e6;--okt:#1b6b2b;--bad:#fde3e3;--badt:#a12020}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--k);font:14px/1.4 "Neo Sans Std","Lato","Segoe UI",system-ui,sans-serif}
 header{background:var(--k);border-bottom:4px solid var(--y);padding:14px 28px;display:flex;align-items:center;gap:18px}
-.logo{width:40px;height:40px;border-radius:10px;background:var(--y);color:var(--k);display:grid;place-items:center;font-weight:800;font-size:20px}
+.logo{height:46px;width:auto}
 .ttl{color:#fff;font-weight:700;font-size:20px;line-height:1.1}
 .sub{color:#cfd2d4;font-size:11px;margin-top:2px}
 .sp{flex:1}
@@ -60,7 +61,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 </head>
 <body>
 <header>
-  <div class="logo">IV</div>
+  <img class="logo" src="logo.png" alt="WCT">
   <div><div class="ttl">Warranty Case Tracker</div><div class="sub" id="sub"></div></div>
   <div class="sp"></div>
   <nav><button class="pill on" id="navCases"></button></nav>
