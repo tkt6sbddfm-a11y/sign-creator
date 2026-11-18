@@ -58,9 +58,9 @@ dialog{border:0;border-radius:18px;padding:24px;width:min(560px,92vw);box-shadow
 dialog::backdrop{background:rgba(0,0,0,.45)}
 .hdr2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 @media(max-width:900px){.row,.crow{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}header{flex-wrap:wrap}}
-#splash{position:fixed;inset:0;z-index:99;background:#0D1112;transition:opacity .3s ease}
-#splash::before{content:"";position:absolute;inset:0;background:url(splash.jpg) center 24px/48% auto no-repeat;opacity:0;animation:flash 3.6s linear forwards}
-@keyframes flash{0%{opacity:0}3%{opacity:1}9%{opacity:0}18%{opacity:1}24%{opacity:0}30%{opacity:1}62%{opacity:1}100%{opacity:0}}
+#splash{position:fixed;inset:0;z-index:99;background:#0D1112;transition:opacity 1.6s ease}
+#splash::before{content:"";position:absolute;inset:0;background:url(splash.svg) center top/100% auto no-repeat;animation:sin .5s ease-out both}
+@keyframes sin{from{opacity:0}to{opacity:1}}
 #splash.off{opacity:0;pointer-events:none}
 </style>
 </head>
@@ -194,7 +194,7 @@ document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.datas
 ["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
 $("#bRefresh").onclick=load;$("#bNew").onclick=()=>window.open("https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/NewForm.aspx","_blank");
-const _t0=Date.now();load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,3700-(Date.now()-_t0))));
+const _t0=Date.now();load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,3000-(Date.now()-_t0))));
 </script>
 </body>
 </html>
