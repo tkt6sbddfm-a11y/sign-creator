@@ -1,0 +1,1218 @@
+- HdrBgDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =72
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- HdrLineDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =0
+      Y: =72
+      Width: =Parent.Width
+      Height: =4
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(253, 217, 19, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- HdrLogoDet:
+    Control: Image@2.2.3
+    Properties:
+      Image: ="data:image/png;base64,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"
+      X: =16
+      Y: =10
+      Width: =52
+      Height: =52
+      ImagePosition: =ImagePosition.Fit
+      RadiusTopLeft: =0
+      RadiusTopRight: =0
+      RadiusBottomLeft: =0
+      RadiusBottomRight: =0
+- HdrTitleDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="Warranty Case Tracker"
+      X: =80
+      Y: =10
+      Width: =Parent.Width - 380
+      Height: =34
+      Size: =22
+      Color: =RGBA(255, 255, 255, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- HdrSubDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Gewährleistungsfälle", "ES", "Casos de garantía", "Warranty cases") & " · Airsafe / GOMINTEC"
+      X: =80
+      Y: =44
+      Width: =Parent.Width - 380
+      Height: =18
+      Size: =12
+      Color: =RGBA(201, 201, 198, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- NavCasesDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Fälle", "ES", "Casos", "Claims")
+      X: =Parent.Width - 276
+      Y: =14
+      Width: =96
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(253, 217, 19, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(253, 217, 19, 1)
+      BorderThickness: =1
+      OnSelect: =Navigate(ListScreen, ScreenTransition.None)
+- LangDEDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="DE"
+      X: =Parent.Width - 164
+      Y: =14
+      Width: =44
+      Height: =44
+      Size: =13
+      Color: =If(varLang="DE", RGBA(13, 17, 18, 1), RGBA(187, 187, 187, 1))
+      Fill: =If(varLang="DE", RGBA(253, 217, 19, 1), RGBA(13, 17, 18, 1))
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =If(varLang="DE", RGBA(253, 217, 19, 1), RGBA(85, 85, 85, 1))
+      BorderThickness: =1
+      OnSelect: =Set(varLang, "DE")
+- LangENDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="EN"
+      X: =Parent.Width - 114
+      Y: =14
+      Width: =44
+      Height: =44
+      Size: =13
+      Color: =If(varLang="EN", RGBA(13, 17, 18, 1), RGBA(187, 187, 187, 1))
+      Fill: =If(varLang="EN", RGBA(253, 217, 19, 1), RGBA(13, 17, 18, 1))
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =If(varLang="EN", RGBA(253, 217, 19, 1), RGBA(85, 85, 85, 1))
+      BorderThickness: =1
+      OnSelect: =Set(varLang, "EN")
+- LangESDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="ES"
+      X: =Parent.Width - 64
+      Y: =14
+      Width: =44
+      Height: =44
+      Size: =13
+      Color: =If(varLang="ES", RGBA(13, 17, 18, 1), RGBA(187, 187, 187, 1))
+      Fill: =If(varLang="ES", RGBA(253, 217, 19, 1), RGBA(13, 17, 18, 1))
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =If(varLang="ES", RGBA(253, 217, 19, 1), RGBA(85, 85, 85, 1))
+      BorderThickness: =1
+      OnSelect: =Set(varLang, "ES")
+- BackList:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="‹ " & Switch(varLang, "DE", "Alle Fälle", "ES", "Todos los casos", "All claims")
+      X: =24
+      Y: =84
+      Width: =260
+      Height: =32
+      Size: =14
+      Color: =RGBA(107, 85, 0, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      OnSelect: =Navigate(ListScreen, ScreenTransition.None)
+- CardBgDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =24
+      Y: =118
+      Width: =Parent.Width - 48
+      Height: =640
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      RadiusTopLeft: =22
+      RadiusTopRight: =22
+      RadiusBottomLeft: =22
+      RadiusBottomRight: =22
+- CardTopDet:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =24
+      Y: =118
+      Width: =Parent.Width - 48
+      Height: =5
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(253, 217, 19, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- CaseNo:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Fall", "ES", "Caso", "Case") & " " & varCase.ID
+      X: =44
+      Y: =130
+      Width: =300
+      Height: =40
+      Size: =26
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- btnEdit:
+    Control: Classic/Button@2.2.0
+    Properties:
+      Text: =Switch(varLang, "DE", "Bearbeiten", "ES", "Editar", "Edit")
+      X: =Parent.Width - 24 - 20 - 170
+      Y: =132
+      Width: =170
+      Height: =40
+      Fill: =RGBA(253, 217, 19, 1)
+      Color: =RGBA(13, 17, 18, 1)
+      HoverFill: =ColorFade(Self.Fill, -8%)
+      HoverColor: =Self.Color
+      PressedFill: =ColorFade(Self.Fill, -16%)
+      PressedColor: =Self.Color
+      BorderThickness: =0
+      BorderColor: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Size: =15
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      RadiusTopLeft: =20
+      RadiusTopRight: =20
+      RadiusBottomLeft: =20
+      RadiusBottomRight: =20
+      OnSelect: =Set(varNew, false); Navigate(EditScreen, ScreenTransition.None)
+- btnFiles:
+    Control: Classic/Button@2.2.0
+    Properties:
+      Text: =Switch(varLang, "DE", "Anhänge & Bilder in SharePoint öffnen", "ES", "Abrir adjuntos e imágenes en SharePoint", "Open attachments & pictures in SharePoint")
+      X: =Parent.Width - 24 - 20 - 170 - 12 - 330
+      Y: =132
+      Width: =330
+      Height: =40
+      Fill: =RGBA(255, 255, 255, 1)
+      Color: =RGBA(13, 17, 18, 1)
+      HoverFill: =ColorFade(Self.Fill, -8%)
+      HoverColor: =Self.Color
+      PressedFill: =ColorFade(Self.Fill, -16%)
+      PressedColor: =Self.Color
+      BorderThickness: =1
+      BorderColor: =RGBA(226, 214, 138, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Size: =15
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      RadiusTopLeft: =20
+      RadiusTopRight: =20
+      RadiusBottomLeft: =20
+      RadiusBottomRight: =20
+      OnSelect: =Launch("https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/DispForm.aspx?ID=" & varCase.ID)
+- FNoL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "FALL-NR.", "ES", "N.º CASO", "CASE NO.")
+      X: =44
+      Y: =182
+      Width: =80
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- FNoV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Text(varCase.ID)
+      X: =44
+      Y: =200
+      Width: =80
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- FTitleL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "TITEL", "ES", "TÍTULO", "TITLE")
+      X: =136
+      Y: =182
+      Width: =Parent.Width - 764
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- FTitleV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =If(IsBlank(varCase.Titel), Left(varCase.Description, 60), varCase.Titel)
+      X: =136
+      Y: =200
+      Width: =Parent.Width - 764
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- FPortL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "FLUGHAFEN", "ES", "AEROPUERTO", "AIRPORT")
+      X: =Parent.Width - 616
+      Y: =182
+      Width: =190
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- FPortV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Coalesce(varCase.Flughafen.Value, "–")
+      X: =Parent.Width - 616
+      Y: =200
+      Width: =190
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- FStatL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "STATUS", "ES", "ESTADO", "STATUS")
+      X: =Parent.Width - 416
+      Y: =182
+      Width: =190
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- FStatV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Coalesce(LookUp('Translation PowerApps Warehouse', English=varCase.Status.Value, Switch(varLang,"DE",German,"ES",Spanish,English)), varCase.Status.Value)
+      X: =Parent.Width - 416
+      Y: =200
+      Width: =190
+      Height: =44
+      Size: =14
+      Color: =Switch(varCase.Status.Value, "new", RGBA(13, 17, 18, 1), "in progress", RGBA(253, 217, 19, 1), "send back to AES", RGBA(122, 92, 0, 1), "send repaired back to Innovence", RGBA(27, 122, 46, 1), "irremediable", RGBA(168, 0, 1, 1), RGBA(96, 94, 92, 1))
+      Fill: =Switch(varCase.Status.Value, "new", RGBA(253, 217, 19, 1), "in progress", RGBA(13, 17, 18, 1), "send back to AES", RGBA(255, 248, 220, 1), "send repaired back to Innovence", RGBA(223, 242, 226, 1), "irremediable", RGBA(252, 228, 226, 1), RGBA(242, 242, 240, 1))
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =If(varCase.Status.Value = "send back to AES", RGBA(253, 217, 19, 1), RGBA(0, 0, 0, 0))
+      BorderThickness: =2
+- FDateL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "MELDEDATUM", "ES", "FECHA DE AVISO", "DATE OF NOTIFICATION")
+      X: =Parent.Width - 214
+      Y: =182
+      Width: =170
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- FDateV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Text(varCase.'Date of notification', "dd.mm.yyyy")
+      X: =Parent.Width - 214
+      Y: =200
+      Width: =170
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- S1Bg:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44
+      Y: =262
+      Width: =((Parent.Width - 88 - 28) * 0.40)
+      Height: =250
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =20
+      RadiusTopRight: =20
+      RadiusBottomLeft: =20
+      RadiusBottomRight: =20
+- S1Num:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="1"
+      X: =44 + 16
+      Y: =276
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      RadiusTopLeft: =16
+      RadiusTopRight: =16
+      RadiusBottomLeft: =16
+      RadiusBottomRight: =16
+- S1Ttl:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Fehler", "ES", "Fallo", "Failure")
+      X: =44 + 58
+      Y: =276
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S2Bg:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14
+      Y: =262
+      Width: =((Parent.Width - 88 - 28) * 0.30)
+      Height: =250
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =20
+      RadiusTopRight: =20
+      RadiusBottomLeft: =20
+      RadiusBottomRight: =20
+- S2Num:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="2"
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + 16
+      Y: =276
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      RadiusTopLeft: =16
+      RadiusTopRight: =16
+      RadiusBottomLeft: =16
+      RadiusBottomRight: =16
+- S2Ttl:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Beteiligte", "ES", "Implicados", "Parties involved")
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + 58
+      Y: =276
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S3Bg:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + ((Parent.Width - 88 - 28) * 0.30) + 14
+      Y: =262
+      Width: =((Parent.Width - 88 - 28) * 0.30)
+      Height: =250
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =20
+      RadiusTopRight: =20
+      RadiusBottomLeft: =20
+      RadiusBottomRight: =20
+- S3Num:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="3"
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + ((Parent.Width - 88 - 28) * 0.30) + 14 + 16
+      Y: =276
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      RadiusTopLeft: =16
+      RadiusTopRight: =16
+      RadiusBottomLeft: =16
+      RadiusBottomRight: =16
+- S3Ttl:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Referenzen", "ES", "Referencias", "References")
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + ((Parent.Width - 88 - 28) * 0.30) + 14 + 58
+      Y: =276
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S1DL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "FEHLER- / PROBLEMBESCHREIBUNG", "ES", "DESCRIPCIÓN DEL FALLO", "FAILURE / ISSUE DESCRIPTION")
+      X: =44 + 16
+      Y: =318
+      Width: =((Parent.Width - 88 - 28) * 0.40) - 32
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S1DV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =varCase.Description
+      X: =44 + 16
+      Y: =336
+      Width: =((Parent.Width - 88 - 28) * 0.40) - 32
+      Height: =84
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Top
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- S1SL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "SERIENNUMMER(N)", "ES", "N.º DE SERIE", "SERIAL NUMBER(S)")
+      X: =44 + 16
+      Y: =424
+      Width: =((Parent.Width - 88 - 28) * 0.40) - 32
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S1SV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =varCase.'Serial number'
+      X: =44 + 16
+      Y: =442
+      Width: =((Parent.Width - 88 - 28) * 0.40) - 32
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- S2IL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "VERANTWORTLICH INNOVENCE", "ES", "RESPONSABLE INNOVENCE", "RESPONSIBLE INNOVENCE")
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + 16
+      Y: =318
+      Width: =((Parent.Width - 88 - 28) * 0.30) - 32
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- galIv:
+    Control: Gallery@2.15.0
+    Variant: BrowseLayout_Vertical_ThreeTextOneImageVariant_ver5.0
+    Properties:
+      Items: =varCase.'responsible Person Innovence'
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + 16
+      Y: =338
+      Width: =((Parent.Width - 88 - 28) * 0.30) - 32
+      Height: =68
+      TemplateSize: =34
+      TemplatePadding: =0
+      WrapCount: =2
+      Fill: =RGBA(0, 0, 0, 0)
+      BorderThickness: =0
+    Children:
+      - galIvPill:
+          Control: Label@2.5.1
+          Properties:
+            Text: =First(Split(ThisItem.DisplayName, " ")).Value & " " & Last(Split(ThisItem.DisplayName, " ")).Value
+            X: =0
+            Y: =2
+            Width: =Parent.TemplateWidth - 8
+            Height: =30
+            Size: =14
+            Color: =RGBA(13, 17, 18, 1)
+            Fill: =RGBA(253, 217, 19, 1)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Bold
+            Align: =Align.Center
+            VerticalAlign: =VerticalAlign.Middle
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PaddingBottom: =0
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+- S2AL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "VERANTWORTLICH AES", "ES", "RESPONSABLE AES", "RESPONSIBLE AES")
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + 16
+      Y: =418
+      Width: =((Parent.Width - 88 - 28) * 0.30) - 32
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- galAes:
+    Control: Gallery@2.15.0
+    Variant: BrowseLayout_Vertical_ThreeTextOneImageVariant_ver5.0
+    Properties:
+      Items: =varCase.'responsible person AES'
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + 16
+      Y: =438
+      Width: =((Parent.Width - 88 - 28) * 0.30) - 32
+      Height: =68
+      TemplateSize: =34
+      TemplatePadding: =0
+      WrapCount: =2
+      Fill: =RGBA(0, 0, 0, 0)
+      BorderThickness: =0
+    Children:
+      - galAesPill:
+          Control: Label@2.5.1
+          Properties:
+            Text: =Upper(First(Split(ThisItem.Email, "@")).Value)
+            X: =0
+            Y: =2
+            Width: =Parent.TemplateWidth - 8
+            Height: =30
+            Size: =14
+            Color: =RGBA(13, 17, 18, 1)
+            Fill: =RGBA(253, 217, 19, 1)
+            Font: =Font.Lato
+            FontWeight: =FontWeight.Bold
+            Align: =Align.Center
+            VerticalAlign: =VerticalAlign.Middle
+            PaddingLeft: =0
+            PaddingRight: =0
+            PaddingTop: =0
+            PaddingBottom: =0
+            RadiusTopLeft: =15
+            RadiusTopRight: =15
+            RadiusBottomLeft: =15
+            RadiusBottomRight: =15
+- S3PL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "PROJEKT-NR. INNOVENCE", "ES", "N.º PROYECTO INNOVENCE", "PROJECT NO. INNOVENCE")
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + ((Parent.Width - 88 - 28) * 0.30) + 14 + 16
+      Y: =318
+      Width: =((Parent.Width - 88 - 28) * 0.30) - 32
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S3PV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =varCase.'Project No. Innovence'
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + ((Parent.Width - 88 - 28) * 0.30) + 14 + 16
+      Y: =336
+      Width: =((Parent.Width - 88 - 28) * 0.30) - 32
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- S3RL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "REFERENZ-NR. AES", "ES", "N.º REFERENCIA AES", "REFERENCE NO. AES")
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + ((Parent.Width - 88 - 28) * 0.30) + 14 + 16
+      Y: =392
+      Width: =((Parent.Width - 88 - 28) * 0.30) - 32
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S3RV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =varCase.'Reference No. AES'
+      X: =44 + ((Parent.Width - 88 - 28) * 0.40) + 14 + ((Parent.Width - 88 - 28) * 0.30) + 14 + 16
+      Y: =410
+      Width: =((Parent.Width - 88 - 28) * 0.30) - 32
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- S4Bg:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44
+      Y: =526
+      Width: =Parent.Width - 88
+      Height: =226
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =20
+      RadiusTopRight: =20
+      RadiusBottomLeft: =20
+      RadiusBottomRight: =20
+- S4Num:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="4"
+      X: =44 + 16
+      Y: =540
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      RadiusTopLeft: =16
+      RadiusTopRight: =16
+      RadiusBottomLeft: =16
+      RadiusBottomRight: =16
+- S4Ttl:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Anhänge & Lösung", "ES", "Adjuntos y solución", "Attachments & solution")
+      X: =44 + 58
+      Y: =540
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S4SL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "LÖSUNG", "ES", "SOLUCIÓN", "SOLUTION")
+      X: =44 + 16
+      Y: =582
+      Width: =(Parent.Width - 88) * 0.64 - 32
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S4SV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =If(IsBlank(varCase.Solution), "–", varCase.Solution)
+      X: =44 + 16
+      Y: =600
+      Width: =(Parent.Width - 88) * 0.64 - 32
+      Height: =148
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Top
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- S4CL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "ÄNDERUNGSKOMMENTAR", "ES", "COMENTARIO DE CAMBIO", "COMMENT ON CHANGE")
+      X: =44 + (Parent.Width - 88) * 0.64
+      Y: =582
+      Width: =(Parent.Width - 88) * 0.36 - 16
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S4CV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =If(IsBlank(varCase.'Comment on change'), "–", varCase.'Comment on change')
+      X: =44 + (Parent.Width - 88) * 0.64
+      Y: =600
+      Width: =(Parent.Width - 88) * 0.36 - 16
+      Height: =56
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12
+- S4RL:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "LETZTE ERINNERUNG", "ES", "ÚLTIMO RECORDATORIO", "LAST REMINDER")
+      X: =44 + (Parent.Width - 88) * 0.64
+      Y: =660
+      Width: =(Parent.Width - 88) * 0.36 - 16
+      Height: =16
+      Size: =10
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S4RV:
+    Control: Label@2.5.1
+    Properties:
+      Text: =If(IsBlank(varCase.'Last reminder'), "–", Text(varCase.'Last reminder', "dd.mm.yyyy"))
+      X: =44 + (Parent.Width - 88) * 0.64
+      Y: =678
+      Width: =(Parent.Width - 88) * 0.36 - 16
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =14
+      PaddingRight: =14
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =12
+      RadiusTopRight: =12
+      RadiusBottomLeft: =12
+      RadiusBottomRight: =12

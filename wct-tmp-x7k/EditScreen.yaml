@@ -1,0 +1,1125 @@
+- HdrBgEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =0
+      Y: =0
+      Width: =Parent.Width
+      Height: =72
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- HdrLineEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =0
+      Y: =72
+      Width: =Parent.Width
+      Height: =4
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(253, 217, 19, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- HdrLogoEdt:
+    Control: Image@2.2.3
+    Properties:
+      Image: ="data:image/png;base64,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"
+      X: =16
+      Y: =10
+      Width: =52
+      Height: =52
+      ImagePosition: =ImagePosition.Fit
+      RadiusTopLeft: =0
+      RadiusTopRight: =0
+      RadiusBottomLeft: =0
+      RadiusBottomRight: =0
+- HdrTitleEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="Warranty Case Tracker"
+      X: =80
+      Y: =10
+      Width: =Parent.Width - 380
+      Height: =34
+      Size: =22
+      Color: =RGBA(255, 255, 255, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- HdrSubEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Gewährleistungsfälle", "ES", "Casos de garantía", "Warranty cases") & " · Airsafe / GOMINTEC"
+      X: =80
+      Y: =44
+      Width: =Parent.Width - 380
+      Height: =18
+      Size: =12
+      Color: =RGBA(201, 201, 198, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- NavCasesEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Fälle", "ES", "Casos", "Claims")
+      X: =Parent.Width - 276
+      Y: =14
+      Width: =96
+      Height: =44
+      Size: =15
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(253, 217, 19, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(253, 217, 19, 1)
+      BorderThickness: =1
+      OnSelect: =Navigate(ListScreen, ScreenTransition.None)
+- LangDEEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="DE"
+      X: =Parent.Width - 164
+      Y: =14
+      Width: =44
+      Height: =44
+      Size: =13
+      Color: =If(varLang="DE", RGBA(13, 17, 18, 1), RGBA(187, 187, 187, 1))
+      Fill: =If(varLang="DE", RGBA(253, 217, 19, 1), RGBA(13, 17, 18, 1))
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =If(varLang="DE", RGBA(253, 217, 19, 1), RGBA(85, 85, 85, 1))
+      BorderThickness: =1
+      OnSelect: =Set(varLang, "DE")
+- LangENEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="EN"
+      X: =Parent.Width - 114
+      Y: =14
+      Width: =44
+      Height: =44
+      Size: =13
+      Color: =If(varLang="EN", RGBA(13, 17, 18, 1), RGBA(187, 187, 187, 1))
+      Fill: =If(varLang="EN", RGBA(253, 217, 19, 1), RGBA(13, 17, 18, 1))
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =If(varLang="EN", RGBA(253, 217, 19, 1), RGBA(85, 85, 85, 1))
+      BorderThickness: =1
+      OnSelect: =Set(varLang, "EN")
+- LangESEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="ES"
+      X: =Parent.Width - 64
+      Y: =14
+      Width: =44
+      Height: =44
+      Size: =13
+      Color: =If(varLang="ES", RGBA(13, 17, 18, 1), RGBA(187, 187, 187, 1))
+      Fill: =If(varLang="ES", RGBA(253, 217, 19, 1), RGBA(13, 17, 18, 1))
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =If(varLang="ES", RGBA(253, 217, 19, 1), RGBA(85, 85, 85, 1))
+      BorderThickness: =1
+      OnSelect: =Set(varLang, "ES")
+- BackEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="‹ " & Switch(varLang, "DE", "Abbrechen", "ES", "Cancelar", "Cancel")
+      X: =24
+      Y: =84
+      Width: =260
+      Height: =32
+      Size: =14
+      Color: =RGBA(107, 85, 0, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      OnSelect: =If(varNew, Navigate(ListScreen, ScreenTransition.None), Navigate(DetailScreen, ScreenTransition.None))
+- CardBgEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =24
+      Y: =118
+      Width: =Parent.Width - 48
+      Height: =640
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- CardTopEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =24
+      Y: =118
+      Width: =Parent.Width - 48
+      Height: =5
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(253, 217, 19, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- CaseNoEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =If(varNew, Switch(varLang, "DE", "Neuer Fall", "ES", "Nuevo caso", "New claim"), Switch(varLang, "DE", "Fall", "ES", "Caso", "Case") & " " & varCase.ID)
+      X: =44
+      Y: =130
+      Width: =Parent.Width - 88 - 400
+      Height: =40
+      Size: =26
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- btnSave:
+    Control: Classic/Button@2.2.0
+    Properties:
+      Text: =Switch(varLang, "DE", "Speichern", "ES", "Guardar", "Save")
+      X: =Parent.Width - 24 - 20 - 170
+      Y: =132
+      Width: =170
+      Height: =40
+      Fill: =RGBA(253, 217, 19, 1)
+      Color: =RGBA(13, 17, 18, 1)
+      HoverFill: =ColorFade(Self.Fill, -8%)
+      HoverColor: =Self.Color
+      PressedFill: =ColorFade(Self.Fill, -16%)
+      PressedColor: =Self.Color
+      BorderThickness: =0
+      BorderColor: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Size: =15
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      RadiusTopLeft: =20
+      RadiusTopRight: =20
+      RadiusBottomLeft: =20
+      RadiusBottomRight: =20
+      OnSelect: |-
+        =If(IsBlank(txtDesc.Text) || IsEmpty(cmbIv.SelectedItems) || IsEmpty(cmbAes.SelectedItems) || IsBlank(dpDate.SelectedDate), Notify(Switch(varLang, "DE", "Bitte Pflichtfelder ausfüllen: Beschreibung, Meldedatum, Verantwortliche Innovence und AES", "ES", "Complete los campos obligatorios: descripción, fecha, responsables", "Please fill the required fields: description, date, responsible persons"), NotificationType.Error), Set(varCase, Patch('Warranty Case Tracker', If(varNew, Defaults('Warranty Case Tracker'), LookUp('Warranty Case Tracker', ID = varCase.ID)), {Titel: txtTitle.Text, Flughafen: {Value: cmbPort.Selected.Value}, 'Comment on change': txtComment.Text, Status: {Value: cmbStatus.Selected.Value}, Description: txtDesc.Text, Solution: txtSol.Text, 'Serial number': txtSerial.Text, 'Project No. Innovence': txtProj.Text, 'Reference No. AES': txtRef.Text, 'Date of notification': dpDate.SelectedDate, 'responsible Person Innovence': ForAll(cmbIv.SelectedItems As p, {'@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser", Claims: p.Claims, DisplayName: p.DisplayName, Email: p.Email, Department: "", JobTitle: "", Picture: ""}), 'responsible person AES': ForAll(cmbAes.SelectedItems As q, {'@odata.type': "#Microsoft.Azure.Connectors.SharePoint.SPListExpandedUser", Claims: q.Claims, DisplayName: q.DisplayName, Email: q.Email, Department: "", JobTitle: "", Picture: ""})})); If(IsEmpty(Errors('Warranty Case Tracker')), Notify(Switch(varLang, "DE", "Gespeichert", "ES", "Guardado", "Saved"), NotificationType.Success); Set(varNew, false); Navigate(DetailScreen, ScreenTransition.None), Notify(First(Errors('Warranty Case Tracker')).Message, NotificationType.Error)))
+- btnCancel:
+    Control: Classic/Button@2.2.0
+    Properties:
+      Text: =Switch(varLang, "DE", "Abbrechen", "ES", "Cancelar", "Cancel")
+      X: =Parent.Width - 24 - 20 - 170 - 12 - 150
+      Y: =132
+      Width: =150
+      Height: =40
+      Fill: =RGBA(255, 255, 255, 1)
+      Color: =RGBA(13, 17, 18, 1)
+      HoverFill: =ColorFade(Self.Fill, -8%)
+      HoverColor: =Self.Color
+      PressedFill: =ColorFade(Self.Fill, -16%)
+      PressedColor: =Self.Color
+      BorderThickness: =1
+      BorderColor: =RGBA(226, 214, 138, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Size: =15
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      RadiusTopLeft: =20
+      RadiusTopRight: =20
+      RadiusBottomLeft: =20
+      RadiusBottomRight: =20
+      OnSelect: =If(varNew, Navigate(ListScreen, ScreenTransition.None), Navigate(DetailScreen, ScreenTransition.None))
+- LTitleEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Titel (optional)", "ES", "Título (opcional)", "Title (optional)")
+      X: =44
+      Y: =180
+      Width: =Parent.Width - 88 - 476 - 202
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- txtTitle:
+    Control: Classic/TextInput@2.3.2
+    Properties:
+      Default: =If(varNew, "", Coalesce(varCase.Titel, ""))
+      HintText: =""
+      X: =44
+      Y: =200
+      Width: =Parent.Width - 88 - 476 - 202
+      Height: =44
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      PaddingLeft: =12
+- LStatEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Status", "ES", "Estado", "Status")
+      X: =Parent.Width - 416
+      Y: =180
+      Width: =190
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- cmbStatus:
+    Control: Classic/ComboBox@2.4.0
+    Properties:
+      Items: =Choices('Warranty Case Tracker'.Status)
+      DefaultSelectedItems: =If(varNew, Filter(Choices('Warranty Case Tracker'.Status), Value = "new"), Filter(Choices('Warranty Case Tracker'.Status), Value = varCase.Status.Value))
+      DisplayFields: =["Value"]
+      SearchFields: =["Value"]
+      SelectMultiple: =false
+      IsSearchable: =true
+      InputTextPlaceholder: =""
+      X: =Parent.Width - 416
+      Y: =200
+      Width: =190
+      Height: =44
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      ChevronBackground: =RGBA(253, 217, 19, 1)
+      ChevronFill: =RGBA(13, 17, 18, 1)
+      ChevronHoverBackground: =RGBA(229, 192, 0, 1)
+      ChevronHoverFill: =RGBA(13, 17, 18, 1)
+      SelectionFill: =RGBA(253, 217, 19, 1)
+      SelectionColor: =RGBA(13, 17, 18, 1)
+      HoverFill: =RGBA(255, 248, 220, 1)
+      PressedFill: =RGBA(253, 217, 19, 1)
+      PressedColor: =RGBA(13, 17, 18, 1)
+- LDateEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Meldedatum *", "ES", "Fecha de aviso *", "Date of notification *")
+      X: =Parent.Width - 214
+      Y: =180
+      Width: =170
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- dpDate:
+    Control: Classic/DatePicker@2.6.0
+    Properties:
+      DefaultDate: =If(varNew, Today(), varCase.'Date of notification')
+      Format: ="dd.mm.yyyy"
+      X: =Parent.Width - 214
+      Y: =200
+      Width: =170
+      Height: =44
+      Font: =Font.Lato
+      Size: =14
+      BorderColor: =RGBA(226, 214, 138, 1)
+      IconBackground: =RGBA(253, 217, 19, 1)
+      IconFill: =RGBA(13, 17, 18, 1)
+- S1BgE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44
+      Y: =262
+      Width: =((Parent.Width - 88 - 28) / 3)
+      Height: =240
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+- S1NumE:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="1"
+      X: =44 + 16
+      Y: =276
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S1TtlE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Fehler", "ES", "Fallo", "Failure")
+      X: =44 + 58
+      Y: =276
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S5BgE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44
+      Y: =514
+      Width: =((Parent.Width - 88 - 28) / 3)
+      Height: =236
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+- S5NumE:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="5"
+      X: =44 + 16
+      Y: =528
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S5TtlE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Lösung", "ES", "Solución", "Solution")
+      X: =44 + 58
+      Y: =528
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S2BgE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14
+      Y: =262
+      Width: =((Parent.Width - 88 - 28) / 3)
+      Height: =240
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+- S2NumE:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="2"
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =276
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S2TtlE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Beteiligte", "ES", "Implicados", "Parties involved")
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 58
+      Y: =276
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S3BgE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14
+      Y: =514
+      Width: =((Parent.Width - 88 - 28) / 3)
+      Height: =236
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+- S3NumE:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="3"
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =528
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S3TtlE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Referenzen", "ES", "Referencias", "References")
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 58
+      Y: =528
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S4BgE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =""
+      X: =44 + 2 * (((Parent.Width - 88 - 28) / 3) + 14)
+      Y: =262
+      Width: =((Parent.Width - 88 - 28) / 3)
+      Height: =488
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(250, 250, 248, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+      BorderColor: =RGBA(225, 225, 222, 1)
+      BorderThickness: =1
+- S4NumE:
+    Control: Label@2.5.1
+    Properties:
+      Text: ="4"
+      X: =44 + 2 * (((Parent.Width - 88 - 28) / 3) + 14) + 16
+      Y: =276
+      Width: =32
+      Height: =32
+      Size: =15
+      Color: =RGBA(253, 217, 19, 1)
+      Fill: =RGBA(13, 17, 18, 1)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Center
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- S4TtlE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Seriennummer", "ES", "Número de serie", "Serial number")
+      X: =44 + 2 * (((Parent.Width - 88 - 28) / 3) + 14) + 58
+      Y: =276
+      Width: =300
+      Height: =32
+      Size: =18
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- LDescE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Fehler- / Problembeschreibung *", "ES", "Descripción del fallo *", "Failure / issue description *")
+      X: =44 + 16
+      Y: =316
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- txtDesc:
+    Control: Classic/TextInput@2.3.2
+    Properties:
+      Default: =If(varNew, "", Coalesce(varCase.Description, ""))
+      HintText: =""
+      X: =44 + 16
+      Y: =336
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =150
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      PaddingLeft: =12
+      Mode: =TextMode.MultiLine
+- LSolE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Lösung / Maßnahme", "ES", "Solución / medida", "Solution / action")
+      X: =44 + 16
+      Y: =548
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- txtSol:
+    Control: Classic/TextInput@2.3.2
+    Properties:
+      Default: =If(varNew, "", Coalesce(varCase.Solution, ""))
+      HintText: =""
+      X: =44 + 16
+      Y: =568
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =164
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      PaddingLeft: =12
+      Mode: =TextMode.MultiLine
+- LIvE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Verantwortlich Innovence *", "ES", "Responsable Innovence *", "Responsible Innovence *")
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =316
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- cmbIv:
+    Control: Classic/ComboBox@2.4.0
+    Properties:
+      Items: =Choices('Warranty Case Tracker'.'responsible Person Innovence')
+      DefaultSelectedItems: =If(varNew, [], varCase.'responsible Person Innovence')
+      DisplayFields: =["DisplayName"]
+      SearchFields: =["DisplayName", "Email"]
+      SelectMultiple: =true
+      IsSearchable: =true
+      InputTextPlaceholder: =Switch(varLang, "DE", "Person suchen…", "ES", "Buscar persona…", "Search person…")
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =336
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =54
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      ChevronBackground: =RGBA(253, 217, 19, 1)
+      ChevronFill: =RGBA(13, 17, 18, 1)
+      ChevronHoverBackground: =RGBA(229, 192, 0, 1)
+      ChevronHoverFill: =RGBA(13, 17, 18, 1)
+      SelectionFill: =RGBA(253, 217, 19, 1)
+      SelectionColor: =RGBA(13, 17, 18, 1)
+      HoverFill: =RGBA(255, 248, 220, 1)
+      PressedFill: =RGBA(253, 217, 19, 1)
+      PressedColor: =RGBA(13, 17, 18, 1)
+- LAesE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Verantwortlich AES *", "ES", "Responsable AES *", "Responsible AES *")
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =402
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- cmbAes:
+    Control: Classic/ComboBox@2.4.0
+    Properties:
+      Items: =Choices('Warranty Case Tracker'.'responsible person AES')
+      DefaultSelectedItems: =If(varNew, [], varCase.'responsible person AES')
+      DisplayFields: =["DisplayName"]
+      SearchFields: =["DisplayName", "Email"]
+      SelectMultiple: =true
+      IsSearchable: =true
+      InputTextPlaceholder: =Switch(varLang, "DE", "Person suchen…", "ES", "Buscar persona…", "Search person…")
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =422
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =54
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      ChevronBackground: =RGBA(253, 217, 19, 1)
+      ChevronFill: =RGBA(13, 17, 18, 1)
+      ChevronHoverBackground: =RGBA(229, 192, 0, 1)
+      ChevronHoverFill: =RGBA(13, 17, 18, 1)
+      SelectionFill: =RGBA(253, 217, 19, 1)
+      SelectionColor: =RGBA(13, 17, 18, 1)
+      HoverFill: =RGBA(255, 248, 220, 1)
+      PressedFill: =RGBA(253, 217, 19, 1)
+      PressedColor: =RGBA(13, 17, 18, 1)
+- LProjE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Projekt-Nr. Innovence", "ES", "N.º proyecto Innovence", "Project no. Innovence")
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =568
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- txtProj:
+    Control: Classic/TextInput@2.3.2
+    Properties:
+      Default: =If(varNew, "", Coalesce(varCase.'Project No. Innovence', ""))
+      HintText: =""
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =588
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =44
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      PaddingLeft: =12
+- LRefE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Referenz-Nr. AES", "ES", "N.º referencia AES", "Reference no. AES")
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =642
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- txtRef:
+    Control: Classic/TextInput@2.3.2
+    Properties:
+      Default: =If(varNew, "", Coalesce(varCase.'Reference No. AES', ""))
+      HintText: =""
+      X: =44 + ((Parent.Width - 88 - 28) / 3) + 14 + 16
+      Y: =662
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =44
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      PaddingLeft: =12
+- LSerE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Seriennummer(n), mehrere mit Semikolon trennen", "ES", "Números de serie, separar con punto y coma", "Serial number(s), separate with semicolon")
+      X: =44 + 2 * (((Parent.Width - 88 - 28) / 3) + 14) + 16
+      Y: =316
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- txtSerial:
+    Control: Classic/TextInput@2.3.2
+    Properties:
+      Default: =If(varNew, "", Coalesce(varCase.'Serial number', ""))
+      HintText: =""
+      X: =44 + 2 * (((Parent.Width - 88 - 28) / 3) + 14) + 16
+      Y: =336
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =44
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      PaddingLeft: =12
+- NoteE:
+    Control: Label@2.5.1
+    Properties:
+      Text: |-
+        =Switch(varLang, "DE", "Bilder und Anhänge: in der Fall-Ansicht über „Anhänge & Bilder in SharePoint öffnen". * Pflichtfeld", "ES", "Imágenes y adjuntos: en la vista del caso con «Abrir adjuntos e imágenes en SharePoint». * Obligatorio", "Pictures and attachments: use “Open attachments & pictures in SharePoint” in the case view. * Required")
+      X: =44 + 2 * (((Parent.Width - 88 - 28) / 3) + 14) + 16
+      Y: =490
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =40
+      Size: =12
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Normal
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Top
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- LPortEdt:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Flughafen", "ES", "Aeropuerto", "Airport")
+      X: =Parent.Width - 618
+      Y: =180
+      Width: =190
+      Height: =18
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Middle
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- cmbPort:
+    Control: Classic/ComboBox@2.4.0
+    Properties:
+      Items: =Choices('Warranty Case Tracker'.Flughafen)
+      DefaultSelectedItems: =If(varNew, [], Filter(Choices('Warranty Case Tracker'.Flughafen), Value = varCase.Flughafen.Value))
+      DisplayFields: =["Value"]
+      SearchFields: =["Value"]
+      SelectMultiple: =false
+      IsSearchable: =true
+      InputTextPlaceholder: =""
+      X: =Parent.Width - 618
+      Y: =200
+      Width: =190
+      Height: =44
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      ChevronBackground: =RGBA(253, 217, 19, 1)
+      ChevronFill: =RGBA(13, 17, 18, 1)
+      ChevronHoverBackground: =RGBA(229, 192, 0, 1)
+      ChevronHoverFill: =RGBA(13, 17, 18, 1)
+      SelectionFill: =RGBA(253, 217, 19, 1)
+      SelectionColor: =RGBA(13, 17, 18, 1)
+      HoverFill: =RGBA(255, 248, 220, 1)
+      PressedFill: =RGBA(253, 217, 19, 1)
+      PressedColor: =RGBA(13, 17, 18, 1)
+- LComE:
+    Control: Label@2.5.1
+    Properties:
+      Text: =Switch(varLang, "DE", "Kommentar zur Änderung (optional, geht in die Info-Mail)", "ES", "Comentario del cambio (opcional)", "Comment on change (optional, goes into the info mail)")
+      X: =44 + 2 * (((Parent.Width - 88 - 28) / 3) + 14) + 16
+      Y: =380
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =32
+      Size: =11
+      Color: =RGBA(107, 106, 104, 1)
+      Fill: =RGBA(0, 0, 0, 0)
+      Font: =Font.Lato
+      FontWeight: =FontWeight.Bold
+      Align: =Align.Left
+      VerticalAlign: =VerticalAlign.Top
+      PaddingLeft: =0
+      PaddingRight: =0
+      PaddingTop: =0
+      PaddingBottom: =0
+- txtComment:
+    Control: Classic/TextInput@2.3.2
+    Properties:
+      Default: =""
+      HintText: =""
+      X: =44 + 2 * (((Parent.Width - 88 - 28) / 3) + 14) + 16
+      Y: =416
+      Width: =((Parent.Width - 88 - 28) / 3) - 32
+      Height: =60
+      Font: =Font.Lato
+      Size: =14
+      Color: =RGBA(13, 17, 18, 1)
+      Fill: =RGBA(255, 255, 255, 1)
+      BorderColor: =RGBA(226, 214, 138, 1)
+      BorderThickness: =1
+      RadiusTopLeft: =10
+      RadiusTopRight: =10
+      RadiusBottomLeft: =10
+      RadiusBottomRight: =10
+      PaddingLeft: =12
+      Mode: =TextMode.MultiLine
