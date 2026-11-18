@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Warranty Case Tracker</title>
+<style>
+:root{--y:#FDD913;--yd:#E5C000;--k:#0D1112;--yl:#FFF8DC;--bg:#F2F2F0;--g:#6b7075;--line:#e4e4df;--ok:#e3f4e6;--okt:#1b6b2b;--bad:#fde3e3;--badt:#a12020}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--k);font:14px/1.4 "Neo Sans Std","Lato","Segoe UI",system-ui,sans-serif}
+header{background:var(--k);border-bottom:4px solid var(--y);padding:14px 28px;display:flex;align-items:center;gap:18px}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--y);color:var(--k);display:grid;place-items:center;font-weight:800;font-size:20px}
+.ttl{color:#fff;font-weight:700;font-size:20px;line-height:1.1}
+.sub{color:#cfd2d4;font-size:11px;margin-top:2px}
+.sp{flex:1}
+nav{display:flex;gap:8px}
+.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font:inherit;font-size:13px;cursor:pointer;color:var(--k)}
+.pill:hover{border-color:var(--k)}
+.pill.y{background:var(--y);border-color:var(--y);font-weight:700}
+.pill.y:hover{background:var(--yd)}
+nav .pill{background:transparent;color:#fff;border-color:#555}
+nav .pill.on{background:var(--y);color:var(--k);border-color:var(--y);font-weight:700}
+.lang{display:flex;align-items:center;margin-left:8px}
+.lang button{background:none;border:0;color:#8d9296;font:inherit;font-size:14px;padding:6px 10px;cursor:pointer;border-bottom:3px solid transparent}
+.lang button.on{color:var(--y);font-weight:800;border-bottom-color:var(--y)}
+.lang i{width:1px;height:16px;background:#555}
+main{max-width:1240px;margin:0 auto;padding:22px 28px 60px}
+.filter{background:var(--yl);border-left:6px solid var(--y);border-radius:16px;padding:16px 20px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.filter h2{margin:0 14px 6px 0;font-size:22px}
+label.f{display:flex;flex-direction:column;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;gap:4px}
+input,select,textarea{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;color:var(--k);min-width:150px}
+textarea{width:100%;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--y);border-color:var(--yd)}
+.bar{display:flex;gap:10px;margin:16px 0 6px;flex-wrap:wrap;align-items:center}
+.meta{font-size:12px;color:var(--g);margin-bottom:8px}
+h3{font-size:16px;margin:18px 0 8px}h3 small{font-weight:400;color:var(--g)}
+.row{background:#fff;border-top:4px solid var(--y);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:12px 16px;margin-bottom:10px;display:grid;grid-template-columns:44px 2.4fr 1fr 1fr 1.5fr 1fr 130px 90px;gap:14px;align-items:center}
+.no{width:36px;height:36px;border-radius:50%;background:var(--k);color:var(--y);display:grid;place-items:center;font-weight:800}
+.t{font-weight:700;font-size:14px}.d{font-size:11px;color:var(--g);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.c small{display:block;font-size:9px;font-weight:700;text-transform:uppercase;color:#8a6d00;letter-spacing:.04em}
+.c span{font-size:12px}
+.chip{border-radius:999px;padding:4px 12px;font-size:11px;font-weight:700;text-align:center;background:var(--y)}
+.chip.p{background:var(--k);color:var(--y)}.chip.ok{background:var(--ok);color:var(--okt)}.chip.bad{background:var(--bad);color:var(--badt)}.chip.s{background:#fff0c2}
+.closed{border-top:2px dashed #ccc;margin-top:22px;padding-top:6px}
+.crow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:6px;display:grid;grid-template-columns:30px 3fr 1fr 1.4fr 1fr 150px 60px;gap:12px;align-items:center;font-size:12px}
+a.open{color:#8a6d00;font-weight:700;cursor:pointer;text-decoration:none}
+.card{background:#fff;border-top:4px solid var(--y);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:22px 26px;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.box{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fcfcfa}
+.box h4{margin:0 0 10px;display:flex;gap:8px;align-items:center}.box h4 b{background:var(--k);color:var(--y);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px}
+.lab{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#555;margin:10px 0 3px}
+.val{white-space:pre-wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chips .pill{padding:5px 12px;font-size:12px}
+.err{background:var(--bad);color:var(--badt);border-radius:10px;padding:10px 14px;margin:12px 0}
+dialog{border:0;border-radius:18px;padding:24px;width:min(560px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.hdr2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+@media(max-width:900px){.row,.crow{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}header{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">IV</div>
+  <div><div class="ttl">Warranty Case Tracker</div><div class="sub" id="sub"></div></div>
+  <div class="sp"></div>
+  <nav><button class="pill on" id="navCases"></button></nav>
+  <div class="lang"><button data-l="de">DE</button><i></i><button data-l="en">EN</button><i></i><button data-l="es">ES</button></div>
+</header>
+<main>
+  <div id="err"></div>
+  <section id="vList">
+    <div class="filter">
+      <h2 data-t="filter"></h2>
+      <label class="f"><span data-t="search"></span><input id="fSearch" style="min-width:260px"></label>
+      <label class="f"><span data-t="aes"></span><select id="fAes"></select></label>
+      <label class="f"><span data-t="proj"></span><select id="fProj"></select></label>
+      <label class="f"><span data-t="since"></span><input id="fSince" type="date"></label>
+      <label class="f"><span data-t="status"></span><select id="fStatus"></select></label>
+    </div>
+    <div class="bar">
+      <button class="pill y" id="bNew"></button>
+      <button class="pill" id="bRefresh"></button>
+      <button class="pill" id="bReset"></button>
+      <span class="sp"></span><span class="meta" id="cnt"></span>
+    </div>
+    <h3 id="hRun"></h3><div id="run"></div>
+    <div class="closed"><h3 id="hClosed"></h3><div id="done"></div></div>
+  </section>
+  <section id="vCase" hidden></section>
+</main>
+<dialog id="dlg"></dialog>
+<script>
+// ===== Konfiguration =====
+const _h=new URLSearchParams(location.hash.slice(1));
+if(_h.get("r")){try{localStorage.setItem("wct-read",_h.get("r"))}catch(e){}history.replaceState(null,"",location.pathname)}
+if(_h.get("w")){try{localStorage.setItem("wct-write",_h.get("w"))}catch(e){}}
+const CFG={
+  get read(){try{return localStorage.getItem("wct-read")||""}catch(e){return""}},
+  get write(){try{return localStorage.getItem("wct-write")||""}catch(e){return""}},
+  sp:"https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/AllItems.aspx"
+};
+const I18={
+ de:{sub:"Gewährleistungsfälle · Airsafe / GOMINTEC · Innovence Airport Systems GmbH",cases:"Fälle",filter:"Filter",search:"Suche (alle Felder)",aes:"Verantwortlich AES",proj:"Projekt-Nr.",since:"Meldedatum ab",status:"Status",all:"– alle –",newc:"+ Neuer Fall",refresh:"Aktualisieren",reset:"Filter zurücksetzen",run:"Laufende Fälle",closed:"Abgeschlossene Fälle",count:(n,t)=>`${t} Fälle · sortiert nach Meldedatum`,open:"Öffnen",date:"Meldedatum",resp:"Verantw. Innovence",back:"‹ Alle Fälle",fail:"Fehler",involved:"Beteiligte",refs:"Referenzen",att:"Anhänge & Lösung",serial:"Seriennummer(n)",sol:"Lösung",files:"Anhänge/Bilder in SharePoint öffnen",edit:"Bearbeiten",save:"Speichern",cancel:"Abbrechen",comment:"Änderungskommentar",refNo:"Referenz-Nr. AES",loading:"Lade Fälle …",nowrite:"Schreib-Flow noch nicht verbunden – Änderungen sind nur Vorschau.",saved:"Gespeichert",notitle:"(ohne Titel)",ms:"Antwortzeit"},
+ en:{sub:"Warranty cases · Airsafe / GOMINTEC · Innovence Airport Systems GmbH",cases:"Cases",filter:"Filter",search:"Search (all fields)",aes:"Responsible AES",proj:"Project no.",since:"Reported since",status:"Status",all:"– all –",newc:"+ New case",refresh:"Refresh",reset:"Reset filter",run:"Open cases",closed:"Closed cases",count:(n,t)=>`${t} cases · sorted by report date`,open:"Open",date:"Reported",resp:"Resp. Innovence",back:"‹ All cases",fail:"Failure",involved:"People involved",refs:"References",att:"Attachments & solution",serial:"Serial number(s)",sol:"Solution",files:"Open attachments/pictures in SharePoint",edit:"Edit",save:"Save",cancel:"Cancel",comment:"Change comment",refNo:"Reference no. AES",loading:"Loading cases …",nowrite:"Write flow not connected yet – changes are preview only.",saved:"Saved",notitle:"(no title)",ms:"Response time"},
+ es:{sub:"Casos de garantía · Airsafe / GOMINTEC · Innovence Airport Systems GmbH",cases:"Casos",filter:"Filtro",search:"Buscar (todos los campos)",aes:"Responsable AES",proj:"N.º de proyecto",since:"Fecha desde",status:"Estado",all:"– todos –",newc:"+ Nuevo caso",refresh:"Actualizar",reset:"Restablecer filtro",run:"Casos abiertos",closed:"Casos cerrados",count:(n,t)=>`${t} casos · ordenado por fecha`,open:"Abrir",date:"Fecha",resp:"Resp. Innovence",back:"‹ Todos los casos",fail:"Fallo",involved:"Implicados",refs:"Referencias",att:"Adjuntos y solución",serial:"N.º de serie",sol:"Solución",files:"Abrir adjuntos/imágenes en SharePoint",edit:"Editar",save:"Guardar",cancel:"Cancelar",comment:"Comentario de cambio",refNo:"N.º de referencia AES",loading:"Cargando casos …",nowrite:"Flujo de escritura no conectado – solo vista previa.",saved:"Guardado",notitle:"(sin título)",ms:"Tiempo"}
+};
+const OPEN=["new","in progress","send back to AES"];
+let lang=localStorage.getItem("wct-lang")||"de",items=[],cur=null,ms=null;
+const $=s=>document.querySelector(s),T=k=>I18[lang][k];
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pick=(o,p)=>{const k=Object.keys(o).find(k=>k.startsWith(p));return k?o[k]:undefined};
+const ppl=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>p.DisplayName||p.Claims||"").filter(Boolean);
+const aes=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>(String(p.Email||p.Claims||"").replace(/^i:0#\.f\|membership\|/,"").split("@")[0]||"").toUpperCase()).filter(Boolean);
+const norm=r=>({id:r.ID,title:r.Title||"",status:r.Status?.Value||"new",desc:r.Description||"",serial:pick(r,"Serial_x0020_number")||"",aes:aes(r.Assignedto0),aesN:ppl(r.Assignedto0),inn:ppl(r.Issueloggedby),date:(r.DateReported||"").slice(0,10),proj:pick(r,"Project_x0020_No")||"",ref:pick(r,"Reference_x0020_No")||"",sol:r.Solution||"",cmt:pick(r,"Comment")||pick(r,"Anderungskommentar")||""});
+function fmt(d){if(!d)return"–";const[a,b,c]=d.split("-");return`${c}.${b}.${a}`}
+function chip(s){const c=s=="in progress"?"p":s.startsWith("send repaired")?"ok":s=="irremediable"?"bad":s=="send back to AES"?"s":"";const n={new:"neu","in progress":"in Bearbeitung"};return`<span class="chip ${c}">${esc(lang=="de"?(n[s]||s):s)}</span>`}
+async function load(){
+  $("#run").innerHTML=`<div class="meta">${T("loading")}</div>`;
+  const t=performance.now();
+  if(!CFG.read){$("#err").innerHTML=`<div class="err">Flow-Adresse fehlt (einmalig per #r=… in der URL setzen).</div>`;items=[];fill();render();return}
+  try{const r=await fetch(CFG.read,{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});if(!r.ok)throw new Error("HTTP "+r.status);
+    items=(await r.json()).map(norm);ms=Math.round(performance.now()-t);$("#err").innerHTML=""}
+  catch(e){$("#err").innerHTML=`<div class="err">Daten konnten nicht geladen werden (${esc(e.message)}). Der Lese-Flow ist evtl. ausgeschaltet.</div>`;items=[]}
+  fill();render();
+}
+function fill(){
+  const keep=[$("#fAes").value,$("#fProj").value,$("#fStatus").value];
+  const opt=(a,v)=>`<option value="">${T("all")}</option>`+[...new Set(a)].sort().map(x=>`<option${x==v?" selected":""}>${esc(x)}</option>`).join("");
+  $("#fAes").innerHTML=opt(items.flatMap(i=>i.aes),keep[0]);
+  $("#fProj").innerHTML=opt(items.map(i=>i.proj).filter(Boolean),keep[1]);
+  $("#fStatus").innerHTML=opt(items.map(i=>i.status),keep[2]);
+}
+function filtered(){
+  const q=$("#fSearch").value.toLowerCase(),a=$("#fAes").value,p=$("#fProj").value,s=$("#fStatus").value,d=$("#fSince").value;
+  return items.filter(i=>(!q||[i.title,i.desc,i.serial,i.ref,i.proj,i.sol,i.aes.join(" "),i.inn.join(" ")].join(" ").toLowerCase().includes(q))&&(!a||i.aes.includes(a))&&(!p||i.proj==p)&&(!s||i.status==s)&&(!d||i.date>=d)).sort((x,y)=>y.date.localeCompare(x.date)||y.id-x.id);
+}
+function render(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=T(e.dataset.t));
+  $("#sub").textContent=T("sub");$("#navCases").textContent=T("cases");
+  $("#bNew").textContent=T("newc");$("#bRefresh").textContent=T("refresh");$("#bReset").textContent=T("reset");
+  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.l==lang));
+  const f=filtered(),run=f.filter(i=>OPEN.includes(i.status)),done=f.filter(i=>!OPEN.includes(i.status));
+  $("#hRun").innerHTML=`${T("run")} <small>(${run.length})</small>`;$("#hClosed").innerHTML=`${T("closed")} <small>(${done.length})</small>`;
+  $("#cnt").textContent=T("count")(f.length,f.length)+(ms?` · ${T("ms")} ${ms} ms`:"");
+  $("#run").innerHTML=run.map(i=>`<div class="row"><div class="no">${i.id}</div><div><div class="t">${esc(i.title||i.desc.split("\n")[0].slice(0,60)||T("notitle"))}</div><div class="d">${T("fail")}: ${esc(i.desc)}</div></div>
+   <div class="c"><small>${T("date")}</small><span>${fmt(i.date)}</span></div><div class="c"><small>${T("aes").replace("Verantwortlich","Verantw.")}</small><span>${esc(i.aes.join(", ")||"–")}</span></div>
+   <div class="c"><small>${T("resp")}</small><span>${esc(i.inn.join(", ")||"–")}</span></div><div class="c"><small>${T("proj")}</small><span>${esc(i.proj||"–")}</span></div>${chip(i.status)}<button class="pill y" onclick="show(${i.id})">${T("open")}</button></div>`).join("");
+  $("#done").innerHTML=done.map(i=>`<div class="crow"><b>${i.id}</b><span>${esc(i.title||i.desc.split("\n")[0].slice(0,80))}</span><span>${fmt(i.date)}</span><span>${esc(i.inn.join(", "))}</span><span>${esc(i.proj)}</span>${chip(i.status)}<a class="open" onclick="show(${i.id})">${T("open")}</a></div>`).join("");
+}
+function show(id){
+  cur=items.find(i=>i.id==id);$("#vList").hidden=true;const v=$("#vCase");v.hidden=false;
+  v.innerHTML=`<button class="pill" onclick="back()">${T("back")}</button>
+  <div class="card"><div class="hdr2"><h2 style="margin:0">Fall ${cur.id}</h2><div style="display:flex;gap:8px"><button class="pill" onclick="edit()">${T("edit")}</button><a class="pill y" style="text-decoration:none" target="_blank" href="${CFG.sp}">${T("files")}</a></div></div>
+  <div style="margin-top:8px">${chip(cur.status)} <span class="meta">${T("date")}: ${fmt(cur.date)}</span></div>
+  <div class="grid"><div class="box"><h4><b>1</b>${T("fail")}</h4><div class="val">${esc(cur.desc)}</div><div class="lab">${T("serial")}</div><div class="val">${esc(cur.serial.replace(/;/g,"\n"))||"–"}</div></div>
+  <div class="box"><h4><b>2</b>${T("involved")}</h4><div class="lab">Innovence</div><div class="chips">${cur.inn.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div><div class="lab">AES</div><div class="chips">${cur.aesN.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div></div>
+  <div class="box"><h4><b>3</b>${T("refs")}</h4><div class="lab">${T("proj")}</div><div class="val">${esc(cur.proj)||"–"}</div><div class="lab">${T("refNo")}</div><div class="val">${esc(cur.ref)||"–"}</div></div></div>
+  <div class="box" style="margin-top:16px"><h4><b>4</b>${T("att")}</h4><div class="lab">${T("sol")}</div><div class="val">${esc(cur.sol)||"–"}</div><div class="lab">${T("comment")}</div><div class="val">${esc(cur.cmt)||"–"}</div></div></div>`;
+  scrollTo(0,0);
+}
+function back(){$("#vCase").hidden=true;$("#vList").hidden=false}
+const STAT=["new","in progress","send back to AES","send repaired back to Innovence","irremediable"];
+function edit(isNew){
+  const c=isNew?{id:"",status:"new",desc:"",serial:"",proj:"",ref:"",sol:"",cmt:"",date:new Date().toISOString().slice(0,10)}:cur;
+  const d=$("#dlg");
+  d.innerHTML=`<h3 style="margin-top:0">${isNew?T("newc"):T("edit")+" – Fall "+c.id}</h3>
+  <label class="f">${T("status")}<select id="eSt">${STAT.map(s=>`<option${s==c.status?" selected":""}>${s}</option>`).join("")}</select></label>
+  <div class="lab">${T("fail")}</div><textarea id="eDesc" rows="4">${esc(c.desc)}</textarea>
+  <div class="lab">${T("serial")}</div><input id="eSer" style="width:100%" value="${esc(c.serial)}">
+  <div class="lab">${T("proj")}</div><input id="eProj" style="width:100%" value="${esc(c.proj)}">
+  <div class="lab">${T("sol")}</div><textarea id="eSol" rows="3">${esc(c.sol)}</textarea>
+  <div class="lab">${T("comment")}</div><input id="eCmt" style="width:100%" value="${esc(c.cmt)}">
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="pill" onclick="dlg.close()">${T("cancel")}</button><button class="pill y" onclick="save(${isNew?1:0})">${T("save")}</button></div>`;
+  d.showModal();
+}
+async function save(isNew){
+  const body={action:isNew?"create":"update",id:isNew?null:cur.id,Status:$("#eSt").value,Description:$("#eDesc").value,Serial:$("#eSer").value,Project:$("#eProj").value,Solution:$("#eSol").value,Comment:$("#eCmt").value};
+  if(!CFG.write){alert(T("nowrite"));return}
+  const t=performance.now();
+  try{const r=await fetch(CFG.write,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error("HTTP "+r.status);
+    ms=Math.round(performance.now()-t);$("#dlg").close();await load();if(!isNew)show(body.id)}catch(e){alert("Fehler: "+e.message)}
+}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;localStorage.setItem("wct-lang",lang);fill();render();if(!$("#vCase").hidden)show(cur.id)});
+["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
+$("#bReset").onclick=()=>{["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
+$("#bRefresh").onclick=load;$("#bNew").onclick=()=>edit(true);$("#navCases").onclick=back;
+load();
+</script>
+</body>
+</html>
