@@ -14,6 +14,7 @@ header{background:var(--k);border-bottom:4px solid var(--y);padding:14px 28px;di
 .ttl{color:#fff;font-weight:700;font-size:20px;line-height:1.1}
 .sub{color:#cfd2d4;font-size:11px;margin-top:2px}
 .sp{flex:1}
+.inno{height:16px;width:auto;margin-left:18px;padding-left:18px;border-left:1px solid #444;opacity:.95}
 nav{display:flex;gap:8px}
 .pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font:inherit;font-size:13px;cursor:pointer;color:var(--k)}
 .pill:hover{border-color:var(--k)}
@@ -69,6 +70,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
   <div class="sp"></div>
   <nav><button class="pill on" id="navCases"></button></nav>
   <div class="lang"><button data-l="de">DE</button><i></i><button data-l="en">EN</button><i></i><button data-l="es">ES</button></div>
+  <img class="inno" src="innovence.png" alt="INNOVENCE">
 </header>
 <main>
   <div id="err"></div>
@@ -91,6 +93,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
     <div class="closed"><h3 id="hClosed"></h3><div id="done"></div></div>
   </section>
   <section id="vCase" hidden></section>
+  <footer style="margin-top:36px;text-align:center;font-size:11px;color:#8a8e92;letter-spacing:.08em;text-transform:uppercase">Track. Resolve. Keep moving. · Innovence Airport Systems GmbH</footer>
 </main>
 <dialog id="dlg"></dialog>
 <script>
