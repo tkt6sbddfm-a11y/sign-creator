@@ -49,6 +49,7 @@ h3{font-size:16px;margin:18px 0 8px}h3 small{font-weight:400;color:var(--g)}
 .chip{border-radius:999px;padding:4px 12px;font-size:11px;font-weight:700;text-align:center}
 .chip{background:#dbeafe;color:#1e40af}.chip.p{background:#ffedd5;color:#9a3412}.chip.ok{background:var(--ok);color:var(--okt)}.chip.bad{background:var(--bad);color:var(--badt)}.chip.s{background:#ede9fe;color:#5b21b6}
 .chead{display:grid;grid-template-columns:30px 3fr 1fr 1.4fr 1fr 150px 60px;gap:12px;padding:0 14px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#8a6d00}
+.pks{display:flex;gap:6px;flex-wrap:wrap}.pk{cursor:pointer}.pk input{display:none}.pk span{display:inline-block;padding:5px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;font-weight:700}.pk input:checked+span{background:var(--y);border-color:var(--yd)}
 .legend{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}.legend .chip{font-size:10px;padding:3px 10px}
 .closed{border-top:2px dashed #ccc;margin-top:22px;padding-top:6px}
 .crow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:6px;display:grid;grid-template-columns:30px 3fr 1fr 1.4fr 1fr 150px 60px;gap:12px;align-items:center;font-size:12px}
@@ -215,7 +216,8 @@ function editOpen(isNew){
   if(!d.open)d.showModal();
 }
 
-const NC={de:{ph:"name@firma.de",req:"Bitte Beschreibung, Meldedatum sowie je eine verantwortliche Person (Innovence und AES, E-Mail) angeben.",hint:"Anhänge und Bilder lassen sich nach dem Speichern über „Anhänge/Bilder in SharePoint öffnen“ ergänzen.",aesH:"E-Mail der AES-Person",innH:"E-Mail der Innovence-Person",busy:"Wird gespeichert …"},en:{ph:"name@company.com",req:"Please enter a description, report date and one responsible person each (Innovence and AES, e-mail).",hint:"Attachments and pictures can be added after saving via “Open attachments/pictures in SharePoint”.",aesH:"E-mail of the AES person",innH:"E-mail of the Innovence person",busy:"Saving …"},es:{ph:"nombre@empresa.com",req:"Indique descripción, fecha de aviso y una persona responsable de cada parte (Innovence y AES, correo electrónico).",hint:"Los adjuntos e imágenes se pueden añadir tras guardar mediante «Abrir adjuntos/imágenes en SharePoint».",aesH:"Correo de la persona de AES",innH:"Correo de la persona de Innovence",busy:"Guardando …"}};
+const PA=[[21,"JNB"],[32,"JHP"],[26,"JLG"],[33,"YGE"],[22,"TJ"]],PI=[[9,"Bastian Müller"],[13,"Markus Müller"],[12,"Nicole Fischer"],[28,"Benjamin Dembski"],[29,"Radouane Benoudda"],[30,"Zakaria Mahrazi"]];
+const NC={de:{ph:"name@firma.de",req:"Bitte Beschreibung, Meldedatum sowie mindestens je eine verantwortliche Person (Innovence und AES) angeben.",hint:"Anhänge und Bilder lassen sich nach dem Speichern über „Anhänge/Bilder in SharePoint öffnen“ ergänzen.",aesH:"E-Mail der AES-Person",innH:"E-Mail der Innovence-Person",busy:"Wird gespeichert …"},en:{ph:"name@company.com",req:"Please enter a description, report date and at least one responsible person each (Innovence and AES).",hint:"Attachments and pictures can be added after saving via “Open attachments/pictures in SharePoint”.",aesH:"E-mail of the AES person",innH:"E-mail of the Innovence person",busy:"Saving …"},es:{ph:"nombre@empresa.com",req:"Indique descripción, fecha de aviso y al menos una persona responsable de cada parte (Innovence y AES).",hint:"Los adjuntos e imágenes se pueden añadir tras guardar mediante «Abrir adjuntos/imágenes en SharePoint».",aesH:"Correo de la persona de AES",innH:"Correo de la persona de Innovence",busy:"Guardando …"}};
 function newCase(){
   const N=NC[lang]||NC.de,today=new Date().toISOString().slice(0,10);
   $("#vList").hidden=true;const v=$("#vCase");v.hidden=false;cur=null;
@@ -223,17 +225,18 @@ function newCase(){
   <div class="card"><div class="hdr2"><h2 style="margin:0">${T("newc")}</h2><div style="display:flex;gap:8px"><button class="pill" onclick="back()">${T("cancel")}</button><button class="pill y" id="ncSave">${T("save")}</button></div></div>
   <div style="margin-top:8px">${chip("new")} <span class="meta">${T("date")}: <input id="nDate" type="date" value="${today}" style="min-width:0;padding:5px 8px;width:150px"></span></div>
   <div class="grid"><div class="box"><h4><b>1</b>${T("fail")} *</h4><textarea id="nDesc" rows="5"></textarea><div class="lab">${T("serial")}</div><input id="nSer" style="width:100%;box-sizing:border-box"></div>
-  <div class="box"><h4><b>2</b>${T("involved")} *</h4><div class="lab">Innovence</div><input id="nInn" type="email" style="width:100%;box-sizing:border-box" placeholder="${N.ph}" title="${N.innH}"><div class="lab">AES</div><input id="nAes" type="email" style="width:100%;box-sizing:border-box" placeholder="${N.ph}" title="${N.aesH}"></div>
+  <div class="box"><h4><b>2</b>${T("involved")} *</h4><div class="lab">Innovence</div><div class="pks" title="${N.innH}">${PI.map(([i,n])=>`<label class="pk" title="${esc(n)}"><input type="checkbox" data-g="nInn" value="${i}"><span>${esc(ini(n))}</span></label>`).join("")}</div><div class="lab">AES</div><div class="pks" title="${N.aesH}">${PA.map(([i,n])=>`<label class="pk"><input type="checkbox" data-g="nAes" value="${i}"><span>${esc(n)}</span></label>`).join("")}</div></div>
   <div class="box"><h4><b>3</b>${T("refs")}</h4><div class="lab">${T("proj")}</div><input id="nProj" style="width:100%;box-sizing:border-box"><div class="lab">${T("refNo")}</div><input id="nRef" style="width:100%;box-sizing:border-box"></div></div>
   <div class="box" style="margin-top:16px"><h4><b>4</b>${T("att")}</h4><div class="lab">${T("sol")}</div><textarea id="nSol" rows="3"></textarea><div class="meta" style="margin-top:8px">${N.hint}</div></div>
   <div id="ncErr"></div></div>`;
   $("#ncSave").onclick=createCase;
 }
 async function createCase(){
-  const N=NC[lang]||NC.de,g=i=>$("#"+i).value.trim(),em=x=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x);
-  if(!g("nDesc")||!g("nDate")||!em(g("nInn"))||!em(g("nAes"))){$("#ncErr").innerHTML=`<div class="err">${N.req}</div>`;return}
+  const N=NC[lang]||NC.de,g=i=>$("#"+i).value.trim();
+  const ids=k=>[...document.querySelectorAll(`input[data-g="${k}"]:checked`)].map(x=>+x.value);
+  if(!g("nDesc")||!g("nDate")||!ids("nInn").length||!ids("nAes").length){$("#ncErr").innerHTML=`<div class="err">${N.req}</div>`;return}
   if(!CFG.write){alert(T("nowrite"));return}
-  const body={create:true,fields:{Status:"new",Description:g("nDesc"),"Serial_x0020_number":g("nSer"),"Project_x0020_No_x002e__x0020_In":g("nProj"),"Reference_x0020_No_x002e__x0020_":g("nRef"),Solution:g("nSol"),DateReported:g("nDate")+"T12:00:00Z"},aes:g("nAes"),inn:g("nInn")};
+  const body={create:"1",fields:{Status:"new",Description:g("nDesc"),"Serial_x0020_number":g("nSer"),"Project_x0020_No_x002e__x0020_In":g("nProj"),"Reference_x0020_No_x002e__x0020_":g("nRef"),Solution:g("nSol"),DateReported:g("nDate")+"T12:00:00Z",Assignedto0Id:ids("nAes"),IssueloggedbyId:ids("nInn")}};
   const b=$("#ncSave");b.disabled=true;b.textContent=N.busy;
   try{const r=await fetch(CFG.write,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error("HTTP "+r.status);
     await load();back()}catch(e){b.disabled=false;b.textContent=T("save");$("#ncErr").innerHTML=`<div class="err">${W("e")}: ${esc(e.message)}</div>`}
@@ -249,7 +252,7 @@ async function save(isNew){
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;localStorage.setItem("wct-lang",lang);fill();render();if(!$("#vCase").hidden)show(cur.id)});
 ["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
-$("#bRefresh").onclick=load;$("#bNew").onclick=()=>window.open("https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/NewForm.aspx","_blank");
+$("#bRefresh").onclick=load;$("#bNew").onclick=newCase;
 setTimeout(()=>$("#intro").classList.add("gone"),3200);load();
 </script>
 </body>
