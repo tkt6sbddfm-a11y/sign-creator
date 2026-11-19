@@ -138,7 +138,9 @@ const ppl=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>fixN(p.DisplayName||p.Claims||
 const aes=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>(String(p.Email||p.Claims||"").replace(/^i:0#\.f\|membership\|/,"").split("@")[0]||"").toUpperCase()).filter(Boolean).map(fixN);
 const norm=r=>({id:r.ID,title:r.Title||"",status:r.Status?.Value||"new",desc:r.Description||"",serial:pick(r,"Serial_x0020_number")||"",aes:aes(r.Assignedto0),aesN:ppl(r.Assignedto0),inn:ppl(r.Issueloggedby),date:(r.DateReported||"").slice(0,10),proj:pick(r,"Project_x0020_No")||"",ref:pick(r,"Reference_x0020_No")||"",sol:r.Solution||"",cmt:pick(r,"Comment")||pick(r,"Anderungskommentar")||""});
 function fmt(d){if(!d)return"–";const[a,b,c]=d.split("-");return`${c}.${b}.${a}`}
-function chip(s){const c=s=="in progress"?"p":s.startsWith("send repaired")?"ok":s=="irremediable"?"bad":s=="send back to AES"?"s":"";const n={new:"neu","in progress":"in Bearbeitung"};return`<span class="chip ${c}">${esc(lang=="de"?(n[s]||s):s)}</span>`}
+const SL={de:{new:"neu","in progress":"in Bearbeitung","send back to AES":"zurück an AES","send repaired back to Innovence":"repariert zurück an Innovence",irremediable:"nicht reparierbar"},es:{new:"nuevo","in progress":"en curso","send back to AES":"devuelto a AES","send repaired back to Innovence":"reparado, devuelto a Innovence",irremediable:"irreparable"}};
+const sl=s=>(SL[lang]||{})[s]||s;
+function chip(s){const c=s=="in progress"?"p":s.startsWith("send repaired")?"ok":s=="irremediable"?"bad":s=="send back to AES"?"s":"";return`<span class="chip ${c}">${esc(sl(s))}</span>`}
 async function load(){
   $("#run").innerHTML=`<div class="meta">${T("loading")}</div>`;
   const t=performance.now();
@@ -153,7 +155,7 @@ function fill(){
   const opt=(a,v)=>`<option value="">${T("all")}</option>`+[...new Set(a)].sort().map(x=>`<option${x==v?" selected":""}>${esc(x)}</option>`).join("");
   $("#fAes").innerHTML=opt(items.flatMap(i=>i.aes),keep[0]);
   $("#fProj").innerHTML=opt(items.map(i=>i.proj).filter(Boolean),keep[1]);
-  $("#fStatus").innerHTML=opt(items.map(i=>i.status),keep[2]);
+  $("#fStatus").innerHTML=`<option value="">${T("all")}</option>`+[...new Set(items.map(i=>i.status))].sort().map(x=>`<option value="${esc(x)}"${x==keep[2]?" selected":""}>${esc(sl(x))}</option>`).join("");
 }
 function filtered(){
   const q=$("#fSearch").value.toLowerCase(),a=$("#fAes").value,p=$("#fProj").value,s=$("#fStatus").value,d=$("#fSince").value;
@@ -203,7 +205,7 @@ function editOpen(isNew){
   const c=isNew?{id:"",status:"new",desc:"",serial:"",proj:"",ref:"",sol:"",cmt:"",date:new Date().toISOString().slice(0,10)}:cur;
   const d=$("#dlg");
   d.innerHTML=`<h3 style="margin-top:0">${isNew?T("newc"):T("edit")+" – Fall "+c.id}</h3>
-  <label class="f">${T("status")}<select id="eSt">${STAT.map(s=>`<option${s==c.status?" selected":""}>${s}</option>`).join("")}</select></label>
+  <label class="f">${T("status")}<select id="eSt">${STAT.map(s=>`<option value="${s}"${s==c.status?" selected":""}>${esc(sl(s))}</option>`).join("")}</select></label>
   <div class="lab">${T("fail")}</div><textarea id="eDesc" rows="4">${esc(c.desc)}</textarea>
   <div class="lab">${T("serial")}</div><input id="eSer" style="width:100%" value="${esc(c.serial)}">
   <div class="lab">${T("proj")}</div><input id="eProj" style="width:100%" value="${esc(c.proj)}">
