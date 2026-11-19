@@ -131,10 +131,11 @@ let lang=localStorage.getItem("wct-lang")||((navigator.language||"").toLowerCase
 const $=s=>document.querySelector(s),T=k=>I18[lang][k];
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pick=(o,p)=>{const k=Object.keys(o).find(k=>k.startsWith(p));return k?o[k]:undefined};
-const fixN=n=>/^administraci/i.test(n)?"Tanja Soler":n;
+const fixN=n=>/^administraci/i.test(n)?"TJ":n;
+const ini=n=>{const w=String(n).replace(/[(),.@].*$/,"").trim().split(/\s+/).filter(Boolean);return(w.length>1?w[0][0]+w[w.length-1][0]:(w[0]||"").slice(0,3)).toUpperCase()};
 const ppl=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>fixN(p.DisplayName||p.Claims||"")).filter(Boolean);
 const aes=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>(String(p.Email||p.Claims||"").replace(/^i:0#\.f\|membership\|/,"").split("@")[0]||"").toUpperCase()).filter(Boolean).map(fixN);
-const norm=r=>({id:r.ID,title:r.Title||"",status:r.Status?.Value||"new",desc:r.Description||"",serial:pick(r,"Serial_x0020_number")||"",aes:aes(r.Assignedto0),aesN:ppl(r.Assignedto0),inn:ppl(r.Issueloggedby),date:(r.DateReported||"").slice(0,10),proj:pick(r,"Project_x0020_No")||"",ref:pick(r,"Reference_x0020_No")||"",sol:r.Solution||"",cmt:pick(r,"Comment")||pick(r,"Anderungskommentar")||""});
+const norm=r=>({id:r.ID,title:r.Title||"",status:r.Status?.Value||"new",desc:r.Description||"",serial:pick(r,"Serial_x0020_number")||"",aes:aes(r.Assignedto0),aesN:ppl(r.Assignedto0),inn:ppl(r.Issueloggedby),innK:ppl(r.Issueloggedby).map(ini),date:(r.DateReported||"").slice(0,10),proj:pick(r,"Project_x0020_No")||"",ref:pick(r,"Reference_x0020_No")||"",sol:r.Solution||"",cmt:pick(r,"Comment")||pick(r,"Anderungskommentar")||""});
 function fmt(d){if(!d)return"–";const[a,b,c]=d.split("-");return`${c}.${b}.${a}`}
 const SL={de:{new:"neu","in progress":"in Bearbeitung","send back to AES":"zurück an AES","send repaired back to Innovence":"repariert zurück an Innovence",irremediable:"nicht reparierbar"},es:{new:"nuevo","in progress":"en curso","send back to AES":"devuelto a AES","send repaired back to Innovence":"reparado, devuelto a Innovence",irremediable:"irreparable"}};
 const WD={de:{c:"Fall",e:"Fehler",nr:"Neuanlage folgt (zweiter Flow).",nf:"Flow-Adresse fehlt (einmalig per #r=… in der URL setzen).",lf:"Daten konnten nicht geladen werden",lf2:"Der Lese-Flow ist evtl. ausgeschaltet."},en:{c:"Case",e:"Error",nr:"Creating new cases comes next (second flow).",nf:"Flow address missing (set once via #r=… in the URL).",lf:"Data could not be loaded",lf2:"The read flow may be switched off."},es:{c:"Caso",e:"Error",nr:"La creación de casos llegará próximamente (segundo flujo).",nf:"Falta la dirección del flujo (definir una vez mediante #r=… en la URL).",lf:"No se pudieron cargar los datos",lf2:"Puede que el flujo de lectura esté desactivado."}};
@@ -171,10 +172,10 @@ function render(){
   $("#cnt").textContent=T("count")(f.length,f.length)+(ms?` · ${T("ms")} ${ms} ms`:"");
   $("#run").innerHTML=run.map(i=>`<div class="row"><div class="no">${i.id}</div><div><div class="t">${esc(i.title||i.desc.split("\n")[0].slice(0,60)||T("notitle"))}</div><div class="d">${T("fail")}: ${esc(i.desc)}</div></div>
    <div class="c"><small>${T("date")}</small><span>${fmt(i.date)}</span></div><div class="c"><small>${T("aes").replace("Verantwortlich","Verantw.")}</small><span>${esc(i.aes.join(", ")||"–")}</span></div>
-   <div class="c"><small>${T("resp")}</small><span>${esc(i.inn.join(", ")||"–")}</span></div><div class="c"><small>${T("proj")}</small><span>${esc(i.proj||"–")}</span></div><div class="act">${chip(i.status)}<button class="pill y" onclick="show(${i.id})">${T("open")}</button></div></div>`).join("");
+   <div class="c"><small>${T("resp")}</small><span>${esc(i.innK.join(", ")||"–")}</span></div><div class="c"><small>${T("proj")}</small><span>${esc(i.proj||"–")}</span></div><div class="act">${chip(i.status)}<button class="pill y" onclick="show(${i.id})">${T("open")}</button></div></div>`).join("");
   $("#cHead").innerHTML=`<span>#</span><span>${T("fail")}</span><span>${T("date")}</span><span>${T("resp")}</span><span>${T("proj")}</span><span>${T("status")}</span><span></span>`;
   $("#legend").innerHTML=STAT.map(x=>chip(x)).join("");
-  $("#done").innerHTML=done.map(i=>`<div class="crow"><b>${i.id}</b><span>${esc(i.title||i.desc.split("\n")[0].slice(0,80))}</span><span>${fmt(i.date)}</span><span>${esc(i.inn.join(", "))}</span><span>${esc(i.proj)}</span>${chip(i.status)}<a class="open" onclick="show(${i.id})">${T("open")}</a></div>`).join("");
+  $("#done").innerHTML=done.map(i=>`<div class="crow"><b>${i.id}</b><span>${esc(i.title||i.desc.split("\n")[0].slice(0,80))}</span><span>${fmt(i.date)}</span><span>${esc(i.innK.join(", "))}</span><span>${esc(i.proj)}</span>${chip(i.status)}<a class="open" onclick="show(${i.id})">${T("open")}</a></div>`).join("");
 }
 function show(id){
   cur=items.find(i=>i.id==id);$("#vList").hidden=true;const v=$("#vCase");v.hidden=false;
@@ -182,7 +183,7 @@ function show(id){
   <div class="card"><div class="hdr2"><h2 style="margin:0">${W("c")} ${cur.id}</h2><div style="display:flex;gap:8px"><button class="pill" onclick="edit()">${T("edit")}</button><a class="pill y" style="text-decoration:none" target="_blank" href="${CFG.sp}">${T("files")}</a></div></div>
   <div style="margin-top:8px">${chip(cur.status)} <span class="meta">${T("date")}: ${fmt(cur.date)}</span></div>
   <div class="grid"><div class="box"><h4><b>1</b>${T("fail")}</h4><div class="val">${esc(cur.desc)}</div><div class="lab">${T("serial")}</div><div class="val">${esc(cur.serial.replace(/;/g,"\n"))||"–"}</div></div>
-  <div class="box"><h4><b>2</b>${T("involved")}</h4><div class="lab">Innovence</div><div class="chips">${cur.inn.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div><div class="lab">AES</div><div class="chips">${cur.aes.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div></div>
+  <div class="box"><h4><b>2</b>${T("involved")}</h4><div class="lab">Innovence</div><div class="chips">${cur.inn.map((n,k)=>`<span class="pill y" title="${esc(n)}">${esc(cur.innK[k])}</span>`).join("")||"–"}</div><div class="lab">AES</div><div class="chips">${cur.aes.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div></div>
   <div class="box"><h4><b>3</b>${T("refs")}</h4><div class="lab">${T("proj")}</div><div class="val">${esc(cur.proj)||"–"}</div><div class="lab">${T("refNo")}</div><div class="val">${esc(cur.ref)||"–"}</div></div></div>
   <div class="box" style="margin-top:16px"><h4><b>4</b>${T("att")}</h4><div class="lab">${T("sol")}</div><div class="val">${esc(cur.sol)||"–"}</div><div class="lab">${T("comment")}</div><div class="val">${esc(cur.cmt)||"–"}</div></div></div>`;
   scrollTo(0,0);
