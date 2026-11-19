@@ -28,6 +28,8 @@ nav .pill.on{background:var(--y);color:var(--k);border-color:var(--y);font-weigh
 .lang i{width:1px;height:16px;background:#555}
 main{max-width:1240px;margin:0 auto;padding:22px 28px 60px}
 .filter{background:var(--yl);border-left:6px solid var(--y);border-radius:16px;padding:16px 20px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.filter{flex-wrap:nowrap;align-items:flex-end}.filter label.f{flex:0 0 auto}.filter label.f:nth-of-type(1){flex:1 1 320px}.filter label.f:nth-of-type(1) input{width:100%;min-width:0;box-sizing:border-box}.filter select,.filter input[type=date]{min-width:0;width:150px}
+@media(max-width:1000px){.filter{flex-wrap:wrap}.filter label.f:nth-of-type(1){flex:1 1 100%}}
 .filter h2{margin:0 14px 6px 0;font-size:22px}
 label.f{display:flex;flex-direction:column;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;gap:4px}
 input,select,textarea{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;color:var(--k);min-width:150px}
@@ -91,7 +93,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
   <section id="vList">
     <div class="filter">
       <h2 data-t="filter"></h2>
-      <label class="f"><span data-t="search"></span><input id="fSearch" style="min-width:260px"></label>
+      <label class="f"><span data-t="search"></span><input id="fSearch"></label>
       <label class="f"><span data-t="aes"></span><select id="fAes"></select></label>
       <label class="f"><span data-t="proj"></span><select id="fProj"></select></label>
       <label class="f"><span data-t="since"></span><input id="fSince" type="date"></label>
