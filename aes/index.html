@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AES Import Tracker</title>
+<link rel="icon" href="../tracker/favicon.png">
+<style>
+:root{--y:#FDD913;--yd:#E5C000;--k:#0D1112;--yl:#FFF8DC;--bg:#F2F2F0;--g:#6b7075;--line:#e4e4df;--ok:#e3f4e6;--okt:#1b6b2b;--bad:#fde3e3;--badt:#a12020}
+@font-face{font-family:"NeoSansWCT";src:url(../tracker/NeoSansStd-Bold.otf?v=2) format("opentype");font-weight:700;font-display:swap}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--k);font:14px/1.4 "Neo Sans Std","Lato","Segoe UI",system-ui,sans-serif}
+header{background:var(--k);border-bottom:4px solid var(--y);padding:14px 28px;display:flex;align-items:center;gap:18px}
+.logo{height:46px;width:46px;border-radius:50%;background:var(--y);color:var(--k);display:grid;place-items:center;font:700 15px/1 "NeoSansWCT","Neo Sans Std","Segoe UI",sans-serif;letter-spacing:.04em}
+.ttl{color:#fff;font:700 20px/1.1 "NeoSansWCT","Neo Sans Std","Segoe UI",sans-serif}
+.sub{color:#cfd2d4;font-size:11px;margin-top:2px}
+.sp{flex:1}
+.inno{height:16px;width:auto;margin-left:18px;padding-left:18px;border-left:1px solid #444;opacity:.95}
+.pill{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 16px;font:inherit;font-size:13px;cursor:pointer;color:var(--k)}
+.pill:hover{border-color:var(--k)}
+.pill.y{background:var(--y);border-color:var(--y);font-weight:700}
+.pill.y:hover{background:var(--yd)}
+.pill[disabled]{opacity:.5;cursor:default}
+.lang{display:flex;align-items:center;margin-left:8px}
+.lang button{background:none;border:0;color:#8d9296;font:inherit;font-size:14px;padding:6px 10px;cursor:pointer;border-bottom:3px solid transparent}
+.lang button.on{color:var(--y);font-weight:800;border-bottom-color:var(--y)}
+.lang i{width:1px;height:16px;background:#555}
+.role{background:transparent;color:#fff;border:1px solid #555;border-radius:999px;padding:6px 12px;font:inherit;font-size:12px;cursor:pointer}
+main{max-width:1240px;margin:0 auto;padding:22px 28px 60px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.kpi{background:#fff;border:0;border-top:4px solid var(--y);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:12px 16px;text-align:left;font:inherit;cursor:pointer}
+.kpi.on{outline:2px solid var(--k)}
+.kpi b{display:block;font:700 28px/1.1 "NeoSansWCT","Neo Sans Std","Segoe UI",sans-serif}
+.kpi span{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:#8a6d00}
+.kpi.late{border-top-color:#c62828}.kpi.late b{color:#a12020}
+.filter{background:var(--yl);border-left:6px solid var(--y);border-radius:16px;padding:16px 20px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.filter label.f:first-of-type{flex:1 1 260px}
+.filter label.f:first-of-type input{width:100%}
+.filter select,.filter input[type=date]{min-width:0;width:140px}
+.filter h2{margin:0 14px 6px 0;font:700 22px/1.2 "NeoSansWCT","Neo Sans Std","Segoe UI",sans-serif}
+label.f{display:flex;flex-direction:column;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;gap:4px}
+input,select,textarea{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;color:var(--k);min-width:150px}
+textarea{width:100%;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--y);border-color:var(--yd)}
+.bar{display:flex;gap:10px;margin:16px 0 6px;flex-wrap:wrap;align-items:center}
+.meta{font-size:12px;color:var(--g);margin-bottom:8px}
+h3{font:700 16px/1.2 "NeoSansWCT","Neo Sans Std","Segoe UI",sans-serif;margin:18px 0 8px}h3 small{font-weight:400;color:var(--g)}
+.row{position:relative;background:#fff;border-top:4px solid var(--y);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:12px 16px 12px 26px;margin:20px 0 10px 16px;display:grid;grid-template-columns:3fr 1.1fr 1.5fr .8fr 1fr 130px;gap:14px;align-items:center}
+.row.late{border-top-color:#c62828}
+.row .act{display:flex;flex-direction:column;gap:6px;align-items:stretch}.row .act .pill{text-align:center}
+.no{width:32px;height:32px;border-radius:50%;background:var(--k);color:var(--y);display:grid;place-items:center;font-weight:800;font-size:13px}
+.row>.no{position:absolute;left:-16px;top:-16px;border:3px solid var(--bg);box-sizing:content-box}
+.t{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.d{font-size:10.5px;line-height:1.35;color:var(--g);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:2px}
+.row>.c{align-self:start;padding-top:4px}
+.c small{display:block;font-size:9px;font-weight:700;text-transform:uppercase;color:#8a6d00;letter-spacing:.04em}
+.c span{font-size:12px}
+.chip{display:inline-block;border-radius:999px;padding:4px 12px;font-size:11px;font-weight:700;text-align:center;background:#dbeafe;color:#1e40af}
+.chip.p{background:#ffedd5;color:#9a3412}.chip.ok{background:var(--ok);color:var(--okt)}.chip.bad{background:var(--bad);color:var(--badt)}.chip.s{background:#ede9fe;color:#5b21b6}
+.chead{display:grid;grid-template-columns:30px 3fr 1fr 1.4fr 1fr 150px 60px;gap:12px;padding:0 14px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#8a6d00}
+.closed{border-top:2px dashed #ccc;margin-top:22px;padding-top:6px}
+.crow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:6px;display:grid;grid-template-columns:30px 3fr 1fr 1.4fr 1fr 150px 60px;gap:12px;align-items:center;font-size:12px}
+a.open{color:#8a6d00;font-weight:700;cursor:pointer;text-decoration:none}
+.card{background:#fff;border-top:4px solid var(--y);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:22px 26px;margin-top:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.box{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fcfcfa}
+.box h4{margin:0 0 10px;display:flex;gap:8px;align-items:center}.box h4 b{background:var(--k);color:var(--y);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px}
+.lab{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#555;margin:10px 0 3px}
+.val{white-space:pre-wrap}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chips .pill{padding:5px 12px;font-size:12px}
+.doc{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+.doc:last-child{border-bottom:0}
+.err{background:var(--bad);color:var(--badt);border-radius:10px;padding:10px 14px;margin:12px 0}
+.note{background:var(--yl);border-left:6px solid var(--y);border-radius:10px;padding:10px 14px;margin:12px 0;font-size:12px}
+.alert{background:var(--bad);color:var(--badt);border-radius:12px;padding:12px 16px;margin-top:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+dialog{border:0;border-radius:18px;padding:24px;width:min(680px,94vw);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+pre.mail{white-space:pre-wrap;font:12.5px/1.45 "Segoe UI",system-ui,sans-serif;background:#fcfcfa;border:1px solid var(--line);border-radius:12px;padding:12px 14px;max-height:46vh;overflow:auto;margin:6px 0 0}
+.hdr2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+@media(max-width:900px){.row,.crow{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}header{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" aria-hidden="true">AES</div>
+  <div><div class="ttl">AES Import Tracker</div><div class="sub" id="sub"></div></div>
+  <div class="sp"></div>
+  <button class="role" id="role" hidden></button>
+  <div class="lang"><button data-l="de">DE</button><i></i><button data-l="en">EN</button><i></i><button data-l="es">ES</button></div>
+  <a href="https://www.innovence.de" target="_blank" rel="noopener" style="display:flex;align-items:center"><img class="inno" src="../tracker/innovence.png" alt="INNOVENCE" onerror="this.style.display='none'"></a>
+</header>
+<main>
+  <div id="err"></div>
+  <section id="vList">
+    <div class="kpis" id="kpis"></div>
+    <div class="filter">
+      <h2 data-t="filter"></h2>
+      <label class="f"><span data-t="search"></span><input id="fSearch"></label>
+      <label class="f"><span data-t="proj"></span><select id="fProj"></select></label>
+      <label class="f"><span data-t="freight"></span><select id="fFr"></select></label>
+      <label class="f"><span data-t="status"></span><select id="fStatus"></select></label>
+      <label class="f"><span data-t="since"></span><input id="fSince" type="date"></label>
+    </div>
+    <div class="bar">
+      <button class="pill y" id="bNew"></button>
+      <button class="pill" id="bRefresh"></button>
+      <button class="pill" id="bReset"></button>
+      <span class="sp"></span><span class="meta" id="cnt"></span>
+    </div>
+    <h3 id="hRun"></h3><div id="run"></div>
+    <div class="closed"><h3 id="hClosed"></h3><div class="chead" id="cHead"></div><div id="done"></div></div>
+  </section>
+  <section id="vCase" hidden></section>
+  <footer style="margin-top:36px;text-align:center;font-size:11px;color:#8a8e92;letter-spacing:.08em;text-transform:uppercase">Innovence Airport Systems GmbH</footer>
+</main>
+<dialog id="dlg"></dialog>
+<script>
+// ===== Konfiguration: gleiche Technik wie beim Warranty Case Tracker =====
+// Lese-Flow-URL (#r=…) für alle, Schreib-Flow-URL (#w=…) nur für Admins. Ohne #w= ist die App schreibgeschützt (Gäste).
+const _h=new URLSearchParams(location.hash.slice(1));
+if(_h.get("r")){try{localStorage.setItem("aes-read",_h.get("r"))}catch(e){}}
+if(_h.get("w")){try{localStorage.setItem("aes-write",_h.get("w"))}catch(e){}}
+if(_h.get("r")||_h.get("w")||_h.has("new")){history.replaceState(null,"",location.pathname)}
+const _ls=k=>{try{return localStorage.getItem(k)||""}catch(e){return""}};
+const CFG={
+  get read(){return _ls("aes-read")},
+  get write(){return _ls("aes-write")},
+  sp:"https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/AES%20Import%20Tracker/AllItems.aspx"
+};
+const DEMO=!CFG.read;            // ohne Flow: Demodaten (frei erfunden)
+let demoAdmin=true;
+const canWrite=()=>DEMO?demoAdmin:!!CFG.write;
+
+const I18={
+ de:{sub:"Importsendungen · Airsafe / GOMINTEC · Innovence Airport Systems GmbH",filter:"Filter",search:"Suche (alle Felder)",proj:"Projekt",freight:"Freight",status:"Status",since:"ETA ab",all:"– alle –",newc:"+ Neue Sendung",refresh:"Aktualisieren",reset:"Filter zurücksetzen",run:"Laufende Sendungen",closed:"Gelieferte Sendungen",count:n=>`${n} Sendungen · sortiert nach ETA`,open:"Öffnen",eta:"ETA",fw:"Spedition",docs:"Unterlagen",back:"‹ Alle Sendungen",edit:"Bearbeiten",save:"Speichern",cancel:"Abbrechen",
+  kOpen:"Offen",kLate:"Im Verzug",kInc:"Unterlagen fehlen",kDone:"Geliefert",ship:"Sendung",refs:"Referenzen",inv:"Beteiligte",dochk:"Unterlagen-Check",customer:"Kunde / Flughafen",parts:"Teile",box:"Box / Packstücke",ivo:"IV Order No.",oa:"OA No.",oad:"OA AES",ctc:"IV Kontakt",ppl:"Verteiler (CC)",complete:"vollständig",missingN:n=>`${n} fehlt`,late:n=>`${n} Tage Verzug`,
+  mMissing:"Fehlende Unterlagen nachfordern (EN)",mDelay:"Verzugs-Info vorbereiten (EN)",lateTxt:"Lieferdatum überschritten – neues Lieferdatum erfragen.",newEta:"Neues Lieferdatum",copy:"Kopieren",mailto:"In Outlook öffnen",close:"Schließen",sp:"Liste in SharePoint öffnen",
+  demo:"Demo-Modus: Beispieldaten, keine Verbindung zur SharePoint-Liste. Flow-Adresse einmalig per #r=… in der URL setzen.",view:"Ansicht: Admin",viewG:"Ansicht: Gast (nur lesen)",ro:"Nur Leseansicht",loading:"Lade Sendungen …",lf:"Daten konnten nicht geladen werden",nowrite:"Schreib-Flow nicht verbunden.",none:"(ohne Titel)",saved:"Gespeichert"},
+ en:{sub:"Import shipments · Airsafe / GOMINTEC · Innovence Airport Systems GmbH",filter:"Filter",search:"Search (all fields)",proj:"Project",freight:"Freight",status:"Status",since:"ETA from",all:"– all –",newc:"+ New shipment",refresh:"Refresh",reset:"Reset filter",run:"Open shipments",closed:"Delivered shipments",count:n=>`${n} shipments · sorted by ETA`,open:"Open",eta:"ETA",fw:"Forwarder",docs:"Documents",back:"‹ All shipments",edit:"Edit",save:"Save",cancel:"Cancel",
+  kOpen:"Open",kLate:"Overdue",kInc:"Docs missing",kDone:"Delivered",ship:"Shipment",refs:"References",inv:"People involved",dochk:"Document check",customer:"Customer / airport",parts:"Parts",box:"Box / packages",ivo:"IV Order No.",oa:"OA No.",oad:"OA AES",ctc:"IV contact",ppl:"Distribution (CC)",complete:"complete",missingN:n=>`${n} missing`,late:n=>`${n} days overdue`,
+  mMissing:"Request missing documents (EN)",mDelay:"Prepare delay notice (EN)",lateTxt:"Delivery date passed – ask for an updated date.",newEta:"New delivery date",copy:"Copy",mailto:"Open in Outlook",close:"Close",sp:"Open list in SharePoint",
+  demo:"Demo mode: sample data, not connected to the SharePoint list. Set the flow address once via #r=… in the URL.",view:"View: admin",viewG:"View: guest (read only)",ro:"Read-only view",loading:"Loading shipments …",lf:"Data could not be loaded",nowrite:"Write flow not connected.",none:"(no title)",saved:"Saved"},
+ es:{sub:"Envíos de importación · Airsafe / GOMINTEC · Innovence Airport Systems GmbH",filter:"Filtro",search:"Buscar (todos los campos)",proj:"Proyecto",freight:"Transporte",status:"Estado",since:"ETA desde",all:"– todos –",newc:"+ Nuevo envío",refresh:"Actualizar",reset:"Restablecer filtro",run:"Envíos abiertos",closed:"Envíos entregados",count:n=>`${n} envíos · ordenado por ETA`,open:"Abrir",eta:"ETA",fw:"Transitario",docs:"Documentos",back:"‹ Todos los envíos",edit:"Editar",save:"Guardar",cancel:"Cancelar",
+  kOpen:"Abiertos",kLate:"Con retraso",kInc:"Faltan documentos",kDone:"Entregados",ship:"Envío",refs:"Referencias",inv:"Implicados",dochk:"Control de documentos",customer:"Cliente / aeropuerto",parts:"Piezas",box:"Caja / bultos",ivo:"IV Order No.",oa:"OA No.",oad:"OA AES",ctc:"Contacto IV",ppl:"Distribución (CC)",complete:"completo",missingN:n=>`faltan ${n}`,late:n=>`${n} días de retraso`,
+  mMissing:"Reclamar documentos faltantes (EN)",mDelay:"Preparar aviso de retraso (EN)",lateTxt:"Fecha de entrega superada – solicitar nueva fecha.",newEta:"Nueva fecha de entrega",copy:"Copiar",mailto:"Abrir en Outlook",close:"Cerrar",sp:"Abrir lista en SharePoint",
+  demo:"Modo demo: datos de ejemplo, sin conexión a la lista de SharePoint. Defina la dirección del flujo una vez mediante #r=… en la URL.",view:"Vista: admin",viewG:"Vista: invitado (solo lectura)",ro:"Solo lectura",loading:"Cargando envíos …",lf:"No se pudieron cargar los datos",nowrite:"Flujo de escritura no conectado.",none:"(sin título)",saved:"Guardado"}
+};
+let lang=(()=>{try{return localStorage.getItem("aes-lang")}catch(e){return null}})()||((navigator.language||"").toLowerCase().startsWith("es")?"es":"de");
+const T=k=>I18[lang][k];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const strip=s=>String(s??"").replace(/<[^>]+>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
+const todayS=()=>new Date().toISOString().slice(0,10);
+const fmt=d=>{if(!d)return"–";const[a,b,c]=d.split("-");return`${c}.${b}.${a}`};
+
+const STAT=["New","in Process","Delivered"],OPEN=["New","in Process"],FR=["Sea","Air","Train","Road"];
+const FRI={Sea:"⚓",Air:"✈",Train:"🚆",Road:"🚚"};
+const TR={Air:"AWB",Sea:"B/L",Train:"CIM",Road:"CMR"};
+// Pflichtunterlagen: Transportdokument hängt von der Freight-Art ab
+const docList=i=>[["tr",TR[i.freight]||"B/L / AWB"],["invM","Invoice Material"],["invT","Invoice Transport"],["pack","Packing list"],["sn","S/N list"]];
+const missing=i=>docList(i).filter(([k])=>!i.docs[k]).map(d=>d[1]);
+const effEta=i=>i.etaNew||i.eta;
+const lateDays=i=>OPEN.includes(i.status)&&effEta(i)?Math.floor((Date.parse(todayS())-Date.parse(effEta(i)))/864e5):0;
+const isLate=i=>lateDays(i)>0;
+
+// ===== SharePoint-Felder -> App =====
+const val=v=>v&&typeof v==="object"&&!Array.isArray(v)?v.Value:v;
+const arr=v=>(Array.isArray(v)?v:v?[v]:[]).map(x=>val(x)||x.Email||x.DisplayName||x).filter(Boolean);
+const norm=r=>({id:r.ID??r.Id,title:r.Title||"",freight:val(r.Priority)||"",status:val(r.Status)||"New",
+ eta:(r.DateReported||"").slice(0,10),etaNew:(r.ETA_New||"").slice(0,10),ivOrder:strip(r.IVOderNo_x002e_),oaDate:(r.OAAES||"").slice(0,10),oaNo:r.OANo_x002e_||"",
+ contact:arr(r.IVContact1),forwarder:String(r.Germanforwarder||"").trim(),box:strip(r.BoxNo_x002e_),customer:r.Customer_x002f_Airport||"",parts:strip(r.Partlist),
+ people:String(r.Participants||"").split(/[;,\s]+/).filter(x=>x.includes("@")),sender:r.SenderEmail||"",
+ docs:{tr:!!r.Doc_Transport,invM:!!r.Doc_InvMaterial,invT:!!r.Doc_InvTransport,pack:!!r.Doc_Packlist,sn:!!r.S_x002f_NList}});
+const toFields=i=>({Status:i.status,DateReported:(i.eta||todayS())+"T12:00:00Z",ETA_New:i.etaNew?i.etaNew+"T12:00:00Z":null,Germanforwarder:i.forwarder,
+ Doc_Transport:i.docs.tr,Doc_InvMaterial:i.docs.invM,Doc_InvTransport:i.docs.invT,Doc_Packlist:i.docs.pack,"S_x002f_NList":i.docs.sn});
+
+// ===== Demodaten (frei erfunden) =====
+const dd=n=>new Date(Date.now()+n*864e5).toISOString().slice(0,10);
+const demoItems=()=>[
+ {id:101,title:"Demo-Projekt Alpha",freight:"Sea",status:"in Process",eta:dd(-12),etaNew:"",ivOrder:"IV-DEMO-0001",oaDate:dd(-90),oaNo:"OA25-01",contact:["Bastian","Markus"],forwarder:"Demo Logistics GmbH",box:"2 pallets",customer:"Airport A / TWY 1",parts:"TGSL-LED, STB",people:["buyer@supplier.example","ops@forwarder.example"],sender:"sales@supplier.example",docs:{tr:true,invM:true,invT:false,pack:true,sn:false}},
+ {id:102,title:"Demo-Projekt Beta",freight:"Air",status:"New",eta:dd(-3),etaNew:"",ivOrder:"IV-DEMO-0002",oaDate:dd(-40),oaNo:"OA25-02",contact:["Markus"],forwarder:"Demo Air Cargo",box:"1 box, 102 kg",customer:"Airport B",parts:"RELZ-12-LED",people:["buyer@supplier.example"],sender:"sales@supplier.example",docs:{tr:false,invM:false,invT:false,pack:false,sn:false}},
+ {id:103,title:"Demo-Projekt Gamma",freight:"Train",status:"in Process",eta:dd(9),etaNew:"",ivOrder:"IV-DEMO-0003",oaDate:dd(-30),oaNo:"OA25-03",contact:["Nicole"],forwarder:"Demo Rail Services",box:"C1 – C6",customer:"Airport C",parts:"EUL-RG-H-LED",people:["ops@forwarder.example"],sender:"sales@supplier.example",docs:{tr:true,invM:true,invT:true,pack:true,sn:true}},
+ {id:104,title:"Demo-Projekt Delta",freight:"Sea",status:"in Process",eta:dd(-20),etaNew:dd(6),ivOrder:"IV-DEMO-0004",oaDate:dd(-70),oaNo:"OA25-04",contact:["Bastian"],forwarder:"Demo Logistics GmbH",box:"1 pallet",customer:"Airport D",parts:"TOEL-08-LED",people:["buyer@supplier.example"],sender:"sales@supplier.example",docs:{tr:true,invM:true,invT:true,pack:true,sn:false}},
+ {id:105,title:"Demo-Projekt Epsilon",freight:"Air",status:"Delivered",eta:dd(-40),etaNew:"",ivOrder:"IV-DEMO-0005",oaDate:dd(-100),oaNo:"OA24-77",contact:["Markus","Bastian"],forwarder:"Demo Air Cargo",box:"2 cartons",customer:"Airport E",parts:"HRGS-08-S-LED",people:[],sender:"sales@supplier.example",docs:{tr:true,invM:true,invT:true,pack:true,sn:true}}
+];
+
+let items=[],cur=null,EDITING=false,qf="";
+function chip(s){const c=s==="in Process"?"p":s==="Delivered"?"ok":"";return`<span class="chip ${c}">${esc(s)}</span>`}
+function docChip(i){const m=missing(i).length;return m?`<span class="chip bad">${T("missingN")(m)}</span>`:`<span class="chip ok">✓ ${T("complete")}</span>`}
+function lateChip(i){const n=lateDays(i);return n>0?`<span class="chip bad">${T("late")(n)}</span>`:""}
+
+async function load(){
+  $("#run").innerHTML=`<div class="meta">${T("loading")}</div>`;
+  if(DEMO){if(!items.length||!window._demoKept)items=demoItems();window._demoKept=1;$("#err").innerHTML=`<div class="note">${T("demo")}</div>`;fill();render();return}
+  try{const r=await fetch(CFG.read,{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});if(!r.ok)throw new Error("HTTP "+r.status);
+    items=(await r.json()).map(norm);$("#err").innerHTML=canWrite()?"":`<div class="note">${T("ro")}</div>`}
+  catch(e){$("#err").innerHTML=`<div class="err">${T("lf")} (${esc(e.message)}).</div>`;items=[]}
+  fill();render();
+}
+function fill(){
+  const k=[$("#fProj").value,$("#fFr").value,$("#fStatus").value];
+  const opt=(a,v,lab)=>`<option value="">${T("all")}</option>`+[...new Set(a)].sort().map(x=>`<option value="${esc(x)}"${x==v?" selected":""}>${esc(lab?lab(x):x)}</option>`).join("");
+  $("#fProj").innerHTML=opt(items.map(i=>i.title).filter(Boolean),k[0]);
+  $("#fFr").innerHTML=opt(FR,k[1],x=>FRI[x]+" "+x);
+  $("#fStatus").innerHTML=opt(STAT,k[2]);
+}
+function filtered(){
+  const q=$("#fSearch").value.toLowerCase(),p=$("#fProj").value,f=$("#fFr").value,s=$("#fStatus").value,d=$("#fSince").value;
+  return items.filter(i=>(!q||[i.id,i.title,i.freight,i.status,i.ivOrder,i.oaNo,i.forwarder,i.customer,i.parts,i.box,fmt(i.eta),i.eta,i.contact.join(" ")].join(" ").toLowerCase().includes(q))
+   &&(!p||i.title==p)&&(!f||i.freight==f)&&(!s||i.status==s)&&(!d||effEta(i)>=d)
+   &&(!qf||(qf=="open"&&OPEN.includes(i.status))||(qf=="late"&&isLate(i))||(qf=="inc"&&OPEN.includes(i.status)&&missing(i).length>0)||(qf=="done"&&i.status=="Delivered")));
+}
+function render(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-t]").forEach(e=>e.textContent=T(e.dataset.t));
+  $("#sub").textContent=T("sub");
+  $("#bNew").textContent=T("newc");$("#bNew").hidden=!canWrite();$("#bRefresh").textContent=T("refresh");$("#bReset").textContent=T("reset");
+  const rb=$("#role");rb.hidden=!DEMO;rb.textContent=demoAdmin?T("view"):T("viewG");
+  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.l==lang));
+  const all=items,op=all.filter(i=>OPEN.includes(i.status));
+  const K=[["open",T("kOpen"),op.length,""],["late",T("kLate"),all.filter(isLate).length,"late"],["inc",T("kInc"),op.filter(i=>missing(i).length).length,""],["done",T("kDone"),all.filter(i=>i.status=="Delivered").length,""]];
+  $("#kpis").innerHTML=K.map(([k,l,n,c])=>`<button class="kpi ${c}${qf==k?" on":""}" data-q="${k}"><b>${n}</b><span>${esc(l)}</span></button>`).join("");
+  document.querySelectorAll(".kpi").forEach(b=>b.onclick=()=>{qf=qf==b.dataset.q?"":b.dataset.q;render()});
+  const f=filtered(),run=f.filter(i=>OPEN.includes(i.status)).sort((x,y)=>(effEta(x)||"9").localeCompare(effEta(y)||"9")),done=f.filter(i=>!OPEN.includes(i.status)).sort((x,y)=>(effEta(y)||"").localeCompare(effEta(x)||""));
+  $("#hRun").innerHTML=`${T("run")} <small>(${run.length})</small>`;$("#hClosed").innerHTML=`${T("closed")} <small>(${done.length})</small>`;
+  $("#cnt").textContent=T("count")(f.length);
+  $("#run").innerHTML=run.map(i=>`<div class="row${isLate(i)?" late":""}"><div class="no">${i.id}</div>
+   <div><div class="t">${esc(i.title||T("none"))}${i.oaNo?` · ${esc(i.oaNo)}`:""}</div><div class="d">${esc([i.customer,i.parts].filter(Boolean).join(" · "))}</div></div>
+   <div class="c"><small>${T("eta")}</small><span>${fmt(effEta(i))}${i.etaNew?" *":""}</span><div>${lateChip(i)}</div></div>
+   <div class="c"><small>${T("fw")}</small><span>${esc(i.forwarder||"–")}</span></div>
+   <div class="c"><small>${T("freight")}</small><span>${FRI[i.freight]||""} ${esc(i.freight||"–")}</span></div>
+   <div class="act">${docChip(i)}${chip(i.status)}<button class="pill y" onclick="show(${i.id})">${T("open")}</button></div></div>`).join("");
+  $("#cHead").innerHTML=`<span>#</span><span>${T("proj")}</span><span>${T("eta")}</span><span>${T("fw")}</span><span>${T("freight")}</span><span>${T("status")}</span><span></span>`;
+  $("#done").innerHTML=done.map(i=>`<div class="crow"><b>${i.id}</b><span>${esc(i.title)}${i.oaNo?" · "+esc(i.oaNo):""}</span><span>${fmt(effEta(i))}</span><span>${esc(i.forwarder)}</span><span>${esc(i.freight)}</span>${chip(i.status)}<a class="open" onclick="show(${i.id})">${T("open")}</a></div>`).join("");
+}
+
+// ===== Detailansicht =====
+function show(id,ed){
+  cur=items.find(i=>i.id==id);if(!cur)return;EDITING=!!ed&&canWrite();const E=EDITING;
+  $("#vList").hidden=true;const v=$("#vCase");v.hidden=false;
+  const w=canWrite(),n=lateDays(cur),m=missing(cur);
+  const inp=(k,val,type)=>`<input id="${k}" ${type?`type="${type}" `:""}style="width:100%;box-sizing:border-box" value="${esc(val)}">`;
+  v.innerHTML=`<button class="pill" onclick="back()">${T("back")}</button>
+  <div class="card"><div class="hdr2"><h2 style="margin:0;font-family:NeoSansWCT,inherit">${T("ship")} ${cur.id}</h2><div style="display:flex;gap:8px;flex-wrap:wrap">
+   ${E?`<button class="pill" onclick="show(cur.id)">${T("cancel")}</button><button class="pill y" id="eSave" onclick="save()">${T("save")}</button>`
+      :`${w?`<button class="pill" onclick="show(cur.id,1)">${T("edit")}</button>`:""}<a class="pill" style="text-decoration:none" target="_blank" href="${CFG.sp}">${T("sp")}</a>`}</div></div>
+  <div style="margin-top:8px">${E?`<select id="eSt" style="min-width:0">${STAT.map(x=>`<option${x==cur.status?" selected":""}>${x}</option>`).join("")}</select>`:chip(cur.status)} ${lateChip(cur)} ${docChip(cur)}
+   <span class="meta">${T("eta")}: ${fmt(cur.eta)}${cur.etaNew?` → ${fmt(cur.etaNew)}`:""}</span></div>
+  ${n>0?`<div class="alert"><span>${T("lateTxt")}</span>${w?`<button class="pill y" onclick="mail('delay')">${T("mDelay")}</button>`:""}</div>`:""}
+  <div class="grid">
+   <div class="box"><h4><b>1</b>${T("ship")}</h4><div class="lab">${T("proj")}</div><div class="val">${esc(cur.title)||"–"}</div>
+     <div class="lab">${T("customer")}</div><div class="val">${esc(cur.customer)||"–"}</div><div class="lab">${T("parts")}</div><div class="val">${esc(cur.parts)||"–"}</div>
+     <div class="lab">${T("box")}</div><div class="val">${esc(cur.box)||"–"}</div><div class="lab">${T("freight")}</div><div class="val">${FRI[cur.freight]||""} ${esc(cur.freight)||"–"}</div></div>
+   <div class="box"><h4><b>2</b>${T("refs")}</h4><div class="lab">${T("ivo")}</div><div class="val">${esc(cur.ivOrder)||"–"}</div>
+     <div class="lab">${T("oa")}</div><div class="val">${esc(cur.oaNo)||"–"}</div><div class="lab">${T("oad")}</div><div class="val">${fmt(cur.oaDate)}</div>
+     <div class="lab">${T("eta")}</div>${E?inp("eEta",cur.eta,"date"):`<div class="val">${fmt(cur.eta)}</div>`}
+     <div class="lab">${T("newEta")}</div>${E?inp("eEtaN",cur.etaNew,"date"):`<div class="val">${fmt(cur.etaNew)}</div>`}</div>
+   <div class="box"><h4><b>3</b>${T("inv")}</h4><div class="lab">${T("ctc")}</div><div class="chips">${cur.contact.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div>
+     <div class="lab">${T("fw")}</div>${E?inp("eFw",cur.forwarder):`<div class="val">${esc(cur.forwarder)||"–"}</div>`}
+     <div class="lab">${T("ppl")}</div><div class="val">${esc(cur.people.join("\n"))||"–"}</div></div></div>
+  <div class="box" style="margin-top:16px"><h4><b>4</b>${T("dochk")}</h4>
+   ${docList(cur).map(([k,l])=>`<div class="doc"><span>${esc(l)}</span>${E?`<input type="checkbox" data-d="${k}" style="min-width:0"${cur.docs[k]?" checked":""}>`:cur.docs[k]?'<span class="chip ok">✓</span>':'<span class="chip bad">✗</span>'}</div>`).join("")}
+   ${m.length&&w?`<div style="margin-top:12px"><button class="pill y" onclick="mail('missing')">${T("mMissing")}</button></div>`:""}</div></div>`;
+  scrollTo(0,0);
+}
+function back(){$("#vCase").hidden=true;$("#vList").hidden=false;render()}
+
+async function post(body){
+  if(DEMO)return;
+  if(!CFG.write)throw new Error(T("nowrite"));
+  const r=await fetch(CFG.write,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error("HTTP "+r.status);
+}
+async function save(){
+  const c={...cur,docs:{...cur.docs}};
+  c.status=$("#eSt").value;c.eta=$("#eEta").value;c.etaNew=$("#eEtaN").value;c.forwarder=$("#eFw").value.trim();
+  document.querySelectorAll("input[data-d]").forEach(x=>c.docs[x.dataset.d]=x.checked);
+  const b=$("#eSave");b.disabled=true;
+  try{await post({id:c.id,fields:toFields(c)});
+    if(DEMO){items=items.map(i=>i.id==c.id?c:i)}else{await load()}
+    show(c.id)}catch(e){b.disabled=false;alert(e.message)}
+}
+
+// ===== Neue Sendung (manuell; Standardweg ist der Outlook-Button) =====
+function newShip(){
+  const v=$("#vCase");$("#vList").hidden=true;v.hidden=false;cur=null;
+  const i=(id,t)=>`<input id="${id}"${t?` type="${t}"`:""} style="width:100%;box-sizing:border-box">`;
+  v.innerHTML=`<button class="pill" onclick="back()">${T("back")}</button><div class="card"><div class="hdr2"><h2 style="margin:0;font-family:NeoSansWCT,inherit">${T("newc")}</h2>
+   <div style="display:flex;gap:8px"><button class="pill" onclick="back()">${T("cancel")}</button><button class="pill y" id="nSave">${T("save")}</button></div></div>
+   <div class="grid"><div class="box"><h4><b>1</b>${T("ship")}</h4><div class="lab">${T("proj")}</div>${i("nTitle")}<div class="lab">${T("customer")}</div>${i("nCust")}<div class="lab">${T("freight")}</div><select id="nFr" style="width:100%">${FR.map(x=>`<option>${x}</option>`).join("")}</select></div>
+   <div class="box"><h4><b>2</b>${T("refs")}</h4><div class="lab">${T("ivo")}</div>${i("nIvo")}<div class="lab">${T("oa")}</div>${i("nOa")}<div class="lab">${T("eta")}</div>${i("nEta","date")}</div>
+   <div class="box"><h4><b>3</b>${T("inv")}</h4><div class="lab">${T("fw")}</div>${i("nFw")}</div></div><div id="nErr"></div></div>`;
+  $("#nSave").onclick=async()=>{
+    const g=k=>$("#"+k).value.trim();if(!g("nTitle")||!g("nEta")){$("#nErr").innerHTML=`<div class="err">${T("proj")} / ${T("eta")} *</div>`;return}
+    const n={id:Math.max(100,...items.map(x=>x.id))+1,title:g("nTitle"),freight:g("nFr"),status:"New",eta:g("nEta"),etaNew:"",ivOrder:g("nIvo"),oaDate:"",oaNo:g("nOa"),contact:[],forwarder:g("nFw"),box:"",customer:g("nCust"),parts:"",people:[],sender:"",docs:{tr:false,invM:false,invT:false,pack:false,sn:false}};
+    try{await post({create:"1",fields:{Title:n.title,Priority:n.freight,Status:"New",DateReported:n.eta+"T12:00:00Z",IVOderNo_x002e_:n.ivOrder,OANo_x002e_:n.oaNo,Germanforwarder:n.forwarder,Customer_x002f_Airport:n.customer}});
+      if(DEMO)items.push(n);else await load();back()}catch(e){$("#nErr").innerHTML=`<div class="err">${esc(e.message)}</div>`}};
+}
+
+// ===== Mail-Vorschau (Englisch, alle Beteiligten in CC) =====
+function buildMail(kind,i){
+  const link=CFG.sp,ref=[i.title,i.oaNo].filter(Boolean).join(" / ");
+  const facts=`Shipment: ${i.title||"-"}${i.customer?" · "+i.customer:""}\nOur order no.: ${i.ivOrder||"-"}    OA no.: ${i.oaNo||"-"}\nFreight: ${i.freight||"-"}    Forwarder: ${i.forwarder||"-"}    ETA: ${fmt(effEta(i))}`;
+  if(kind=="missing"){const m=missing(i);return{subject:`[AES Import] Missing documents – ${ref} – ETA ${fmt(effEta(i))}`,
+   body:`Dear all,\n\nfor the shipment below we are still missing the following documents needed for the import process:\n\n${m.map(x=>"  - "+x).join("\n")}\n\n${facts}\n\nPlease send the missing documents as soon as possible, or let us know when we can expect them.\n\nBest regards\nInnovence Airport Systems GmbH – Import Team`}}
+  const n=lateDays(i);
+  return{subject:`[AES Import] Delivery overdue – ${ref} (${n} days)`,
+   body:`Dear all,\n\nthe planned delivery date ${fmt(effEta(i))} has passed ${n} day${n==1?"":"s"} ago and the shipment is not yet marked as delivered.\n\n${facts}\n\nPlease reply with an updated delivery date (ETA) and the current shipping status.\n\nTracker entry: ${link}\n\nBest regards\nInnovence Airport Systems GmbH – Import Team`};
+}
+function mail(kind){
+  const i=cur,m=buildMail(kind,i),to=i.sender,cc=i.people.join(","),d=$("#dlg");
+  d.innerHTML=`<h3 style="margin-top:0">${kind=="missing"?T("mMissing"):T("mDelay")}</h3>
+  <div class="lab">To</div><div class="val">${esc(to)||"–"}</div><div class="lab">CC</div><div class="val">${esc(i.people.join("; "))||"–"}</div>
+  <div class="lab">Subject</div><div class="val">${esc(m.subject)}</div><div class="lab">Text</div><pre class="mail">${esc(m.body)}</pre>
+  <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap"><button class="pill" onclick="dlg.close()">${T("close")}</button><button class="pill" id="mCopy">${T("copy")}</button>
+  <a class="pill y" style="text-decoration:none" href="mailto:${encodeURIComponent(to)}?cc=${encodeURIComponent(cc)}&subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.body)}">${T("mailto")}</a></div>`;
+  d.showModal();$("#mCopy").onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(m.subject+"\n\n"+m.body);
+}
+
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem("aes-lang",lang)}catch(e){}fill();render();if(!$("#vCase").hidden&&cur)show(cur.id,EDITING)});
+["fSearch","fProj","fFr","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
+$("#bReset").onclick=()=>{["fSearch","fProj","fFr","fSince","fStatus"].forEach(i=>$("#"+i).value="");qf="";render()};
+$("#bRefresh").onclick=load;$("#bNew").onclick=newShip;
+$("#role").onclick=()=>{demoAdmin=!demoAdmin;if(!$("#vCase").hidden&&cur)show(cur.id);else render()};
+load().then(()=>{if(_h.has("new")&&canWrite())newShip()});
+</script>
+</body>
+</html>
