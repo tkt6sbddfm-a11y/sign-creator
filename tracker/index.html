@@ -36,14 +36,18 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--y);border-color:
 .bar{display:flex;gap:10px;margin:16px 0 6px;flex-wrap:wrap;align-items:center}
 .meta{font-size:12px;color:var(--g);margin-bottom:8px}
 h3{font-size:16px;margin:18px 0 8px}h3 small{font-weight:400;color:var(--g)}
-.row{background:#fff;border-top:4px solid var(--y);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:12px 16px;margin-bottom:10px;display:grid;grid-template-columns:44px 2.4fr 1fr 1fr 1.5fr 1fr 130px 90px;gap:14px;align-items:center}
-.no{width:36px;height:36px;border-radius:50%;background:var(--k);color:var(--y);display:grid;place-items:center;font-weight:800}
-.t{font-weight:700;font-size:14px}.d{font-size:11px;color:var(--g);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.row{position:relative;background:#fff;border-top:4px solid var(--y);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06);padding:12px 16px 12px 26px;margin:20px 0 10px 16px;display:grid;grid-template-columns:3fr 1fr 1fr 1.5fr 1fr 130px;gap:14px;align-items:center}
+.row .act{display:flex;flex-direction:column;gap:6px;align-items:stretch}.row .act .pill{text-align:center}
+.no{width:32px;height:32px;border-radius:50%;background:var(--k);color:var(--y);display:grid;place-items:center;font-weight:800;font-size:13px}
+.row>.no{position:absolute;left:-16px;top:-16px;border:3px solid var(--bg);box-sizing:content-box}
+.t{font-weight:700;font-size:13px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.d{font-size:10.5px;line-height:1.35;color:var(--g);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-top:2px}
 .row>.c{align-self:start;padding-top:4px}
 .c small{display:block;font-size:9px;font-weight:700;text-transform:uppercase;color:#8a6d00;letter-spacing:.04em}
 .c span{font-size:12px}
-.chip{border-radius:999px;padding:4px 12px;font-size:11px;font-weight:700;text-align:center;background:var(--y)}
-.chip.p{background:var(--k);color:var(--y)}.chip.ok{background:var(--ok);color:var(--okt)}.chip.bad{background:var(--bad);color:var(--badt)}.chip.s{background:#fff0c2}
+.chip{border-radius:999px;padding:4px 12px;font-size:11px;font-weight:700;text-align:center}
+.chip{background:#dbeafe;color:#1e40af}.chip.p{background:#ffedd5;color:#9a3412}.chip.ok{background:var(--ok);color:var(--okt)}.chip.bad{background:var(--bad);color:var(--badt)}.chip.s{background:#ede9fe;color:#5b21b6}
+.chead{display:grid;grid-template-columns:30px 3fr 1fr 1.4fr 1fr 150px 60px;gap:12px;padding:0 14px 4px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#8a6d00}
+.legend{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}.legend .chip{font-size:10px;padding:3px 10px}
 .closed{border-top:2px dashed #ccc;margin-top:22px;padding-top:6px}
 .crow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:6px;display:grid;grid-template-columns:30px 3fr 1fr 1.4fr 1fr 150px 60px;gap:12px;align-items:center;font-size:12px}
 a.open{color:#8a6d00;font-weight:700;cursor:pointer;text-decoration:none}
@@ -99,10 +103,11 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
       <span class="sp"></span><span class="meta" id="cnt"></span>
     </div>
     <h3 id="hRun"></h3><div id="run"></div>
-    <div class="closed"><h3 id="hClosed"></h3><div id="done"></div></div>
+    <div class="closed"><h3 id="hClosed"></h3><div class="chead" id="cHead"></div><div id="done"></div></div>
   </section>
   <section id="vCase" hidden></section>
-  <footer style="margin-top:36px;text-align:center;font-size:11px;color:#8a8e92;letter-spacing:.08em;text-transform:uppercase">Track. Resolve. Keep moving. · Innovence Airport Systems GmbH</footer>
+  <div class="legend" id="legend" style="margin-top:36px"></div>
+  <footer style="margin-top:0;text-align:center;font-size:11px;color:#8a8e92;letter-spacing:.08em;text-transform:uppercase">Track. Resolve. Keep moving. · Innovence Airport Systems GmbH</footer>
 </main>
 <dialog id="dlg"></dialog>
 <script>
@@ -125,8 +130,9 @@ let lang=localStorage.getItem("wct-lang")||"de",items=[],cur=null,ms=null;
 const $=s=>document.querySelector(s),T=k=>I18[lang][k];
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pick=(o,p)=>{const k=Object.keys(o).find(k=>k.startsWith(p));return k?o[k]:undefined};
-const ppl=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>p.DisplayName||p.Claims||"").filter(Boolean);
-const aes=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>(String(p.Email||p.Claims||"").replace(/^i:0#\.f\|membership\|/,"").split("@")[0]||"").toUpperCase()).filter(Boolean);
+const fixN=n=>/^administraci/i.test(n)?"Tanja Soler":n;
+const ppl=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>fixN(p.DisplayName||p.Claims||"")).filter(Boolean);
+const aes=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>(String(p.Email||p.Claims||"").replace(/^i:0#\.f\|membership\|/,"").split("@")[0]||"").toUpperCase()).filter(Boolean).map(fixN);
 const norm=r=>({id:r.ID,title:r.Title||"",status:r.Status?.Value||"new",desc:r.Description||"",serial:pick(r,"Serial_x0020_number")||"",aes:aes(r.Assignedto0),aesN:ppl(r.Assignedto0),inn:ppl(r.Issueloggedby),date:(r.DateReported||"").slice(0,10),proj:pick(r,"Project_x0020_No")||"",ref:pick(r,"Reference_x0020_No")||"",sol:r.Solution||"",cmt:pick(r,"Comment")||pick(r,"Anderungskommentar")||""});
 function fmt(d){if(!d)return"–";const[a,b,c]=d.split("-");return`${c}.${b}.${a}`}
 function chip(s){const c=s=="in progress"?"p":s.startsWith("send repaired")?"ok":s=="irremediable"?"bad":s=="send back to AES"?"s":"";const n={new:"neu","in progress":"in Bearbeitung"};return`<span class="chip ${c}">${esc(lang=="de"?(n[s]||s):s)}</span>`}
@@ -161,7 +167,9 @@ function render(){
   $("#cnt").textContent=T("count")(f.length,f.length)+(ms?` · ${T("ms")} ${ms} ms`:"");
   $("#run").innerHTML=run.map(i=>`<div class="row"><div class="no">${i.id}</div><div><div class="t">${esc(i.title||i.desc.split("\n")[0].slice(0,60)||T("notitle"))}</div><div class="d">${T("fail")}: ${esc(i.desc)}</div></div>
    <div class="c"><small>${T("date")}</small><span>${fmt(i.date)}</span></div><div class="c"><small>${T("aes").replace("Verantwortlich","Verantw.")}</small><span>${esc(i.aes.join(", ")||"–")}</span></div>
-   <div class="c"><small>${T("resp")}</small><span>${esc(i.inn.join(", ")||"–")}</span></div><div class="c"><small>${T("proj")}</small><span>${esc(i.proj||"–")}</span></div>${chip(i.status)}<button class="pill y" onclick="show(${i.id})">${T("open")}</button></div>`).join("");
+   <div class="c"><small>${T("resp")}</small><span>${esc(i.inn.join(", ")||"–")}</span></div><div class="c"><small>${T("proj")}</small><span>${esc(i.proj||"–")}</span></div><div class="act">${chip(i.status)}<button class="pill y" onclick="show(${i.id})">${T("open")}</button></div></div>`).join("");
+  $("#cHead").innerHTML=`<span>#</span><span>${T("fail")}</span><span>${T("date")}</span><span>${T("resp")}</span><span>${T("proj")}</span><span>${T("status")}</span><span></span>`;
+  $("#legend").innerHTML=STAT.map(x=>chip(x)).join("");
   $("#done").innerHTML=done.map(i=>`<div class="crow"><b>${i.id}</b><span>${esc(i.title||i.desc.split("\n")[0].slice(0,80))}</span><span>${fmt(i.date)}</span><span>${esc(i.inn.join(", "))}</span><span>${esc(i.proj)}</span>${chip(i.status)}<a class="open" onclick="show(${i.id})">${T("open")}</a></div>`).join("");
 }
 function show(id){
