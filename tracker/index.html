@@ -80,7 +80,6 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 </head>
 <body>
 <div id="intro"><span>Track. Resolve. Keep moving.</span></div>
-<div id="splash"><img src="plane.png" alt=""></div>
 <header>
   <img class="logo" src="logo.png" alt="WCT">
   <div><div class="ttl">Warranty Case Tracker</div><div class="sub" id="sub"></div></div>
@@ -226,7 +225,7 @@ document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.datas
 ["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
 $("#bRefresh").onclick=load;$("#bNew").onclick=()=>window.open("https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/NewForm.aspx","_blank");
-const _t0=Date.now();setTimeout(()=>{$("#intro").classList.add("gone");$("#splash").classList.add("on")},3700);load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,5200-(Date.now()-_t0))));
+setTimeout(()=>$("#intro").classList.add("gone"),3700);load();
 </script>
 </body>
 </html>
