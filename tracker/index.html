@@ -115,8 +115,10 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 <script>
 // ===== Konfiguration =====
 const _h=new URLSearchParams(location.hash.slice(1));
+const _new=_h.has("new");
 if(_h.get("r")){try{localStorage.setItem("wct-read",_h.get("r"))}catch(e){}history.replaceState(null,"",location.pathname)}
 if(_h.get("w")){try{localStorage.setItem("wct-write",_h.get("w"))}catch(e){}}
+if(_h.get("r")||_h.get("w")||_h.has("new")){history.replaceState(null,"",location.pathname)}
 const CFG={
   get read(){try{return localStorage.getItem("wct-read")||""}catch(e){return""}},
   get write(){try{return localStorage.getItem("wct-write")||""}catch(e){return""}},
@@ -255,7 +257,7 @@ document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.datas
 ["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
 $("#bRefresh").onclick=load;$("#bNew").onclick=newCase;
-setTimeout(()=>$("#intro").classList.add("gone"),3200);load().then(()=>{if(location.hash=="#new")newCase()});
+setTimeout(()=>$("#intro").classList.add("gone"),3200);load().then(()=>{if(_new)newCase()});
 </script>
 </body>
 </html>

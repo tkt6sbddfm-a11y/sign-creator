@@ -94,5 +94,14 @@ function apply(){var l=cur();if(l===last)return;last=l;document.documentElement.
 apply();window.addEventListener('storage',apply);setInterval(apply,1000);
 })();
 </script>
+<script>
+(function(){var TR="https://tkt6sbddfm-a11y.github.io/sign-creator/tracker/index.html";
+function g(k){try{return localStorage.getItem(k)||""}catch(e){return""}}
+function fix(){var r=g("wct-read"),w=g("wct-write");document.querySelectorAll('.links a').forEach(function(a){
+ var h=a.getAttribute("data-base")||a.getAttribute("href");if(h.indexOf(TR)!==0)return;a.setAttribute("data-base",h);
+ var p=[];if(h.indexOf("#new")>0)p.push("new");if(r)p.push("r="+encodeURIComponent(r));if(w)p.push("w="+encodeURIComponent(w));
+ a.href=TR+(p.length?"#"+p.join("&"):"")})}
+fix();addEventListener("storage",fix);document.addEventListener("pointerdown",fix,true);document.addEventListener("mouseover",fix,true);})();
+</script>
 </body>
 </html>
