@@ -200,7 +200,7 @@ async function loadAtt(id,interactive){
     const t=await tok(!!interactive);
     if(!t){box.innerHTML=`<button class="pill y" id="aIn">${T("signin")}</button> ${sp}`;$("#aIn").onclick=()=>loadAtt(id,true);return}
     box.textContent="…";
-    const api=AUTH.host+AUTH.site+"/_api/web/lists/getbytitle('"+encodeURIComponent(AUTH.list)+"')/items("+id+")/AttachmentFiles";
+    const api=AUTH.host+AUTH.site+"/_api/web/GetList('"+encodeURIComponent(AUTH.site+"/Lists/"+AUTH.list)+"')/items("+id+")/AttachmentFiles";
     const r=await fetch(api,{headers:{Authorization:"Bearer "+t,Accept:"application/json;odata=nometadata"}});
     if(!r.ok)throw new Error(r.status);
     const fl=(await r.json()).value||[];
@@ -211,7 +211,7 @@ async function loadAtt(id,interactive){
       const url=AUTH.host+AUTH.site+"/_api/web/GetFileByServerRelativePath(decodedurl='"+encodeURIComponent(f.ServerRelativeUrl)+"')/$value";
       if(/\.(jpe?g|png|gif|webp|bmp)$/i.test(f.FileName)){
         const im=new Image();im.title=f.FileName;box.appendChild(im);
-        fetch(url,{headers:{Authorization:"Bearer "+t}}).then(x=>x.blob()).then(b=>{const u=URL.createObjectURL(b);im.src=u;im.onclick=()=>{const l=document.createElement("div");l.id="lb";l.innerHTML=`<img src="${u}">`;l.onclick=()=>l.remove();document.body.appendChild(l)}}).catch(()=>im.remove());
+        fetch(url,{headers:{Authorization:"Bearer "+t}}).then(x=>x.blob()).then(b=>{const u=URL.createObjectURL(new Blob([b],{type:"image/"+(/png$/i.test(f.FileName)?"png":/gif$/i.test(f.FileName)?"gif":/webp$/i.test(f.FileName)?"webp":"jpeg")}));im.src=u;im.onclick=()=>{const l=document.createElement("div");l.id="lb";l.innerHTML=`<img src="${u}">`;l.onclick=()=>l.remove();document.body.appendChild(l)}}).catch(()=>im.remove());
       }else{const a=document.createElement("a");a.className="f";a.target="_blank";a.textContent="📎 "+f.FileName;a.href=AUTH.host+f.ServerRelativeUrl;box.appendChild(a)}
     }
   }catch(e){box.innerHTML=`<span class="meta">${T("picerr")}</span> ${sp}`;console.warn("att",e)}
