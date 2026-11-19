@@ -138,15 +138,17 @@ const aes=a=>(Array.isArray(a)?a:a?[a]:[]).map(p=>(String(p.Email||p.Claims||"")
 const norm=r=>({id:r.ID,title:r.Title||"",status:r.Status?.Value||"new",desc:r.Description||"",serial:pick(r,"Serial_x0020_number")||"",aes:aes(r.Assignedto0),aesN:ppl(r.Assignedto0),inn:ppl(r.Issueloggedby),date:(r.DateReported||"").slice(0,10),proj:pick(r,"Project_x0020_No")||"",ref:pick(r,"Reference_x0020_No")||"",sol:r.Solution||"",cmt:pick(r,"Comment")||pick(r,"Anderungskommentar")||""});
 function fmt(d){if(!d)return"–";const[a,b,c]=d.split("-");return`${c}.${b}.${a}`}
 const SL={de:{new:"neu","in progress":"in Bearbeitung","send back to AES":"zurück an AES","send repaired back to Innovence":"repariert zurück an Innovence",irremediable:"nicht reparierbar"},es:{new:"nuevo","in progress":"en curso","send back to AES":"devuelto a AES","send repaired back to Innovence":"reparado, devuelto a Innovence",irremediable:"irreparable"}};
+const WD={de:{c:"Fall",e:"Fehler",nr:"Neuanlage folgt (zweiter Flow).",nf:"Flow-Adresse fehlt (einmalig per #r=… in der URL setzen).",lf:"Daten konnten nicht geladen werden",lf2:"Der Lese-Flow ist evtl. ausgeschaltet."},en:{c:"Case",e:"Error",nr:"Creating new cases comes next (second flow).",nf:"Flow address missing (set once via #r=… in the URL).",lf:"Data could not be loaded",lf2:"The read flow may be switched off."},es:{c:"Caso",e:"Error",nr:"La creación de casos llegará próximamente (segundo flujo).",nf:"Falta la dirección del flujo (definir una vez mediante #r=… en la URL).",lf:"No se pudieron cargar los datos",lf2:"Puede que el flujo de lectura esté desactivado."}};
+const W=k=>(WD[lang]||WD.de)[k];
 const sl=s=>(SL[lang]||{})[s]||s;
 function chip(s){const c=s=="in progress"?"p":s.startsWith("send repaired")?"ok":s=="irremediable"?"bad":s=="send back to AES"?"s":"";return`<span class="chip ${c}">${esc(sl(s))}</span>`}
 async function load(){
   $("#run").innerHTML=`<div class="meta">${T("loading")}</div>`;
   const t=performance.now();
-  if(!CFG.read){$("#err").innerHTML=`<div class="err">Flow-Adresse fehlt (einmalig per #r=… in der URL setzen).</div>`;items=[];fill();render();return}
+  if(!CFG.read){$("#err").innerHTML=`<div class="err">${W("nf")}</div>`;items=[];fill();render();return}
   try{const r=await fetch(CFG.read,{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});if(!r.ok)throw new Error("HTTP "+r.status);
     items=(await r.json()).map(norm);ms=Math.round(performance.now()-t);$("#err").innerHTML=""}
-  catch(e){$("#err").innerHTML=`<div class="err">Daten konnten nicht geladen werden (${esc(e.message)}). Der Lese-Flow ist evtl. ausgeschaltet.</div>`;items=[]}
+  catch(e){$("#err").innerHTML=`<div class="err">${W("lf")} (${esc(e.message)}). ${W("lf2")}</div>`;items=[]}
   fill();render();
 }
 function fill(){
@@ -178,7 +180,7 @@ function render(){
 function show(id){
   cur=items.find(i=>i.id==id);$("#vList").hidden=true;const v=$("#vCase");v.hidden=false;
   v.innerHTML=`<button class="pill" onclick="back()">${T("back")}</button>
-  <div class="card"><div class="hdr2"><h2 style="margin:0">Fall ${cur.id}</h2><div style="display:flex;gap:8px"><button class="pill" onclick="edit()">${T("edit")}</button><a class="pill y" style="text-decoration:none" target="_blank" href="${CFG.sp}">${T("files")}</a></div></div>
+  <div class="card"><div class="hdr2"><h2 style="margin:0">${W("c")} ${cur.id}</h2><div style="display:flex;gap:8px"><button class="pill" onclick="edit()">${T("edit")}</button><a class="pill y" style="text-decoration:none" target="_blank" href="${CFG.sp}">${T("files")}</a></div></div>
   <div style="margin-top:8px">${chip(cur.status)} <span class="meta">${T("date")}: ${fmt(cur.date)}</span></div>
   <div class="grid"><div class="box"><h4><b>1</b>${T("fail")}</h4><div class="val">${esc(cur.desc)}</div><div class="lab">${T("serial")}</div><div class="val">${esc(cur.serial.replace(/;/g,"\n"))||"–"}</div></div>
   <div class="box"><h4><b>2</b>${T("involved")}</h4><div class="lab">Innovence</div><div class="chips">${cur.inn.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div><div class="lab">AES</div><div class="chips">${cur.aesN.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div></div>
@@ -202,7 +204,7 @@ function edit(isNew){
 function editOpen(isNew){
   const c=isNew?{id:"",status:"new",desc:"",serial:"",proj:"",ref:"",sol:"",cmt:"",date:new Date().toISOString().slice(0,10)}:cur;
   const d=$("#dlg");
-  d.innerHTML=`<h3 style="margin-top:0">${isNew?T("newc"):T("edit")+" – Fall "+c.id}</h3>
+  d.innerHTML=`<h3 style="margin-top:0">${isNew?T("newc"):T("edit")+" – "+W("c")+" "+c.id}</h3>
   <label class="f">${T("status")}<select id="eSt">${STAT.map(s=>`<option value="${s}"${s==c.status?" selected":""}>${esc(sl(s))}</option>`).join("")}</select></label>
   <div class="lab">${T("fail")}</div><textarea id="eDesc" rows="4">${esc(c.desc)}</textarea>
   <div class="lab">${T("serial")}</div><input id="eSer" style="width:100%" value="${esc(c.serial)}">
@@ -213,12 +215,12 @@ function editOpen(isNew){
   if(!d.open)d.showModal();
 }
 async function save(isNew){
-  if(isNew){alert("Neuanlage folgt (zweiter Flow).");return}
+  if(isNew){alert(W("nr"));return}
   const body={id:cur.id,fields:{Status:$("#eSt").value,Description:$("#eDesc").value,"Serial_x0020_number":$("#eSer").value,"Project_x0020_No_x002e__x0020_In":$("#eProj").value,Solution:$("#eSol").value}};
   if(!CFG.write){alert(T("nowrite"));return}
   const t=performance.now();
   try{const r=await fetch(CFG.write,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error("HTTP "+r.status);
-    ms=Math.round(performance.now()-t);$("#dlg").close();await load();if(!isNew)show(body.id)}catch(e){alert("Fehler: "+e.message)}
+    ms=Math.round(performance.now()-t);$("#dlg").close();await load();if(!isNew)show(body.id)}catch(e){alert(W("e")+": "+e.message)}
 }
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;localStorage.setItem("wct-lang",lang);fill();render();if(!$("#vCase").hidden)show(cur.id)});
 ["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
