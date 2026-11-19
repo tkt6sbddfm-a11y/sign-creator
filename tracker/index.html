@@ -58,19 +58,21 @@ dialog{border:0;border-radius:18px;padding:24px;width:min(560px,92vw);box-shadow
 dialog::backdrop{background:rgba(0,0,0,.45)}
 .hdr2{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 @media(max-width:900px){.row,.crow{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}header{flex-wrap:wrap}}
-#intro{position:fixed;inset:0;z-index:100;background:#F1F1F1;display:flex;align-items:flex-start;justify-content:center;padding-top:160px;text-align:center}
-#intro span{font-size:clamp(14px,2.2vw,28px);color:#8a8e92;letter-spacing:.08em;text-transform:uppercase;opacity:0;animation:iflash 5s linear forwards}
+#intro{position:fixed;inset:0;z-index:100;background:#F2F2F0;display:flex;align-items:flex-start;justify-content:center;padding-top:160px;text-align:center}
+#intro span{font:700 clamp(14px,3.2vw,40px)/1.2 "Neo Sans Std","Lato","Segoe UI",system-ui,sans-serif;color:#0D1112;letter-spacing:.08em;text-transform:uppercase;opacity:0;animation:iflash 5s linear forwards}
 #intro.gone{display:none}
 @keyframes iflash{0%{opacity:0}2%{opacity:1}6%{opacity:0}10%{opacity:0}12%{opacity:1}16%{opacity:0}20%{opacity:0}22%{opacity:1}64%{opacity:1}100%{opacity:0}}
-#splash{position:fixed;inset:0;z-index:99;background:#0D1112;transition:opacity 1.6s ease}
-#splash::before{content:"";position:absolute;inset:0;background:url(splash.svg) center top/100% auto no-repeat;animation:sin .5s ease-out both}
+#splash{position:fixed;inset:0;z-index:99;background:#fff;display:none;flex-direction:column;align-items:center;padding-top:90px;transition:opacity 1.6s ease}
+#splash.on{display:flex;animation:sin .5s ease-out both}
 @keyframes sin{from{opacity:0}to{opacity:1}}
+#splash h1{margin:0;width:100%;text-align:center;white-space:nowrap;font:700 4.4vw/1.1 "Neo Sans Std","Lato","Segoe UI",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#0D1112}
+#splash img{margin-top:3vw;width:min(34vw,420px);height:auto}
 #splash.off{opacity:0;pointer-events:none}
 </style>
 </head>
 <body>
-<div id="intro"><span>Track. Resolve. Keep moving. · Innovence Airport Systems GmbH</span></div>
-<div id="splash"></div>
+<div id="intro"><span>Track. Resolve. Keep moving.</span></div>
+<div id="splash"><h1>Innovence Airport Systems GmbH</h1><img src="plane.png" alt=""></div>
 <header>
   <img class="logo" src="logo.png" alt="WCT">
   <div><div class="ttl">Warranty Case Tracker</div><div class="sub" id="sub"></div></div>
@@ -199,7 +201,7 @@ document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.datas
 ["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
 $("#bRefresh").onclick=load;$("#bNew").onclick=()=>window.open("https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/NewForm.aspx","_blank");
-const _t0=Date.now();setTimeout(()=>$("#intro").classList.add("gone"),5000);load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,8000-(Date.now()-_t0))));
+const _t0=Date.now();setTimeout(()=>{$("#intro").classList.add("gone");$("#splash").classList.add("on")},5000);load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,8000-(Date.now()-_t0))));
 </script>
 </body>
 </html>
