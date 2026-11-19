@@ -255,7 +255,7 @@ document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.datas
 ["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
 $("#bRefresh").onclick=load;$("#bNew").onclick=newCase;
-setTimeout(()=>$("#intro").classList.add("gone"),3200);load();
+setTimeout(()=>$("#intro").classList.add("gone"),3200);load().then(()=>{if(location.hash=="#new")newCase()});
 </script>
 </body>
 </html>
