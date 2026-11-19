@@ -530,7 +530,25 @@ function isSingleDesignator(gl, solo){
 }
 /* Faktor für Ränder und Abstände je Schild (Feld „Abstände [%]“, 100 % = Normwert) */
 /* Abstände je Schild: Zeichenabstände in % (Codes 1–4/6), seitlicher Rand und Wort-/Pfeilabstand in mm (leer = Normwert) */
-function spOpts(sign){ const v=Number(sign&&sign.spacing), m=Number(sign&&sign.marginMM), w=Number(sign&&sign.wordGapMM); return {cf: v>0? v/100 : 1, m: m>0? m : null, wg: w>0? w : null}; }
+function spOpts(sign){ const v=Number(sign&&sign.spacing), m=Number(sign&&sign.marginMM), w=Number(sign&&sign.wordGapMM);
+  const o={cf: v>0? v/100 : 1, m: m>0? m : null, wg: w>0? w : null};
+  const L=Number(sign&&sign.lenMM); if(L>0 && sign.panels && sign.panels.length){ const pl=lengthPlan(sign,o,L); if(pl) { o.m=null; o.ex=pl.ex; } }
+  return o; }
+/* Gesamtlänge millimetergenau: Differenz zur Normlänge wird gleichmäßig auf alle seitlichen Panelränder verteilt,
+   der Rest (< Anzahl Ränder) auf die beiden äußeren Ränder des Schilds. Zeichen und Abstände bleiben nach Norm. */
+function normLength(sign, o){ o=o||{cf:spOpts0(sign).cf, m:null, wg:spOpts0(sign).wg}; const solo=sign.panels.length===1;
+  return sign.panels.reduce((a,p)=>a+panelWidth(p,sign.h,sign.norm,solo,o),0) + panelGaps(sign).reduce((a,g)=>a+g.g,0); }
+function spOpts0(sign){ const v=Number(sign.spacing), w=Number(sign.wordGapMM); return {cf: v>0? v/100 : 1, wg: w>0? w : null}; }
+function lengthPlan(sign, o, L){
+  const o0={cf:o.cf, m:null, wg:o.wg}, T0=normLength(sign,o0);
+  const idx=sign.panels.map((p,i)=>PANEL_TYPES[p.type].symbol?-1:i).filter(i=>i>=0); if(!idx.length) return null;
+  const k=2*idx.length, delta=Math.round(L)-T0, dm=Math.floor(delta/k), r=delta-dm*k;
+  const ex=new Map(); idx.forEach(i=>ex.set(sign.panels[i],{l:dm,r:dm}));
+  ex.get(sign.panels[idx[0]]).l += Math.floor(r/2); ex.get(sign.panels[idx[idx.length-1]]).r += r-Math.floor(r/2);
+  return {T0, delta, ex};
+}
+function effMargins(sign){ const solo=sign.panels.length===1, o=spOpts(sign); const ms=[];
+  sign.panels.forEach(p=>{ if(PANEL_TYPES[p.type].symbol) return; const c=panelChain(p,sign.h,sign.norm,solo,o); ms.push(c[0].w, c[c.length-1].w); }); return ms; }
 function spf(sign){ return spOpts(sign); }
 function normMargin(sign){ const solo=sign.panels.length===1; const gl=sign.panels[0]?panelGlyphs(sign.panels[0]):[]; return Math.round(P(sign.norm, isSingleDesignator(gl,solo)?'sideMarginSingle':'sideMargin', sign.h)); }
 function lockHintHTML(k, text){
@@ -543,7 +561,8 @@ function panelChain(p, h, norm, solo, o){
   const gl = panelGlyphs(p);
   const single = isSingleDesignator(gl, solo);
   const m = o.m!=null ? Math.round(o.m) : Math.round(P(norm, single?'sideMarginSingle':'sideMargin', h));
-  const chain = [{kind:'margin',label:o.m!=null?'Rand (manuell)':(single?'Rand (H)':'Rand'),w:m}];
+  const ex = (o.ex && o.ex.get(p)) || {l:0,r:0}, adj = o.m!=null || ex.l || ex.r;
+  const chain = [{kind:'margin',label:adj?'Rand (angepasst)':(single?'Rand (H)':'Rand'),w:m+ex.l}];
   gl.forEach((g,i)=>{
     chain.push({kind:'char',label:g,w: (g===' ' && o.wg!=null) ? Math.round(o.wg) : charWidth(g,h)});
     if(i<gl.length-1){
@@ -555,7 +574,7 @@ function panelChain(p, h, norm, solo, o){
       chain.push({kind:'space',label:'↔',w:Math.round(sp)});
     }
   });
-  chain.push({kind:'margin',label:single?'Rand (H)':'Rand',w:m});
+  chain.push({kind:'margin',label:adj?'Rand (angepasst)':(single?'Rand (H)':'Rand'),w:m+ex.r});
   return chain;
 }
 function panelWidth(panel, h, norm, solo, f){
@@ -763,7 +782,7 @@ function renderSigns(){
           <select data-f="faceMode"><option value="norm"${(sign.faceMode||'norm')==='norm'?' selected':''}>Norm-Minimum ${NORM_INFO[sign.norm].short} (${P(sign.norm,'faceHeight',sign.h)} mm)</option><option value="2H"${sign.faceMode==='2H'?' selected':''}>2 H (${2*sign.h} mm)</option><option value="custom"${sign.faceMode==='custom'?' selected':''}>eigener Wert</option></select></div>
         ${sign.faceMode==='custom'?`<div class="field" style="min-width:auto"><label>Schildhöhe [mm]</label><input type="number" data-f="faceCustom" value="${sign.faceCustom||P(sign.norm,'faceHeight',sign.h)}" style="width:90px"></div>`:''}
         <div class="field" style="min-width:auto" title="Höhe des Gehäuses (Schildfläche + Rahmen oben und unten) in mm. Ändert nur den Rahmen – die Schildfläche bleibt nach Norm."><label>Gesamthöhe mit Rahmen [mm]</label><div style="display:flex;gap:4px;align-items:center"><input type="number" data-f="outerH" min="${faceHeight(sign)}" step="1" value="${sign.outerH||outerHDefault(sign)}" placeholder="${outerHDefault(sign)}" ${pj().housing?'':'disabled title="Gehäuserahmen ist in den Projektangaben ausgeschaltet"'} style="${sign.outerH?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}">${sign.outerH?`<button class="btn small" data-act="resetOuter" title="Auf Standard ${outerHDefault(sign)} mm zurücksetzen">Standard</button>`:''}</div><span style="font-size:11px;color:#6c6f73;margin-top:2px">${pj().housing?`Rahmen oben/unten: ${fmtN(((sign.outerH||outerHDefault(sign))-faceHeight(sign))/2)} mm`:'Gehäuserahmen aus'}</span></div>
-        <div class="field" style="min-width:auto" title="Seitlicher Rand je Panel in mm. Leer = Normwert (H/2, bei Einzelbezeichner H)."><label>Rand seitlich [mm]</label><div style="display:flex;gap:4px;align-items:center"><input type="number" data-f="marginMM" min="0" step="5" value="${sign.marginMM||normMargin(sign)}" placeholder="${normMargin(sign)} (Norm)" style="${sign.marginMM?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}">${sign.marginMM?`<button class="btn small" data-act="resetMargin" title="Auf Normwert ${normMargin(sign)} mm zurücksetzen">Standard</button>`:''}</div></div>
+        <div class="field" style="min-width:auto" title="Länge der Schildfläche in mm, millimetergenau. Die Differenz zur Normlänge wird gleichmäßig auf die seitlichen Ränder verteilt – Zeichen und Abstände bleiben nach Norm."><label>Gesamtlänge Schildfläche [mm]</label><div style="display:flex;gap:4px;align-items:center"><input type="number" data-f="lenMM" min="1" step="1" value="${signDims(sign).total}" placeholder="${normLength(sign)}" style="${(sign.lenMM||sign.marginMM)?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}">${(sign.lenMM||sign.marginMM)?`<button class="btn small" data-act="resetMargin" title="Auf Normlänge ${normLength(sign)} mm zurücksetzen">Standard</button>`:''}</div><span style="font-size:11px;color:#6c6f73;margin-top:2px">${(()=>{ const ms=effMargins(sign); if(!ms.length) return ''; const mn=Math.min(...ms), mx=Math.max(...ms); return 'Rand seitlich: '+(mn===mx?mn:mn+'–'+mx)+' mm (Norm '+normMargin(sign)+')'+(pj().housing?' · mit Rahmen '+fmtN(signDims(sign).total+2*(Number(pj().housingSide)||0))+' mm':''); })()}</span></div>
         </div><div class="sg-note">Schildhöhe ${NORM_INFO[sign.norm].face} (vertikaler Rand ${NORM_INFO[sign.norm].vmargin}) · seitlicher Rand H/2, bei Einzelbezeichner H · installiert max. ${P(sign.norm,'installMax',sign.h)} mm</div></div>
         <div class="sgroup"><div class="sg-title"><span class="sg-n">3</span>Abstände <span class="sg-tag">genormt · gesperrt</span></div><div style="display:flex;flex-direction:column;gap:6px">
         <div class="field" style="min-width:auto" title="Abstände zwischen den Zeichen nach Tab. A4-1 (Codes 1–4), 100 % = Normwert."><label>Zeichenabstände [%]</label>${(sign.spUnlock||charPct(sign)!==100)?`<div style="display:flex;gap:4px;align-items:center"><button class="btn small" data-spstep="-5" title="−5 %">−</button><input type="number" data-f="spacing" value="${charPct(sign)}" min="30" max="200" step="5" style="width:66px;${charPct(sign)!==100?'border-color:var(--yd);background:#fff8dc;font-weight:600':''}"><button class="btn small" data-spstep="5" title="+5 %">+</button><button class="btn small" data-act="splock" title="Auf Normwert 100 % zurücksetzen und wieder sperren">Norm + sperren</button></div>`:`<div style="display:flex;gap:6px;align-items:center"><input type="number" value="100" disabled style="width:66px;background:#f1f1ef;color:#6c6f73"><button class="btn small" data-act="spunlockask" title="Bearbeitung freigeben">🔒 Ändern …</button></div>`}</div>
@@ -780,7 +799,7 @@ function renderSigns(){
       <div style="margin-top:8px"><button class="btn small" data-act="addpanel">+ Panel / Nachricht anhängen</button> <span class="note">Tipp: Panel in der Vorschau anklicken, um es zu bearbeiten.</span></div>
       ${sign.h!=rec?`<div class="hint">Die gewählte Schrifthöhe (${sign.h} mm) weicht von der Mindesthöhe nach ${NORM_INFO[sign.norm].height} (${NORM_INFO[sign.norm].short}) für Code ${sign.codeNo} ab (${rec} mm).</div>`:''}
       <div class="preview">${previewSVG(sign)}</div>
-      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${widthsText(d)} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${(sign.outerH||sign.marginMM||sign.wordGapMM||charPct(sign)!==100)?`<span>Abweichend: <b>${[sign.outerH?'Gesamthöhe '+sign.outerH+' mm':'', sign.marginMM?'Rand seitlich '+sign.marginMM+' mm':'', charPct(sign)!==100?'Zeichenabst. '+charPct(sign)+' %':'', sign.wordGapMM?'Wort-/Pfeilabst. '+sign.wordGapMM+' mm':''].filter(Boolean).join(' · ')}</b></span>`:''}</div>
+      <div class="dims"><span>Schildhöhe <b>${d.face} mm</b></span><span>Gesamtlänge <b>${d.total} mm</b></span><span>Panels <b>${widthsText(d)} mm</b></span><span>Fläche <b>${d.area} m²</b></span>${(sign.outerH||sign.lenMM||sign.marginMM||sign.wordGapMM||charPct(sign)!==100)?`<span>Abweichend: <b>${[sign.outerH?'Gesamthöhe '+sign.outerH+' mm':'', sign.lenMM?'Länge '+sign.lenMM+' mm':(sign.marginMM?'Rand seitlich '+sign.marginMM+' mm':''), charPct(sign)!==100?'Zeichenabst. '+charPct(sign)+' %':'', sign.wordGapMM?'Wort-/Pfeilabst. '+sign.wordGapMM+' mm':''].filter(Boolean).join(' · ')}</b></span>`:''}</div>
       <div class="split-wrap">${splitHintHTML(sign)}</div>
       <details class="chain"><summary>Maßkette als Text</summary>${chainHTML(sign)}</details>
       <div class="compliance">${complianceHTML(sign)}</div>
@@ -790,7 +809,11 @@ function renderSigns(){
     card.querySelectorAll('[data-f]').forEach(el=>{
       el.addEventListener('change', e=>{
         const f = el.dataset.f;
-        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='marginMM'||f==='wordGapMM'||f==='outerH'){ let v=Math.round(Number(el.value)); const def = f==='marginMM'?normMargin(sign) : f==='outerH'?outerHDefault(sign) : Math.round(0.5*sign.h); if(f==='outerH' && v<faceHeight(sign)){ v=faceHeight(sign); toast('Gesamthöhe kann nicht kleiner als die Schildhöhe ('+faceHeight(sign)+' mm) sein'); } sign[f] = (v>0 && v!==def) ? v : ''; }   // Standardwert = keine Abweichung else sign[f] = el.value;
+        if(f==='h'||f==='faceCustom') sign[f] = Number(el.value); else if(f==='spacing') sign.spacing = Math.min(200,Math.max(30,Number(el.value)||100)); else if(f==='lenMM'){ let v=Math.round(Number(el.value)); const T0=normLength(sign); sign.marginMM=''; sign.lenMM=''; 
+          const k=2*sign.panels.filter(p=>!PANEL_TYPES[p.type].symbol).length, mins=k? T0-k*normMargin(sign) : T0;
+          if(!(v>0)) v=T0; if(k && v<mins){ v=mins; toast('Kürzer geht nicht – die seitlichen Ränder wären 0 mm'); }
+          sign.lenMM = (v!==T0) ? v : ''; }
+        else if(f==='marginMM'||f==='wordGapMM'||f==='outerH'){ let v=Math.round(Number(el.value)); const def = f==='marginMM'?normMargin(sign) : f==='outerH'?outerHDefault(sign) : Math.round(0.5*sign.h); if(f==='outerH' && v<faceHeight(sign)){ v=faceHeight(sign); toast('Gesamthöhe kann nicht kleiner als die Schildhöhe ('+faceHeight(sign)+' mm) sein'); } sign[f] = (v>0 && v!==def) ? v : ''; }   // Standardwert = keine Abweichung else sign[f] = el.value;
         if(f==='norm'){ sign.faceMode = sign.faceMode||'norm'; }
         if(f==='name'||f==='location'||f==='description'||f==='number'){ if(f==='number') sign.number=String(el.value).replace(/^[^0-9A-Za-z]+/,'').trim(); renderOverview(); return; }
         if(f==='codeNo'){ /* Empfehlung anwenden */ sign.h = recommendedHeight(sign); }
@@ -807,7 +830,7 @@ function renderSigns(){
         if(a==='spunlock'){ sign._spAsk=false; sign.spUnlock=true; }
         if(a==='splock'){ sign.spacing=100; sign.spUnlock=false; }
         if(a==='resetOuter'){ sign.outerH=''; }
-        if(a==='resetMargin'){ sign.marginMM=''; }
+        if(a==='resetMargin'){ sign.marginMM=''; sign.lenMM=''; }
         if(a==='wgunlockask'){ sign._wgAsk=true; }
         if(a==='wgcancel'){ sign._wgAsk=false; }
         if(a==='wgunlock'){ sign._wgAsk=false; sign.wgUnlock=true; }
@@ -905,7 +928,7 @@ function doSplit(){
   const si=state.signs.findIndex(x=>x.id===splitState.id); const c=splitState.cands[splitState.sel]; if(si<0||!c) return;
   const sign=state.signs[si];
   const right=deepCopy(sign); signCounter++; right.id=signCounter; right.name=sign.name; right.panels=deepCopy(c.right);
-  sign.panels=deepCopy(c.left);
+  sign.panels=deepCopy(c.left); sign.lenMM=''; right.lenMM='';
   state.signs.splice(si+1,0,right);
   closeSplit(); renderSigns(); renderOverview();
   toast(`Schild geteilt: ${fmtN(c.wl)} mm + ${fmtN(c.wr)} mm – rechter Teil als Schild ${si+2} eingefügt`);
@@ -967,7 +990,7 @@ function complianceChecks(sign){
     {ok:d.face>=faceMin, label:`Schildhöhe ≥ Norm-Minimum ${N.short} (${N.face}): ${faceMin} mm bei h = ${sign.h} – ist ${d.face} mm`},
     {ok:singleSidedOk, label:`Einseitig aufgestelltes Gebotszeichen ≥ ${sign.codeNo==='1-2'?'1460':'1940'} mm breit (App. 4 Nr. 11; CS N.775(c)(19))`},
     {ok:!badDesig.length, label:`Rollbahnbezeichner ohne I, O, X (A14 5.4.3.37; CS N.785(c)(12))${badDesig.length?' – gefunden: '+badDesig.join(', '):''}`},
-    {ok:!sign.marginMM || sign.marginMM>=normMargin(sign), label:`Seitlicher Rand ≥ Normwert ${normMargin(sign)} mm (Abb. A4-4 / N-3)${sign.marginMM?' – eingestellt '+sign.marginMM+' mm':''}`},
+    (()=>{ const ms=effMargins(sign), mn=ms.length?Math.min(...ms):normMargin(sign); return {ok:mn>=normMargin(sign), label:`Seitlicher Rand ≥ Normwert ${normMargin(sign)} mm (Abb. A4-4 / N-3)${(sign.lenMM||sign.marginMM)?' – ist '+mn+' mm':''}`}; })(),
     {ok:!sign.outerH || Number(sign.outerH)>=faceHeight(sign), label:`Gesamthöhe mit Rahmen ≥ Schildhöhe ${faceHeight(sign)} mm${sign.outerH?' – eingestellt '+sign.outerH+' mm':''}`},
     {ok:charPct(sign)>=100, label:`Zeichenabstände ≥ Normwert (Tab. A4-1 / N-3)${charPct(sign)!==100?' – eingestellt '+charPct(sign)+' %':''}`},
     {ok:!sign.wordGapMM || (sign.wordGapMM>=0.5*sign.h-0.5 && sign.wordGapMM<=0.75*sign.h+0.5), label:`Wort-/Pfeilabstand 0,5–0,75 H = ${Math.round(0.5*sign.h)}–${Math.round(0.75*sign.h)} mm (App. 4)${sign.wordGapMM?' – eingestellt '+sign.wordGapMM+' mm':''}`},
@@ -2443,7 +2466,7 @@ function openDialog(path,msg){
 if(OPEN_PARAM){ (async()=>{ if(!SP_SAVE.clientId){ openDialog(OPEN_PARAM); return; } try{ await openFromSP(OPEN_PARAM,false); }catch(e){ openDialog(OPEN_PARAM, e.message); } })(); }
 
 /* ================= Versionshinweis: neuere Version online? ================= */
-const APP_VERSION='2026-11-18.2';
+const APP_VERSION='2026-11-19.1';
 (function(){
   const f=document.querySelector('footer.site'); if(f){ const v=document.createElement('span'); v.style.cssText='margin-left:auto;color:#888;font-size:12px'; v.textContent='Version '+APP_VERSION; f.appendChild(v); }
   if(!/^https?:/.test(location.protocol)) return;
