@@ -74,5 +74,25 @@
 </ul></div>
 </details>
 </div>
+<script>
+(function(){
+var L='https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/AllItems.aspx';
+var sel={a:'.links a.primary',b:'.links a.secondary:nth-of-type(2)',c:'.links a.secondary:nth-of-type(3)',s0:'details:nth-of-type(1) summary',s1:'details:nth-of-type(2) summary',s2:'details:nth-of-type(3) summary',b0:'details:nth-of-type(1) .body',b1:'details:nth-of-type(2) .body',b2:'details:nth-of-type(3) .body'};
+var T={
+en:{a:'Open Warranty Case Tracker in new tab',b:'Open list in SharePoint',c:'Create new case in SharePoint',s0:'About the Warranty Case Tracker',s1:'Process',s2:'Notes',
+b0:'<p>Management of warranty cases with Airsafe (AES) and GOMINTEC: record cases, track status, assign responsible persons and review closed cases.</p><p>The app reads and writes directly in the SharePoint list <a href="'+L+'">Warranty Case Tracker</a>. There is no second data store.</p>',
+b1:'<ol><li><strong>Filter</strong>: search all fields or choose a status (new, in progress, sent back to AES, sent back repaired to Innovence, irremediable).</li><li><strong>New case</strong>: description, report date and responsible persons (Innovence and AES) are mandatory.</li><li><strong>Open</strong>: detail view of a case, with Edit.</li><li><strong>Language</strong>: DE / EN / ES at the top right of the app.</li></ol>',
+b2:'<ul><li>Attachments and pictures of a case remain in the SharePoint list.</li><li>The app runs in the browser; on first use the data access must be confirmed once.</li></ul>'},
+es:{a:'Abrir Warranty Case Tracker en una pestaña nueva',b:'Abrir la lista en SharePoint',c:'Crear un caso nuevo en SharePoint',s0:'Acerca del Warranty Case Tracker',s1:'Proceso',s2:'Notas',
+b0:'<p>Gestión de casos de garantía con Airsafe (AES) y GOMINTEC: registrar casos, seguir el estado, asignar responsables y consultar casos cerrados.</p><p>La aplicación lee y escribe directamente en la lista de SharePoint <a href="'+L+'">Warranty Case Tracker</a>. No existe un segundo almacén de datos.</p>',
+b1:'<ol><li><strong>Filtro</strong>: buscar en todos los campos o elegir un estado (nuevo, en curso, devuelto a AES, reparado y devuelto a Innovence, irreparable).</li><li><strong>Caso nuevo</strong>: descripción, fecha de aviso y responsables (Innovence y AES) son obligatorios.</li><li><strong>Abrir</strong>: vista detallada de un caso, con Editar.</li><li><strong>Idioma</strong>: DE / EN / ES arriba a la derecha en la aplicación.</li></ol>',
+b2:'<ul><li>Los adjuntos e imágenes de un caso siguen estando en la lista de SharePoint.</li><li>La aplicación se ejecuta en el navegador; en el primer uso hay que confirmar una vez el acceso a los datos.</li></ul>'}};
+var D={};for(var k in sel){var e=document.querySelector(sel[k]);D[k]=e?e.innerHTML:''}
+function cur(){var l='';try{l=localStorage.getItem('wct-lang')||''}catch(e){}if(!l)l=((navigator.language||'').toLowerCase().indexOf('es')==0)?'es':'de';return l}
+var last='';
+function apply(){var l=cur();if(l===last)return;last=l;document.documentElement.lang=l;for(var k in sel){var e=document.querySelector(sel[k]);if(e)e.innerHTML=(l!=='de'&&T[l]&&T[l][k])?T[l][k]:D[k]}}
+apply();window.addEventListener('storage',apply);setInterval(apply,1000);
+})();
+</script>
 </body>
 </html>
