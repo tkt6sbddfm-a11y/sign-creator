@@ -188,7 +188,18 @@ function show(id){
 }
 function back(){$("#vCase").hidden=true;$("#vList").hidden=false}
 const STAT=["new","in progress","send back to AES","send repaired back to Innovence","irremediable"];
+const LOCK_H="ba5344302b7e689b408eba95931dcf2dd97797ea3f0be80de2ceff2bd4150e9a",unl=new Set();
+const LK={de:["Abgeschlossener Fall – Code eingeben","Code","Entsperren","Falscher Code.","Abbrechen"],en:["Closed case – enter code","Code","Unlock","Wrong code.","Cancel"],es:["Caso cerrado – introducir código","Código","Desbloquear","Código incorrecto.","Cancelar"]};
+async function sha(t){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join("")}
 function edit(isNew){
+  if(!isNew&&cur&&!OPEN.includes(cur.status)&&!unl.has(cur.id)){
+    const L=LK[lang]||LK.de,d=$("#dlg");
+    d.innerHTML=`<h3 style="margin-top:0">🔒 ${L[0]}</h3><label class="f">${L[1]}<input id="lkIn" type="password" autocomplete="off" style="width:100%"></label><div id="lkErr" class="meta" style="color:#a12020;min-height:18px;margin-top:6px"></div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px"><button class="pill" onclick="dlg.close()">${L[4]}</button><button class="pill y" id="lkGo">${L[2]}</button></div>`;
+    const go=async()=>{let ok=false;try{ok=(await sha($("#lkIn").value))===LOCK_H}catch(e){}if(ok){unl.add(cur.id);editOpen(false)}else{$("#lkErr").textContent=L[3];$("#lkIn").value="";$("#lkIn").focus()}};
+    d.showModal();$("#lkGo").onclick=go;$("#lkIn").onkeydown=e=>{if(e.key=="Enter")go()};$("#lkIn").focus();return}
+  editOpen(isNew);
+}
+function editOpen(isNew){
   const c=isNew?{id:"",status:"new",desc:"",serial:"",proj:"",ref:"",sol:"",cmt:"",date:new Date().toISOString().slice(0,10)}:cur;
   const d=$("#dlg");
   d.innerHTML=`<h3 style="margin-top:0">${isNew?T("newc"):T("edit")+" – Fall "+c.id}</h3>
@@ -199,7 +210,7 @@ function edit(isNew){
   <div class="lab">${T("sol")}</div><textarea id="eSol" rows="3">${esc(c.sol)}</textarea>
   <div class="lab">${T("comment")}</div><input id="eCmt" style="width:100%" value="${esc(c.cmt)}">
   <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="pill" onclick="dlg.close()">${T("cancel")}</button><button class="pill y" onclick="save(${isNew?1:0})">${T("save")}</button></div>`;
-  d.showModal();
+  if(!d.open)d.showModal();
 }
 async function save(isNew){
   if(isNew){alert("Neuanlage folgt (zweiter Flow).");return}
