@@ -67,7 +67,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 @media(max-width:900px){.row,.crow{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}header{flex-wrap:wrap}}
 @font-face{font-family:"NeoSansWCT";src:url(NeoSansStd-Bold.otf?v=2) format("opentype");font-weight:700;font-display:block}
 #intro{position:fixed;inset:0;z-index:100;background:#F2F2F0;display:flex;align-items:flex-start;justify-content:center;padding-top:160px;text-align:center}
-#intro span{font:700 clamp(14px,3.2vw,40px)/1.2 "NeoSansWCT","Neo Sans Std","Lato","Segoe UI",system-ui,sans-serif;color:#0D1112;letter-spacing:.08em;text-transform:uppercase;opacity:0;animation:iflash 4.2s linear forwards}
+#intro span{font:700 clamp(14px,3.2vw,40px)/1.2 "NeoSansWCT","Neo Sans Std","Lato","Segoe UI",system-ui,sans-serif;color:#0D1112;letter-spacing:.08em;text-transform:uppercase;opacity:0;animation:iflash 3.7s linear forwards}
 #intro.gone{display:none}
 @keyframes iflash{0%{opacity:0}2.5%{opacity:1}7%{opacity:0}12%{opacity:0}14.5%{opacity:1}19%{opacity:0}24%{opacity:0}26.5%{opacity:1}62%{opacity:1}76%{opacity:0}100%{opacity:0}}
 #splash{position:fixed;inset:0;z-index:99;background:#fff;display:none;flex-direction:column;align-items:center;padding-top:90px;transition:opacity 1.6s ease}
@@ -80,7 +80,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 </head>
 <body>
 <div id="intro"><span>Track. Resolve. Keep moving.</span></div>
-<div id="splash"><img src="plane.png" alt=""><h1>Innovence Airport Systems GmbH</h1></div>
+<div id="splash"><img src="plane.png" alt=""></div>
 <header>
   <img class="logo" src="logo.png" alt="WCT">
   <div><div class="ttl">Warranty Case Tracker</div><div class="sub" id="sub"></div></div>
@@ -224,7 +224,7 @@ document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.datas
 ["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
 $("#bRefresh").onclick=load;$("#bNew").onclick=()=>window.open("https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/NewForm.aspx","_blank");
-const _t0=Date.now();setTimeout(()=>{$("#intro").classList.add("gone");$("#splash").classList.add("on")},4200);load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,5700-(Date.now()-_t0))));
+const _t0=Date.now();setTimeout(()=>{$("#intro").classList.add("gone");$("#splash").classList.add("on")},3700);load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,5200-(Date.now()-_t0))));
 </script>
 </body>
 </html>
