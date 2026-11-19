@@ -85,7 +85,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
   <div><div class="ttl">Warranty Case Tracker</div><div class="sub" id="sub"></div></div>
   <div class="sp"></div>
   <div class="lang"><button data-l="de">DE</button><i></i><button data-l="en">EN</button><i></i><button data-l="es">ES</button></div>
-  <img class="inno" src="innovence.png" alt="INNOVENCE">
+  <a href="https://www.innovence.de" target="_blank" rel="noopener" style="display:flex;align-items:center"><img class="inno" src="innovence.png" alt="INNOVENCE"></a>
 </header>
 <main>
   <div id="err"></div>
@@ -213,6 +213,30 @@ function editOpen(isNew){
   <div class="lab">${T("comment")}</div><input id="eCmt" style="width:100%" value="${esc(c.cmt)}">
   <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="pill" onclick="dlg.close()">${T("cancel")}</button><button class="pill y" onclick="save(${isNew?1:0})">${T("save")}</button></div>`;
   if(!d.open)d.showModal();
+}
+
+const NC={de:{ph:"name@firma.de",req:"Bitte Beschreibung, Meldedatum sowie je eine verantwortliche Person (Innovence und AES, E-Mail) angeben.",hint:"Anhänge und Bilder lassen sich nach dem Speichern über „Anhänge/Bilder in SharePoint öffnen“ ergänzen.",aesH:"E-Mail der AES-Person",innH:"E-Mail der Innovence-Person",busy:"Wird gespeichert …"},en:{ph:"name@company.com",req:"Please enter a description, report date and one responsible person each (Innovence and AES, e-mail).",hint:"Attachments and pictures can be added after saving via “Open attachments/pictures in SharePoint”.",aesH:"E-mail of the AES person",innH:"E-mail of the Innovence person",busy:"Saving …"},es:{ph:"nombre@empresa.com",req:"Indique descripción, fecha de aviso y una persona responsable de cada parte (Innovence y AES, correo electrónico).",hint:"Los adjuntos e imágenes se pueden añadir tras guardar mediante «Abrir adjuntos/imágenes en SharePoint».",aesH:"Correo de la persona de AES",innH:"Correo de la persona de Innovence",busy:"Guardando …"}};
+function newCase(){
+  const N=NC[lang]||NC.de,today=new Date().toISOString().slice(0,10);
+  $("#vList").hidden=true;const v=$("#vCase");v.hidden=false;cur=null;
+  v.innerHTML=`<button class="pill" onclick="back()">${T("back")}</button>
+  <div class="card"><div class="hdr2"><h2 style="margin:0">${T("newc")}</h2><div style="display:flex;gap:8px"><button class="pill" onclick="back()">${T("cancel")}</button><button class="pill y" id="ncSave">${T("save")}</button></div></div>
+  <div style="margin-top:8px">${chip("new")} <span class="meta">${T("date")}: <input id="nDate" type="date" value="${today}" style="min-width:0;padding:5px 8px;width:150px"></span></div>
+  <div class="grid"><div class="box"><h4><b>1</b>${T("fail")} *</h4><textarea id="nDesc" rows="5"></textarea><div class="lab">${T("serial")}</div><input id="nSer" style="width:100%;box-sizing:border-box"></div>
+  <div class="box"><h4><b>2</b>${T("involved")} *</h4><div class="lab">Innovence</div><input id="nInn" type="email" style="width:100%;box-sizing:border-box" placeholder="${N.ph}" title="${N.innH}"><div class="lab">AES</div><input id="nAes" type="email" style="width:100%;box-sizing:border-box" placeholder="${N.ph}" title="${N.aesH}"></div>
+  <div class="box"><h4><b>3</b>${T("refs")}</h4><div class="lab">${T("proj")}</div><input id="nProj" style="width:100%;box-sizing:border-box"><div class="lab">${T("refNo")}</div><input id="nRef" style="width:100%;box-sizing:border-box"></div></div>
+  <div class="box" style="margin-top:16px"><h4><b>4</b>${T("att")}</h4><div class="lab">${T("sol")}</div><textarea id="nSol" rows="3"></textarea><div class="meta" style="margin-top:8px">${N.hint}</div></div>
+  <div id="ncErr"></div></div>`;
+  $("#ncSave").onclick=createCase;
+}
+async function createCase(){
+  const N=NC[lang]||NC.de,g=i=>$("#"+i).value.trim(),em=x=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x);
+  if(!g("nDesc")||!g("nDate")||!em(g("nInn"))||!em(g("nAes"))){$("#ncErr").innerHTML=`<div class="err">${N.req}</div>`;return}
+  if(!CFG.write){alert(T("nowrite"));return}
+  const body={create:true,fields:{Status:"new",Description:g("nDesc"),"Serial_x0020_number":g("nSer"),"Project_x0020_No_x002e__x0020_In":g("nProj"),"Reference_x0020_No_x002e__x0020_":g("nRef"),Solution:g("nSol"),DateReported:g("nDate")+"T12:00:00Z"},aes:g("nAes"),inn:g("nInn")};
+  const b=$("#ncSave");b.disabled=true;b.textContent=N.busy;
+  try{const r=await fetch(CFG.write,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error("HTTP "+r.status);
+    await load();back()}catch(e){b.disabled=false;b.textContent=T("save");$("#ncErr").innerHTML=`<div class="err">${W("e")}: ${esc(e.message)}</div>`}
 }
 async function save(isNew){
   if(isNew){alert(W("nr"));return}
