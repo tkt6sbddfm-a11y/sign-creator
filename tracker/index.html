@@ -54,6 +54,7 @@ h3{font-size:16px;margin:18px 0 8px}h3 small{font-weight:400;color:var(--g)}
 .closed{border-top:2px dashed #ccc;margin-top:22px;padding-top:6px}
 .crow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin-bottom:6px;display:grid;grid-template-columns:30px 3fr 1fr 1.4fr 1fr 150px 60px;gap:12px;align-items:center;font-size:12px}
 a.open{color:#8a6d00;font-weight:700;cursor:pointer;text-decoration:none}
+.att{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}.att img{height:120px;border-radius:10px;border:1px solid #ddd;cursor:zoom-in;background:#F2F2F0;object-fit:cover}.att a.f{display:inline-block;padding:6px 12px;border-radius:999px;background:#F2F2F0;color:#0D1112;text-decoration:none;font-size:13px}#lb{position:fixed;inset:0;background:rgba(13,17,18,.88);display:flex;align-items:center;justify-content:center;z-index:99;cursor:zoom-out}#lb img{max-width:94vw;max-height:94vh;border-radius:8px}
 .card{background:#fff;border-top:4px solid var(--y);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:22px 26px;margin-top:12px}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
 .box{border:1px solid var(--line);border-radius:14px;padding:16px;background:#fcfcfa}
@@ -112,6 +113,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
   <footer style="margin-top:0;text-align:center;font-size:11px;color:#8a8e92;letter-spacing:.08em;text-transform:uppercase">Track. Resolve. Keep moving. · Innovence Airport Systems GmbH</footer>
 </main>
 <dialog id="dlg"></dialog>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
 <script>
 // ===== Konfiguration =====
 const _h=new URLSearchParams(location.hash.slice(1));
@@ -125,9 +127,9 @@ const CFG={
   sp:"https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/AllItems.aspx"
 };
 const I18={
- de:{sub:"Gewährleistungsfälle · Airsafe / AES · Innovence Airport Systems GmbH",cases:"Fälle",filter:"Filter",search:"Suche (alle Felder)",aes:"Verantwortlich AES",proj:"Projekt-Nr.",since:"Meldedatum ab",status:"Status",all:"– alle –",newc:"+ Neuer Fall",refresh:"Aktualisieren",reset:"Filter zurücksetzen",run:"Laufende Fälle",closed:"Abgeschlossene Fälle",count:(n,t)=>`${t} Fälle · sortiert nach Meldedatum`,open:"Öffnen",date:"Meldedatum",resp:"Verantw. Innovence",back:"‹ Alle Fälle",fail:"Fehler",involved:"Beteiligte",refs:"Referenzen",att:"Anhänge & Lösung",serial:"Seriennummer(n)",sol:"Lösung",files:"Anhänge/Bilder in SharePoint öffnen",edit:"Bearbeiten",save:"Speichern",cancel:"Abbrechen",comment:"Änderungskommentar",refNo:"Referenz-Nr. AES",loading:"Lade Fälle …",nowrite:"Schreib-Flow noch nicht verbunden – Änderungen sind nur Vorschau.",saved:"Gespeichert",notitle:"(ohne Titel)",ms:"Antwortzeit"},
- en:{sub:"Warranty cases · Airsafe / AES · Innovence Airport Systems GmbH",cases:"Cases",filter:"Filter",search:"Search (all fields)",aes:"Responsible AES",proj:"Project no.",since:"Reported since",status:"Status",all:"– all –",newc:"+ New case",refresh:"Refresh",reset:"Reset filter",run:"Open cases",closed:"Closed cases",count:(n,t)=>`${t} cases · sorted by report date`,open:"Open",date:"Reported",resp:"Resp. Innovence",back:"‹ All cases",fail:"Failure",involved:"People involved",refs:"References",att:"Attachments & solution",serial:"Serial number(s)",sol:"Solution",files:"Open attachments/pictures in SharePoint",edit:"Edit",save:"Save",cancel:"Cancel",comment:"Change comment",refNo:"Reference no. AES",loading:"Loading cases …",nowrite:"Write flow not connected yet – changes are preview only.",saved:"Saved",notitle:"(no title)",ms:"Response time"},
- es:{sub:"Casos de garantía · Airsafe / AES · Innovence Airport Systems GmbH",cases:"Casos",filter:"Filtro",search:"Buscar (todos los campos)",aes:"Responsable AES",proj:"N.º de proyecto",since:"Fecha desde",status:"Estado",all:"– todos –",newc:"+ Nuevo caso",refresh:"Actualizar",reset:"Restablecer filtro",run:"Casos abiertos",closed:"Casos cerrados",count:(n,t)=>`${t} casos · ordenado por fecha`,open:"Abrir",date:"Fecha",resp:"Resp. Innovence",back:"‹ Todos los casos",fail:"Fallo",involved:"Implicados",refs:"Referencias",att:"Adjuntos y solución",serial:"N.º de serie",sol:"Solución",files:"Abrir adjuntos/imágenes en SharePoint",edit:"Editar",save:"Guardar",cancel:"Cancelar",comment:"Comentario de cambio",refNo:"N.º de referencia AES",loading:"Cargando casos …",nowrite:"Flujo de escritura no conectado – solo vista previa.",saved:"Guardado",notitle:"(sin título)",ms:"Tiempo"}
+ de:{sub:"Gewährleistungsfälle · Airsafe / AES · Innovence Airport Systems GmbH",cases:"Fälle",filter:"Filter",search:"Suche (alle Felder)",aes:"Verantwortlich AES",proj:"Projekt-Nr.",since:"Meldedatum ab",status:"Status",all:"– alle –",newc:"+ Neuer Fall",refresh:"Aktualisieren",reset:"Filter zurücksetzen",run:"Laufende Fälle",closed:"Abgeschlossene Fälle",count:(n,t)=>`${t} Fälle · sortiert nach Meldedatum`,open:"Öffnen",date:"Meldedatum",resp:"Verantw. Innovence",back:"‹ Alle Fälle",fail:"Fehler",involved:"Beteiligte",refs:"Referenzen",att:"Anhänge & Lösung",serial:"Seriennummer(n)",sol:"Lösung",files:"Anhänge/Bilder in SharePoint öffnen",pics:"Bilder & Anhänge",signin:"Anmelden für Bildvorschau",nopics:"Keine Anhänge vorhanden.",picerr:"Bildvorschau nicht verfügbar – bitte SharePoint-Link nutzen.",edit:"Bearbeiten",save:"Speichern",cancel:"Abbrechen",comment:"Änderungskommentar",refNo:"Referenz-Nr. AES",loading:"Lade Fälle …",nowrite:"Schreib-Flow noch nicht verbunden – Änderungen sind nur Vorschau.",saved:"Gespeichert",notitle:"(ohne Titel)",ms:"Antwortzeit"},
+ en:{sub:"Warranty cases · Airsafe / AES · Innovence Airport Systems GmbH",cases:"Cases",filter:"Filter",search:"Search (all fields)",aes:"Responsible AES",proj:"Project no.",since:"Reported since",status:"Status",all:"– all –",newc:"+ New case",refresh:"Refresh",reset:"Reset filter",run:"Open cases",closed:"Closed cases",count:(n,t)=>`${t} cases · sorted by report date`,open:"Open",date:"Reported",resp:"Resp. Innovence",back:"‹ All cases",fail:"Failure",involved:"People involved",refs:"References",att:"Attachments & solution",serial:"Serial number(s)",sol:"Solution",files:"Open attachments/pictures in SharePoint",pics:"Pictures & attachments",signin:"Sign in for picture preview",nopics:"No attachments.",picerr:"Preview unavailable – please use the SharePoint link.",edit:"Edit",save:"Save",cancel:"Cancel",comment:"Change comment",refNo:"Reference no. AES",loading:"Loading cases …",nowrite:"Write flow not connected yet – changes are preview only.",saved:"Saved",notitle:"(no title)",ms:"Response time"},
+ es:{sub:"Casos de garantía · Airsafe / AES · Innovence Airport Systems GmbH",cases:"Casos",filter:"Filtro",search:"Buscar (todos los campos)",aes:"Responsable AES",proj:"N.º de proyecto",since:"Fecha desde",status:"Estado",all:"– todos –",newc:"+ Nuevo caso",refresh:"Actualizar",reset:"Restablecer filtro",run:"Casos abiertos",closed:"Casos cerrados",count:(n,t)=>`${t} casos · ordenado por fecha`,open:"Abrir",date:"Fecha",resp:"Resp. Innovence",back:"‹ Todos los casos",fail:"Fallo",involved:"Implicados",refs:"Referencias",att:"Adjuntos y solución",serial:"N.º de serie",sol:"Solución",files:"Abrir adjuntos/imágenes en SharePoint",pics:"Imágenes y adjuntos",signin:"Iniciar sesión para vista previa",nopics:"Sin adjuntos.",picerr:"Vista previa no disponible – use el enlace de SharePoint.",edit:"Editar",save:"Guardar",cancel:"Cancelar",comment:"Comentario de cambio",refNo:"N.º de referencia AES",loading:"Cargando casos …",nowrite:"Flujo de escritura no conectado – solo vista previa.",saved:"Guardado",notitle:"(sin título)",ms:"Tiempo"}
 };
 const OPEN=["new","in progress","send back to AES"];
 let lang=localStorage.getItem("wct-lang")||((navigator.language||"").toLowerCase().startsWith("es")?"es":"de"),items=[],cur=null,ms=null;
@@ -180,6 +182,38 @@ function render(){
   $("#legend").innerHTML=STAT.map(x=>chip(x)).join("");
   $("#done").innerHTML=done.map(i=>`<div class="crow"><b>${i.id}</b><span>${esc(i.title||i.desc.split("\n")[0].slice(0,80))}</span><span>${fmt(i.date)}</span><span>${esc(i.innK.join(", "))}</span><span>${esc(i.proj)}</span>${chip(i.status)}<a class="open" onclick="show(${i.id})">${T("open")}</a></div>`).join("");
 }
+
+// ===== Anhänge via Entra (MSAL, nur Lesen) =====
+const AUTH={cid:"aa2de91e-3ed9-411b-bbb5-0d3b1aad730d",tid:"8a82f600-5e7a-4c00-8761-4a13d8e858e3",host:"https://innovencede.sharepoint.com",site:"/sites/IVTeamSharing",list:"warrenty claim Tracker"};
+let _msal=null;const _pic={};
+function getMsal(){if(_msal)return _msal;if(!window.msal)return null;_msal=new window.msal.PublicClientApplication({auth:{clientId:AUTH.cid,authority:"https://login.microsoftonline.com/"+AUTH.tid,redirectUri:location.origin+location.pathname},cache:{cacheLocation:"localStorage"}});return _msal}
+async function tok(interactive){const m=getMsal();if(!m)throw 0;await m.initialize();const req={scopes:[AUTH.host+"/AllSites.Read"]};let a=m.getAllAccounts()[0];
+  if(a){try{return(await m.acquireTokenSilent({...req,account:a})).accessToken}catch(e){}}
+  if(!interactive)return null;
+  return(await m.acquireTokenPopup({...req,loginHint:a?a.username:undefined})).accessToken}
+async function loadAtt(id,interactive){
+  const box=$("#att");if(!box)return;
+  const sp=`<a class="f" target="_blank" href="${CFG.sp}">${T("files")}</a>`;
+  try{
+    const t=await tok(!!interactive);
+    if(!t){box.innerHTML=`<button class="pill y" id="aIn">${T("signin")}</button> ${sp}`;$("#aIn").onclick=()=>loadAtt(id,true);return}
+    box.textContent="…";
+    const api=AUTH.host+AUTH.site+"/_api/web/lists/getbytitle('"+encodeURIComponent(AUTH.list)+"')/items("+id+")/AttachmentFiles";
+    const r=await fetch(api,{headers:{Authorization:"Bearer "+t,Accept:"application/json;odata=nometadata"}});
+    if(!r.ok)throw new Error(r.status);
+    const fl=(await r.json()).value||[];
+    if(!cur||cur.id!=id)return;
+    if(!fl.length){box.innerHTML=`<span class="meta">${T("nopics")}</span>`;return}
+    box.innerHTML="";
+    for(const f of fl){
+      const url=AUTH.host+AUTH.site+"/_api/web/GetFileByServerRelativePath(decodedurl='"+encodeURIComponent(f.ServerRelativeUrl)+"')/$value";
+      if(/\.(jpe?g|png|gif|webp|bmp)$/i.test(f.FileName)){
+        const im=new Image();im.title=f.FileName;box.appendChild(im);
+        fetch(url,{headers:{Authorization:"Bearer "+t}}).then(x=>x.blob()).then(b=>{const u=URL.createObjectURL(b);im.src=u;im.onclick=()=>{const l=document.createElement("div");l.id="lb";l.innerHTML=`<img src="${u}">`;l.onclick=()=>l.remove();document.body.appendChild(l)}}).catch(()=>im.remove());
+      }else{const a=document.createElement("a");a.className="f";a.target="_blank";a.textContent="📎 "+f.FileName;a.href=AUTH.host+f.ServerRelativeUrl;box.appendChild(a)}
+    }
+  }catch(e){box.innerHTML=`<span class="meta">${T("picerr")}</span> ${sp}`;console.warn("att",e)}
+}
 let EDITING=false;
 function show(id,ed){
   cur=items.find(i=>i.id==id);EDITING=!!ed;const E=EDITING;$("#vList").hidden=true;const v=$("#vCase");v.hidden=false;
@@ -189,8 +223,8 @@ function show(id,ed){
   <div class="grid"><div class="box"><h4><b>1</b>${T("fail")}</h4>${E?`<textarea id="eDesc" rows="5">${esc(cur.desc)}</textarea>`:`<div class="val">${esc(cur.desc)}</div>`}<div class="lab">${T("serial")}</div>${E?`<input id="eSer" style="width:100%;box-sizing:border-box" value="${esc(cur.serial)}">`:`<div class="val">${esc(cur.serial.replace(/;/g,"\n"))||"–"}</div>`}</div>
   <div class="box"><h4><b>2</b>${T("involved")}</h4><div class="lab">Innovence</div><div class="chips">${cur.inn.map((n,k)=>`<span class="pill y" title="${esc(n)}">${esc(cur.innK[k])}</span>`).join("")||"–"}</div><div class="lab">AES</div><div class="chips">${cur.aes.map(n=>`<span class="pill y">${esc(n)}</span>`).join("")||"–"}</div></div>
   <div class="box"><h4><b>3</b>${T("refs")}</h4><div class="lab">${T("proj")}</div>${E?`<input id="eProj" style="width:100%;box-sizing:border-box" value="${esc(cur.proj)}">`:`<div class="val">${esc(cur.proj)||"–"}</div>`}<div class="lab">${T("refNo")}</div>${E?`<input id="eRef" style="width:100%;box-sizing:border-box" value="${esc(cur.ref)}">`:`<div class="val">${esc(cur.ref)||"–"}</div>`}</div></div>
-  <div class="box" style="margin-top:16px"><h4><b>4</b>${T("att")}</h4><div class="lab">${T("sol")}</div>${E?`<textarea id="eSol" rows="4">${esc(cur.sol)}</textarea>`:`<div class="val">${esc(cur.sol)||"–"}</div>`}<div class="lab">${T("comment")}</div><div class="val">${esc(cur.cmt)||"–"}</div></div></div>`;
-  scrollTo(0,0);
+  <div class="box" style="margin-top:16px"><h4><b>4</b>${T("att")}</h4><div class="lab">${T("sol")}</div>${E?`<textarea id="eSol" rows="4">${esc(cur.sol)}</textarea>`:`<div class="val">${esc(cur.sol)||"–"}</div>`}<div class="lab">${T("comment")}</div><div class="val">${esc(cur.cmt)||"–"}</div><div class="lab">${T("pics")}</div><div id="att" class="att"></div></div></div>`;
+  scrollTo(0,0);if(!E)loadAtt(cur.id);
 }
 function back(){$("#vCase").hidden=true;$("#vList").hidden=false}
 const STAT=["new","in progress","send back to AES","send repaired back to Innovence","irremediable"];
