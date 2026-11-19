@@ -129,7 +129,7 @@ const I18={
  es:{sub:"Casos de garantía · Airsafe / GOMINTEC · Innovence Airport Systems GmbH",cases:"Casos",filter:"Filtro",search:"Buscar (todos los campos)",aes:"Responsable AES",proj:"N.º de proyecto",since:"Fecha desde",status:"Estado",all:"– todos –",newc:"+ Nuevo caso",refresh:"Actualizar",reset:"Restablecer filtro",run:"Casos abiertos",closed:"Casos cerrados",count:(n,t)=>`${t} casos · ordenado por fecha`,open:"Abrir",date:"Fecha",resp:"Resp. Innovence",back:"‹ Todos los casos",fail:"Fallo",involved:"Implicados",refs:"Referencias",att:"Adjuntos y solución",serial:"N.º de serie",sol:"Solución",files:"Abrir adjuntos/imágenes en SharePoint",edit:"Editar",save:"Guardar",cancel:"Cancelar",comment:"Comentario de cambio",refNo:"N.º de referencia AES",loading:"Cargando casos …",nowrite:"Flujo de escritura no conectado – solo vista previa.",saved:"Guardado",notitle:"(sin título)",ms:"Tiempo"}
 };
 const OPEN=["new","in progress","send back to AES"];
-let lang=localStorage.getItem("wct-lang")||"de",items=[],cur=null,ms=null;
+let lang=localStorage.getItem("wct-lang")||((navigator.language||"").toLowerCase().startsWith("es")?"es":"de"),items=[],cur=null,ms=null;
 const $=s=>document.querySelector(s),T=k=>I18[lang][k];
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pick=(o,p)=>{const k=Object.keys(o).find(k=>k.startsWith(p));return k?o[k]:undefined};
