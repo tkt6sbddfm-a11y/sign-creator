@@ -94,7 +94,6 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
     <div class="filter">
       <h2 data-t="filter"></h2>
       <label class="f"><span data-t="search"></span><input id="fSearch"></label>
-      <label class="f"><span data-t="aes"></span><select id="fAes"></select></label>
       <label class="f"><span data-t="proj"></span><select id="fProj"></select></label>
       <label class="f"><span data-t="since"></span><input id="fSince" type="date"></label>
       <label class="f"><span data-t="status"></span><select id="fStatus"></select></label>
@@ -151,15 +150,14 @@ async function load(){
   fill();render();
 }
 function fill(){
-  const keep=[$("#fAes").value,$("#fProj").value,$("#fStatus").value];
+  const keep=["",$("#fProj").value,$("#fStatus").value];
   const opt=(a,v)=>`<option value="">${T("all")}</option>`+[...new Set(a)].sort().map(x=>`<option${x==v?" selected":""}>${esc(x)}</option>`).join("");
-  $("#fAes").innerHTML=opt(items.flatMap(i=>i.aes),keep[0]);
   $("#fProj").innerHTML=opt(items.map(i=>i.proj).filter(Boolean),keep[1]);
   $("#fStatus").innerHTML=`<option value="">${T("all")}</option>`+[...new Set(items.map(i=>i.status))].sort().map(x=>`<option value="${esc(x)}"${x==keep[2]?" selected":""}>${esc(sl(x))}</option>`).join("");
 }
 function filtered(){
-  const q=$("#fSearch").value.toLowerCase(),a=$("#fAes").value,p=$("#fProj").value,s=$("#fStatus").value,d=$("#fSince").value;
-  return items.filter(i=>(!q||[i.title,i.desc,i.serial,i.ref,i.proj,i.sol,i.aes.join(" "),i.inn.join(" ")].join(" ").toLowerCase().includes(q))&&(!a||i.aes.includes(a))&&(!p||i.proj==p)&&(!s||i.status==s)&&(!d||i.date>=d)).sort((x,y)=>y.date.localeCompare(x.date)||y.id-x.id);
+  const q=$("#fSearch").value.toLowerCase(),p=$("#fProj").value,s=$("#fStatus").value,d=$("#fSince").value;
+  return items.filter(i=>(!q||[i.id,i.title,i.desc,i.serial,i.ref,i.proj,i.sol,i.cmt,i.status,sl(i.status),fmt(i.date),i.date,i.aes.join(" "),i.aesN.join(" "),i.inn.join(" ")].join(" ").toLowerCase().includes(q))&&(!p||i.proj==p)&&(!s||i.status==s)&&(!d||i.date>=d)).sort((x,y)=>y.date.localeCompare(x.date)||y.id-x.id);
 }
 function render(){
   document.documentElement.lang=lang;
@@ -223,8 +221,8 @@ async function save(isNew){
     ms=Math.round(performance.now()-t);$("#dlg").close();await load();if(!isNew)show(body.id)}catch(e){alert("Fehler: "+e.message)}
 }
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.dataset.l;localStorage.setItem("wct-lang",lang);fill();render();if(!$("#vCase").hidden)show(cur.id)});
-["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
-$("#bReset").onclick=()=>{["fSearch","fAes","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
+["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
+$("#bReset").onclick=()=>{["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
 $("#bRefresh").onclick=load;$("#bNew").onclick=()=>window.open("https://innovencede.sharepoint.com/sites/IVTeamSharing/Lists/warrenty%20claim%20Tracker/NewForm.aspx","_blank");
 const _t0=Date.now();setTimeout(()=>{$("#intro").classList.add("gone");$("#splash").classList.add("on")},3700);load().finally(()=>setTimeout(()=>$("#splash").classList.add("off"),Math.max(0,5200-(Date.now()-_t0))));
 </script>
