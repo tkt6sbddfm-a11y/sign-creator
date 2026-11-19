@@ -68,7 +68,7 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 #intro.gone{display:none}
 @keyframes iflash{0%{opacity:0}2%{opacity:1}6%{opacity:0}10%{opacity:0}12%{opacity:1}16%{opacity:0}20%{opacity:0}22%{opacity:1}64%{opacity:1}100%{opacity:0}}
 #splash{position:fixed;inset:0;z-index:99;background:#fff;display:none;flex-direction:column;align-items:center;padding-top:90px;transition:opacity 1.6s ease}
-#splash.on{display:flex;animation:sin .5s ease-out both}
+#splash.on{display:flex;animation:sin .5s ease-out backwards}
 @keyframes sin{from{opacity:0}to{opacity:1}}
 #splash h1{margin:0;width:100%;text-align:center;white-space:nowrap;font:700 4.4vw/1.1 "Neo Sans Std","Lato","Segoe UI",system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#0D1112}
 #splash img{margin-top:3vw;width:min(34vw,420px);height:auto}
