@@ -187,9 +187,11 @@ function render(){
 const AUTH={cid:"aa2de91e-3ed9-411b-bbb5-0d3b1aad730d",tid:"8a82f600-5e7a-4c00-8761-4a13d8e858e3",host:"https://innovencede.sharepoint.com",site:"/sites/IVTeamSharing",list:"warrenty claim Tracker"};
 let _msal=null;const _pic={};
 function getMsal(){if(_msal)return _msal;if(!window.msal)return null;_msal=new window.msal.PublicClientApplication({auth:{clientId:AUTH.cid,authority:"https://login.microsoftonline.com/"+AUTH.tid,redirectUri:location.origin+location.pathname},cache:{cacheLocation:"localStorage"}});return _msal}
-async function tok(interactive){const m=getMsal();if(!m)throw 0;await m.initialize();const req={scopes:[AUTH.host+"/AllSites.Read"]};let a=m.getAllAccounts()[0];
+async function tok(interactive){const m=getMsal();if(!m)throw 0;await m.initialize();await m.handleRedirectPromise().catch(()=>{});const req={scopes:[AUTH.host+"/AllSites.Read"]};let a=m.getAllAccounts()[0];
   if(a){try{return(await m.acquireTokenSilent({...req,account:a})).accessToken}catch(e){}}
   if(!interactive)return null;
+  const top=window.top===window;
+  if(top){try{sessionStorage.setItem("wct-case",String(cur&&cur.id||""))}catch(e){}await m.acquireTokenRedirect({...req,loginHint:a?a.username:undefined});return null}
   return(await m.acquireTokenPopup({...req,loginHint:a?a.username:undefined})).accessToken}
 async function loadAtt(id,interactive){
   const box=$("#att");if(!box)return;
@@ -291,7 +293,7 @@ document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>{lang=b.datas
 ["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).addEventListener("input",render));
 $("#bReset").onclick=()=>{["fSearch","fProj","fSince","fStatus"].forEach(i=>$("#"+i).value="");render()};
 $("#bRefresh").onclick=load;$("#bNew").onclick=newCase;
-setTimeout(()=>$("#intro").classList.add("gone"),3200);load().then(()=>{if(_new)newCase()});
+setTimeout(()=>$("#intro").classList.add("gone"),3200);load().then(async()=>{if(_new)newCase();let c="";try{c=sessionStorage.getItem("wct-case")||"";sessionStorage.removeItem("wct-case")}catch(e){}if(c&&items.find(i=>i.id==c)){show(c);loadAtt(c)}});
 </script>
 </body>
 </html>
